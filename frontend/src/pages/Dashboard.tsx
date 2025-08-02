@@ -280,62 +280,65 @@ const Dashboard: React.FC = () => {
         </div>
 
         {/* Messages - Scrollable Area */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent hover:scrollbar-thumb-white/30">
-          {messages.length === 0 ? (
-            <div className="text-center text-white/50 mt-20">
-              <MessageCircle className="h-16 w-16 mx-auto mb-4 opacity-50" />
-              <h3 className="text-xl font-medium mb-2">Start a conversation</h3>
-              <p>Ask me anything and I'll help you with detailed responses.</p>
-            </div>
-          ) : (
-            messages.map((message, index) => (
-              <div
-                key={index}
-                className={`flex ${
-                  message.role === "user" ? "justify-end" : "justify-start"
-                }`}
-              >
+        <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent hover:scrollbar-thumb-white/30">
+          <div className="max-w-4xl mx-auto p-4 space-y-4">
+            {messages.length === 0 ? (
+              <div className="text-center text-white/50 mt-20">
+                <MessageCircle className="h-16 w-16 mx-auto mb-4 opacity-50" />
+                <h3 className="text-xl font-medium mb-2">
+                  Start a conversation
+                </h3>
+                <p>
+                  Ask me anything and I'll help you with detailed responses.
+                </p>
+              </div>
+            ) : (
+              messages.map((message, index) => (
                 <div
-                  className={`max-w-3xl p-4 rounded-lg ${
-                    message.role === "user"
-                      ? "bg-primary-600 text-white"
-                      : "bg-white/10 backdrop-blur-sm text-white"
+                  key={index}
+                  className={`flex ${
+                    message.role === "user" ? "justify-end" : "justify-start"
                   }`}
                 >
-                  <p className="whitespace-pre-wrap">{message.content}</p>
+                  <div
+                    className={`max-w-3xl p-4 rounded-lg ${
+                      message.role === "user"
+                        ? "bg-primary-600 text-white"
+                        : "bg-white/10 backdrop-blur-sm text-white"
+                    }`}
+                  >
+                    <p className="whitespace-pre-wrap">{message.content}</p>
+                  </div>
                 </div>
-              </div>
-            ))
-          )}
+              ))
+            )}
 
-          {loading && (
-            <div className="flex justify-start">
-              <div className="bg-white/10 backdrop-blur-sm text-white p-4 rounded-lg">
-                <div className="flex items-center space-x-2">
-                  <div className="animate-pulse">Thinking...</div>
-                  <div className="flex space-x-1">
-                    <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce"></div>
-                    <div
-                      className="w-2 h-2 bg-white/60 rounded-full animate-bounce"
-                      style={{ animationDelay: "0.1s" }}
-                    ></div>
-                    <div
-                      className="w-2 h-2 bg-white/60 rounded-full animate-bounce"
-                      style={{ animationDelay: "0.2s" }}
-                    ></div>
+            {loading && (
+              <div className="flex justify-start">
+                <div className="bg-white/10 backdrop-blur-sm text-white p-4 rounded-lg">
+                  <div className="flex items-center space-x-2">
+                    <div className="animate-pulse">Thinking...</div>
+                    <div className="flex space-x-1">
+                      <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce"></div>
+                      <div
+                        className="w-2 h-2 bg-white/60 rounded-full animate-bounce"
+                        style={{ animationDelay: "0.1s" }}
+                      ></div>
+                      <div
+                        className="w-2 h-2 bg-white/60 rounded-full animate-bounce"
+                        style={{ animationDelay: "0.2s" }}
+                      ></div>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
         {/* Enhanced Premium Input Area - Fixed at bottom */}
-        <div className="p-6 bg-white/5 backdrop-blur-xl border-t border-white/10 relative">
-          {/* Subtle gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-white/5 to-transparent pointer-events-none"></div>
-
-          <div className="relative max-w-4xl mx-auto">
+        <div className="p-4 bg-white/5 backdrop-blur-sm border-t border-white/10">
+          <div className="max-w-4xl mx-auto">
             <div className="flex items-end space-x-4">
               {/* Main Input Container */}
               <div className="flex-1 relative">
