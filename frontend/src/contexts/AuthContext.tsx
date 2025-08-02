@@ -85,7 +85,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
 
       console.log("🔍 Token found, checking authentication...");
-      const response = await api.get("/auth/me");
+      const response = await api.get("/api/auth/me");
       console.log("✅ User authenticated:", response.data.user.email);
       setUser(response.data.user);
     } catch (error) {
@@ -101,7 +101,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
       setIsLoading(true);
-      const response = await api.post("/auth/signin", { email, password });
+      const response = await api.post("/api/auth/signin", { email, password });
       const { user, token } = response.data;
 
       // Store token in localStorage
@@ -128,7 +128,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   ): Promise<boolean> => {
     try {
       setIsLoading(true);
-      const response = await api.post("/auth/signup", {
+      const response = await api.post("/api/auth/signup", {
         name: username,
         email,
         password,
@@ -157,7 +157,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     try {
       setIsLoggingOut(true);
-      await api.post("/auth/logout");
+      await api.post("/api/auth/logout");
     } catch (error) {
       console.error("Logout error:", error);
     } finally {
@@ -186,8 +186,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const googleLogin = () => {
     // Redirect to Google OAuth endpoint
     window.location.href = `${
-      import.meta.env.VITE_API_BASE_URL || "http://localhost:5001/api"
-    }/auth/google`;
+      import.meta.env.VITE_API_BASE_URL || "http://localhost:5001"
+    }/api/auth/google`;
   };
 
   useEffect(() => {

@@ -25,7 +25,7 @@ export class ChatService {
               content: message,
             },
           ],
-          max_tokens: message.length > 500 ? 800 : 1000,
+          max_tokens: message.length > 500 ? 500 : 700,
           temperature: 0.7,
         }),
       });
@@ -36,6 +36,10 @@ export class ChatService {
 
         if (response.status === 401) {
           throw createError('Invalid API key', 401);
+        }
+
+        if (response.status === 402) {
+          throw createError('Insufficient credits in OpenRouter account. Please add more credits at https://openrouter.ai/settings/credits', 402);
         }
 
         if (response.status === 429) {
