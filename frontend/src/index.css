@@ -3,9 +3,6 @@
 @tailwind utilities;
 
 @layer base {
-  * {
-    @apply border-border;
-  }
   body {
     @apply bg-gradient-to-br from-primary-900 via-secondary-500 to-secondary-600;
     min-height: 100vh;

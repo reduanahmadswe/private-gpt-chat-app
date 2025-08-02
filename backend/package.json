@@ -6,8 +6,7 @@
   "scripts": {
     "start": "node dist/app.js",
     "dev": "nodemon src/app.ts",
-    "build": "tsc",
-    "postbuild": "copyfiles -u 1 src/**/*.json dist/"
+    "build": "tsc"
   },
   "dependencies": {
     "express": "^4.18.2",
