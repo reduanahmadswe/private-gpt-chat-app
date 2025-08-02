@@ -33,9 +33,9 @@ const SignIn: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#030637] via-[#1a1a2e] to-[#3C0753] flex flex-col font-sans">
+    <div className="min-h-screen bg-[#030637] flex flex-col font-sans">
       {/* Header with Navigation */}
-      <header className="bg-gradient-to-r from-[#030637]/95 via-[#16213e]/95 to-[#3C0753]/95 backdrop-blur-xl border-b border-white/10 shadow-2xl shadow-black/20">
+      <header className="bg-[#030637]/95 backdrop-blur-xl border-b border-white/10 shadow-2xl shadow-black/20">
         <div className="container mx-auto px-6">
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
@@ -75,27 +75,27 @@ const SignIn: React.FC = () => {
 
           <form onSubmit={handleSubmit} className="space-y-8">
             <div className="relative">
-              <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#E0E0E0]/60" />
+              <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#E0E0E0]/60 transition-colors duration-300" />
               <input
                 type="email"
                 name="email"
                 placeholder="Email Address"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full px-6 py-4 pl-12 bg-[#030637]/50 text-white placeholder-[#E0E0E0]/60 rounded-2xl border border-white/10 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:border-transparent backdrop-blur-sm transition-all duration-300 font-light"
+                className="w-full px-6 py-4 pl-12 bg-white/5 hover:bg-white/10 text-white placeholder-[#E0E0E0]/60 rounded-2xl border border-white/20 hover:border-[#00f5ff]/50 focus:outline-none focus:ring-2 focus:ring-[#00f5ff]/50 focus:border-[#00f5ff]/50 focus:bg-white/10 backdrop-blur-sm transition-all duration-300 font-light shadow-lg hover:shadow-[#00f5ff]/10 focus:shadow-[#00f5ff]/20"
                 required
               />
             </div>
 
             <div className="relative">
-              <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#E0E0E0]/60" />
+              <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#E0E0E0]/60 transition-colors duration-300" />
               <input
                 type="password"
                 name="password"
                 placeholder="Password"
                 value={formData.password}
                 onChange={handleChange}
-                className="w-full px-6 py-4 pl-12 bg-[#030637]/50 text-white placeholder-[#E0E0E0]/60 rounded-2xl border border-white/10 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:border-transparent backdrop-blur-sm transition-all duration-300 font-light"
+                className="w-full px-6 py-4 pl-12 bg-white/5 hover:bg-white/10 text-white placeholder-[#E0E0E0]/60 rounded-2xl border border-white/20 hover:border-[#00f5ff]/50 focus:outline-none focus:ring-2 focus:ring-[#00f5ff]/50 focus:border-[#00f5ff]/50 focus:bg-white/10 backdrop-blur-sm transition-all duration-300 font-light shadow-lg hover:shadow-[#00f5ff]/10 focus:shadow-[#00f5ff]/20"
                 required
                 minLength={6}
               />

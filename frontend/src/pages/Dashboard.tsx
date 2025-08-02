@@ -699,7 +699,7 @@ const Dashboard: React.FC = () => {
         </div>
 
         {/* Messages - Scrollable Area */}
-        <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent hover:scrollbar-thumb-white/30 pb-24 lg:pb-32">
+        <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent hover:scrollbar-thumb-white/30">
           <div className="max-w-4xl lg:max-w-5xl mx-auto p-4 lg:p-6 space-y-4 lg:space-y-6">
             {messages.length === 0 ? (
               <div className="text-center mt-12 lg:mt-20">
@@ -806,13 +806,9 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Input Area - Fixed at Bottom */}
-        <div
-          className={`fixed bottom-0 p-4 lg:p-6 bg-gradient-to-t from-[#030637] via-[#1a1a2e]/95 to-transparent backdrop-blur-xl border-t border-white/10 z-20 transition-all duration-300 ${
-            showSettings ? "lg:right-96" : "right-0"
-          } left-64 lg:left-80`}
-        >
-          <div className="max-w-4xl mx-auto">
+        {/* Input Area - Integrated */}
+        <div className="p-4 lg:p-6 border-t border-white/10 bg-gradient-to-t from-[#030637] via-[#1a1a2e]/95 to-transparent backdrop-blur-xl">
+          <div className="max-w-4xl lg:max-w-4xl mx-auto">
             <div className="bg-gradient-to-r from-white/5 to-white/10 backdrop-blur-xl rounded-2xl lg:rounded-3xl border border-white/20 shadow-2xl shadow-black/20 p-2">
               <div className="flex items-end space-x-2 lg:space-x-4">
                 {/* Input field */}

@@ -28,7 +28,7 @@ export class ChatService {
               content: message,
             },
           ],
-          max_tokens: 1500,
+          max_tokens: message.length > 500 ? 800 : 1000,
           temperature: 0.7,
         }),
       });
