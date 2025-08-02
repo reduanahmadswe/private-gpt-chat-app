@@ -142,11 +142,11 @@ const Dashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex">
-      {/* Sidebar */}
-      <div className="w-80 bg-white/5 backdrop-blur-sm border-r border-white/10 flex flex-col">
+    <div className="min-h-screen flex overflow-hidden">
+      {/* Sidebar - Fixed Full Height */}
+      <div className="w-80 bg-white/5 backdrop-blur-sm border-r border-white/10 flex flex-col fixed left-0 top-0 h-full z-10">
         {/* Header */}
-        <div className="p-4 border-b border-white/10">
+        <div className="p-4 border-b border-white/10 flex-shrink-0">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold text-white">Private GPT</h2>
             <button
@@ -163,84 +163,95 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Chat List */}
-        <div className="flex-1 overflow-y-auto p-4">
+        {/* Chat List - Scrollable Area */}
+        <div className="flex-1 overflow-y-auto p-4 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent hover:scrollbar-thumb-white/30">
           <div className="space-y-2">
-            {chats.map((chat) => (
-              <div
-                key={chat._id}
-                className={`group p-3 rounded-lg cursor-pointer transition-all duration-200 ${
-                  currentChat?._id === chat._id
-                    ? "bg-primary-600/20 border border-primary-500/30"
-                    : "hover:bg-white/5"
-                }`}
-                onClick={() => selectChat(chat)}
-              >
-                <div className="flex items-center justify-between">
-                  {editingTitle === chat._id ? (
-                    <input
-                      type="text"
-                      value={newTitle}
-                      onChange={(e) => setNewTitle(e.target.value)}
-                      onBlur={() => updateChatTitle(chat._id, newTitle)}
-                      onKeyPress={(e) =>
-                        e.key === "Enter" && updateChatTitle(chat._id, newTitle)
-                      }
-                      className="bg-transparent text-white text-sm outline-none flex-1"
-                      autoFocus
-                    />
-                  ) : (
-                    <h3 className="text-white text-sm font-medium truncate flex-1">
-                      {chat.title || "New Chat"}
-                    </h3>
-                  )}
-
-                  <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setEditingTitle(chat._id);
-                        setNewTitle(chat.title || "");
-                      }}
-                      className="p-1 hover:bg-white/10 rounded"
-                      title="Edit title"
-                    >
-                      <Edit2 className="h-3 w-3 text-white/60" />
-                    </button>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        shareChat(chat._id);
-                      }}
-                      className="p-1 hover:bg-white/10 rounded"
-                      title="Share chat"
-                    >
-                      <Share2 className="h-3 w-3 text-white/60" />
-                    </button>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        deleteChat(chat._id);
-                      }}
-                      className="p-1 hover:bg-white/10 rounded"
-                      title="Delete chat"
-                    >
-                      <Trash2 className="h-3 w-3 text-white/60" />
-                    </button>
-                  </div>
-                </div>
-
-                <p className="text-white/50 text-xs mt-1 truncate">
-                  {chat.messages[chat.messages.length - 1]?.content ||
-                    "No messages yet"}
+            {chats.length === 0 ? (
+              <div className="text-center text-white/50 py-8">
+                <MessageCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                <p className="text-sm">No chats yet</p>
+                <p className="text-xs">
+                  Start a conversation to see your chats here
                 </p>
               </div>
-            ))}
+            ) : (
+              chats.map((chat) => (
+                <div
+                  key={chat._id}
+                  className={`group p-3 rounded-lg cursor-pointer transition-all duration-200 ${
+                    currentChat?._id === chat._id
+                      ? "bg-primary-600/20 border border-primary-500/30"
+                      : "hover:bg-white/5"
+                  }`}
+                  onClick={() => selectChat(chat)}
+                >
+                  <div className="flex items-center justify-between">
+                    {editingTitle === chat._id ? (
+                      <input
+                        type="text"
+                        value={newTitle}
+                        onChange={(e) => setNewTitle(e.target.value)}
+                        onBlur={() => updateChatTitle(chat._id, newTitle)}
+                        onKeyPress={(e) =>
+                          e.key === "Enter" &&
+                          updateChatTitle(chat._id, newTitle)
+                        }
+                        className="bg-transparent text-white text-sm outline-none flex-1"
+                        autoFocus
+                      />
+                    ) : (
+                      <h3 className="text-white text-sm font-medium truncate flex-1">
+                        {chat.title || "New Chat"}
+                      </h3>
+                    )}
+
+                    <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditingTitle(chat._id);
+                          setNewTitle(chat.title || "");
+                        }}
+                        className="p-1 hover:bg-white/10 rounded"
+                        title="Edit title"
+                      >
+                        <Edit2 className="h-3 w-3 text-white/60" />
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          shareChat(chat._id);
+                        }}
+                        className="p-1 hover:bg-white/10 rounded"
+                        title="Share chat"
+                      >
+                        <Share2 className="h-3 w-3 text-white/60" />
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          deleteChat(chat._id);
+                        }}
+                        className="p-1 hover:bg-white/10 rounded"
+                        title="Delete chat"
+                      >
+                        <Trash2 className="h-3 w-3 text-white/60" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <p className="text-white/50 text-xs mt-1 truncate">
+                    {chat.messages[chat.messages.length - 1]?.content ||
+                      "No messages yet"}
+                  </p>
+                </div>
+              ))
+            )}
           </div>
         </div>
 
         {/* Bottom Actions */}
-        <div className="p-4 border-t border-white/10 space-y-2">
+        <div className="p-4 border-t border-white/10 space-y-2 flex-shrink-0">
           <Link
             to="/settings"
             className="flex items-center space-x-2 p-2 rounded-lg hover:bg-white/5 text-white/70 hover:text-white transition-colors"
@@ -259,17 +270,17 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col">
+      {/* Main Chat Area - Offset by sidebar width */}
+      <div className="flex-1 flex flex-col ml-80 h-screen">
         {/* Chat Header */}
-        <div className="p-4 border-b border-white/10 bg-white/5 backdrop-blur-sm">
+        <div className="p-4 border-b border-white/10 bg-white/5 backdrop-blur-sm flex-shrink-0">
           <h1 className="text-xl font-semibold text-white">
             {currentChat?.title || "New Chat"}
           </h1>
         </div>
 
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {/* Messages - Scrollable Area */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent hover:scrollbar-thumb-white/30">
           {messages.length === 0 ? (
             <div className="text-center text-white/50 mt-20">
               <MessageCircle className="h-16 w-16 mx-auto mb-4 opacity-50" />
@@ -319,25 +330,102 @@ const Dashboard: React.FC = () => {
           )}
         </div>
 
-        {/* Input Area */}
-        <div className="p-4 border-t border-white/10 bg-white/5 backdrop-blur-sm">
-          <div className="flex space-x-4">
-            <input
-              type="text"
-              value={inputMessage}
-              onChange={(e) => setInputMessage(e.target.value)}
-              onKeyPress={(e) => e.key === "Enter" && !loading && sendMessage()}
-              placeholder="Type your message..."
-              className="flex-1 input-field"
-              disabled={loading}
-            />
-            <button
-              onClick={sendMessage}
-              disabled={loading || !inputMessage.trim()}
-              className="btn-primary p-3 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <Send className="h-5 w-5" />
-            </button>
+        {/* Enhanced Premium Input Area - Fixed at bottom */}
+        <div className="p-6 bg-white/5 backdrop-blur-xl border-t border-white/10 relative">
+          {/* Subtle gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-white/5 to-transparent pointer-events-none"></div>
+
+          <div className="relative max-w-4xl mx-auto">
+            <div className="flex items-end space-x-4">
+              {/* Main Input Container */}
+              <div className="flex-1 relative">
+                <div className="relative bg-white/10 backdrop-blur-md rounded-full border border-white/20 shadow-2xl hover:shadow-3xl transition-all duration-300 focus-within:ring-2 focus-within:ring-primary-500/50 focus-within:border-primary-400/50 focus-within:bg-white/15">
+                  <input
+                    type="text"
+                    value={inputMessage}
+                    onChange={(e) => setInputMessage(e.target.value)}
+                    onKeyPress={(e) =>
+                      e.key === "Enter" && !loading && sendMessage()
+                    }
+                    placeholder="Type your message..."
+                    className="w-full px-6 py-4 bg-transparent text-white placeholder-white/60 rounded-full focus:outline-none text-base font-medium resize-none"
+                    style={{
+                      textShadow: "0 1px 2px rgba(0,0,0,0.1)",
+                      WebkitTextFillColor: "white",
+                    }}
+                    disabled={loading}
+                  />
+
+                  {/* Inner glow effect */}
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-r from-primary-500/10 via-transparent to-primary-500/10 opacity-0 focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+
+                  {/* Subtle inner shadow */}
+                  <div
+                    className="absolute inset-0 rounded-full shadow-inner pointer-events-none"
+                    style={{
+                      boxShadow:
+                        "inset 0 2px 4px rgba(0,0,0,0.1), inset 0 -1px 2px rgba(255,255,255,0.05)",
+                    }}
+                  ></div>
+                </div>
+              </div>
+
+              {/* Premium Send Button */}
+              <div className="relative">
+                <button
+                  onClick={sendMessage}
+                  disabled={loading || !inputMessage.trim()}
+                  className="group relative w-14 h-14 bg-gradient-to-r from-primary-600 via-primary-500 to-primary-600 hover:from-primary-500 hover:to-primary-700 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed disabled:transform-none hover:scale-105 active:scale-95"
+                  style={{
+                    boxShadow:
+                      "0 8px 32px rgba(94, 115, 255, 0.3), 0 4px 16px rgba(0,0,0,0.2)",
+                  }}
+                >
+                  {/* Glass overlay effect */}
+                  <div className="absolute inset-0 rounded-full bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+                  {/* Inner highlight */}
+                  <div className="absolute inset-0.5 rounded-full bg-gradient-to-b from-white/20 to-transparent"></div>
+
+                  {/* Icon Container */}
+                  <div className="relative z-10 flex items-center justify-center h-full">
+                    {loading ? (
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    ) : (
+                      <Send className="h-5 w-5 text-white transform translate-x-0.5 group-hover:translate-x-1 transition-transform duration-200" />
+                    )}
+                  </div>
+
+                  {/* Pulse effect when loading */}
+                  {loading && (
+                    <div className="absolute inset-0 rounded-full bg-primary-500/50 animate-pulse"></div>
+                  )}
+                </button>
+
+                {/* Button glow effect */}
+                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-primary-500 to-primary-600 blur-xl opacity-30 group-hover:opacity-50 transition-opacity duration-300 -z-10"></div>
+              </div>
+            </div>
+
+            {/* Typing indicator or character count could go here */}
+            {loading && (
+              <div className="mt-3 flex items-center justify-center">
+                <div className="flex items-center space-x-2 text-white/60 text-sm">
+                  <div className="flex space-x-1">
+                    <div className="w-2 h-2 bg-primary-400 rounded-full animate-bounce"></div>
+                    <div
+                      className="w-2 h-2 bg-primary-400 rounded-full animate-bounce"
+                      style={{ animationDelay: "0.1s" }}
+                    ></div>
+                    <div
+                      className="w-2 h-2 bg-primary-400 rounded-full animate-bounce"
+                      style={{ animationDelay: "0.2s" }}
+                    ></div>
+                  </div>
+                  <span className="font-medium">AI is thinking...</span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
