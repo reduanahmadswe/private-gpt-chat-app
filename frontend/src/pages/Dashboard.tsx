@@ -1,4 +1,5 @@
 import {
+  Bold,
   Edit2,
   LogOut,
   MessageCircle,
@@ -148,7 +149,9 @@ const Dashboard: React.FC = () => {
         {/* Header */}
         <div className="p-4 border-b border-white/10 flex-shrink-0">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-white">Private GPT</h2>
+            <h2 className="text-xl font-semibold text-white">
+              <span className="text-blue-600 font-bold">Ai </span>Bondhu
+            </h2>
             <button
               onClick={startNewChat}
               className="btn-primary p-2"
@@ -273,14 +276,14 @@ const Dashboard: React.FC = () => {
       {/* Main Chat Area - Offset by sidebar width */}
       <div className="flex-1 flex flex-col ml-80 h-screen">
         {/* Chat Header */}
-        {/* <div className="p-4 border-b border-white/10 bg-white/5 backdrop-blur-sm flex-shrink-0">
+        <div className="p-4 border-b border-white/10 bg-white/5 backdrop-blur-sm flex-shrink-0">
           <h1 className="text-xl font-semibold text-white">
             {currentChat?.title || "New Chat"}
           </h1>
-        </div> */}
+        </div>
 
         {/* Messages - Scrollable Area */}
-        <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent hover:scrollbar-thumb-white/30">
+        <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent hover:scrollbar-thumb-white/30 pb-28">
           <div className="max-w-4xl mx-auto p-4 space-y-4">
             {messages.length === 0 ? (
               <div className="text-center text-white/50 mt-20">
@@ -303,7 +306,7 @@ const Dashboard: React.FC = () => {
                   <div
                     className={`max-w-3xl p-4 rounded-lg ${
                       message.role === "user"
-                        ? "bg-primary-600 text-white"
+                        ? "bg-white/5 text-white"
                         : "bg-white/10 backdrop-blur-sm text-white"
                     }`}
                   >
@@ -336,101 +339,70 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Enhanced Premium Input Area - Fixed at bottom */}
-        <div className="p-4 bg-white/5 backdrop-blur-sm border-t border-white/10">
-          <div className="max-w-4xl mx-auto">
-            <div className="flex items-end space-x-4">
-              {/* Main Input Container */}
+        {/* Input Area */}
+  
+        <div className="bottom-0 left-80 right-0 p-4 z-20">
+          <div className="max-w-3xl mx-auto">
+            <div className="flex items-center space-x-4">
+              {/* Input field */}
               <div className="flex-1 relative">
-                <div className="relative bg-white/10 backdrop-blur-md rounded-full border border-white/20 shadow-2xl hover:shadow-3xl transition-all duration-300 focus-within:ring-2 focus-within:ring-primary-500/50 focus-within:border-primary-400/50 focus-within:bg-white/15">
-                  <input
-                    type="text"
-                    value={inputMessage}
-                    onChange={(e) => setInputMessage(e.target.value)}
-                    onKeyPress={(e) =>
-                      e.key === "Enter" && !loading && sendMessage()
-                    }
-                    placeholder="Type your message..."
-                    className="w-full px-6 py-4 bg-transparent text-white placeholder-white/60 rounded-full focus:outline-none text-base font-medium resize-none"
-                    style={{
-                      textShadow: "0 1px 2px rgba(0,0,0,0.1)",
-                      WebkitTextFillColor: "white",
-                    }}
-                    disabled={loading}
-                  />
-
-                  {/* Inner glow effect */}
-                  <div className="absolute inset-0 rounded-full bg-gradient-to-r from-primary-500/10 via-transparent to-primary-500/10 opacity-0 focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-
-                  {/* Subtle inner shadow */}
-                  <div
-                    className="absolute inset-0 rounded-full shadow-inner pointer-events-none"
-                    style={{
-                      boxShadow:
-                        "inset 0 2px 4px rgba(0,0,0,0.1), inset 0 -1px 2px rgba(255,255,255,0.05)",
-                    }}
-                  ></div>
-                </div>
+                <input
+                  type="text"
+                  value={inputMessage}
+                  onChange={(e) => setInputMessage(e.target.value)}
+                  onKeyPress={(e) =>
+                    e.key === "Enter" && !loading && sendMessage()
+                  }
+                  placeholder="Type your message..."
+                  className="w-full px-6 py-4 bg-white/5 text-white placeholder-gray-400 rounded-2xl border border-[#910A67] focus:outline-none focus:ring-2 focus:ring-[#910A67] focus:border-transparent text-base"
+                  disabled={loading}
+                />
+                {inputMessage && (
+                  <button
+                    onClick={() => setInputMessage("")}
+                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </button>
+                )}
               </div>
 
-              {/* Premium Send Button */}
-              <div className="relative">
-                <button
-                  onClick={sendMessage}
-                  disabled={loading || !inputMessage.trim()}
-                  className="group relative w-14 h-14 bg-gradient-to-r from-primary-600 via-primary-500 to-primary-600 hover:from-primary-500 hover:to-primary-700 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed disabled:transform-none hover:scale-105 active:scale-95"
-                  style={{
-                    boxShadow:
-                      "0 8px 32px rgba(94, 115, 255, 0.3), 0 4px 16px rgba(0,0,0,0.2)",
-                  }}
-                >
-                  {/* Glass overlay effect */}
-                  <div className="absolute inset-0 rounded-full bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-
-                  {/* Inner highlight */}
-                  <div className="absolute inset-0.5 rounded-full bg-gradient-to-b from-white/20 to-transparent"></div>
-
-                  {/* Icon Container */}
-                  <div className="relative z-10 flex items-center justify-center h-full">
-                    {loading ? (
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                    ) : (
-                      <Send className="h-5 w-5 text-white transform translate-x-0.5 group-hover:translate-x-1 transition-transform duration-200" />
-                    )}
-                  </div>
-
-                  {/* Pulse effect when loading */}
-                  {loading && (
-                    <div className="absolute inset-0 rounded-full bg-primary-500/50 animate-pulse"></div>
-                  )}
-                </button>
-
-                {/* Button glow effect */}
-                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-primary-500 to-primary-600 blur-xl opacity-30 group-hover:opacity-50 transition-opacity duration-300 -z-10"></div>
-              </div>
+              {/* Send Button */}
+              <button
+                onClick={sendMessage}
+                disabled={loading || !inputMessage.trim()}
+                className="px-6 py-4 bg-[#ff22b97c] hover:bg-[#720455] disabled:bg-[#3C0753] disabled:cursor-not-allowed text-white rounded-2xl transition-colors focus:outline-none focus:ring-2 focus:ring-[#910A67] flex items-center justify-center min-w-[120px]"
+              >
+                {loading ? (
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                ) : (
+                  <>
+                    <Send className="h-5 w-5" />
+                    <span className="ml-2 hidden sm:inline">Send</span>
+                  </>
+                )}
+              </button>
             </div>
 
-            {/* Typing indicator or character count could go here */}
-            {loading && (
-              <div className="mt-3 flex items-center justify-center">
-                <div className="flex items-center space-x-2 text-white/60 text-sm">
-                  <div className="flex space-x-1">
-                    <div className="w-2 h-2 bg-primary-400 rounded-full animate-bounce"></div>
-                    <div
-                      className="w-2 h-2 bg-primary-400 rounded-full animate-bounce"
-                      style={{ animationDelay: "0.1s" }}
-                    ></div>
-                    <div
-                      className="w-2 h-2 bg-primary-400 rounded-full animate-bounce"
-                      style={{ animationDelay: "0.2s" }}
-                    ></div>
-                  </div>
-                  <span className="font-medium">AI is thinking...</span>
-                </div>
-              </div>
-            )}
+            <p className="text-xs text-gray-400 mt-3 text-center">
+              AI may produce inaccurate information. Consider verifying
+              important details.
+            </p>
           </div>
         </div>
+
+
       </div>
     </div>
   );
