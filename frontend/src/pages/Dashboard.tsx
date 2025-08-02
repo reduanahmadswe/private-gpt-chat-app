@@ -1,5 +1,4 @@
 import {
-  Bold,
   Edit2,
   LogOut,
   MessageCircle,
@@ -143,48 +142,91 @@ const Dashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex overflow-hidden">
+    <div className="min-h-screen bg-[#030637] flex overflow-hidden font-sans">
       {/* Sidebar - Fixed Full Height */}
-      <div className="w-80 bg-white/5 backdrop-blur-sm border-r border-white/10 flex flex-col fixed left-0 top-0 h-full z-10">
+      <div className="w-80 bg-gradient-to-b from-[#030637] to-[#2a1a3e] backdrop-blur-xl border-r border-white/10 flex flex-col fixed left-0 top-0 h-full z-10 shadow-2xl shadow-black/20">
         {/* Header */}
-        <div className="p-4 border-b border-white/10 flex-shrink-0">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-white">
-              <span className="text-blue-600 font-bold">Ai </span>Bondhu
-            </h2>
-            <button
-              onClick={startNewChat}
-              className="btn-primary p-2"
-              title="New Chat"
+        <div className="p-6 border-b border-white/10 flex-shrink-0">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center space-x-3">
+              <div className="bg-gradient-to-br from-[#00f5ff] to-[#9d4edd] rounded-2xl p-3 shadow-lg shadow-[#00f5ff]/20">
+                <MessageCircle className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-white font-bold text-lg tracking-tight">
+                  AI Bondhu
+                </h1>
+                <p className="text-[#D0D0D0] text-xs">Chat Assistant</p>
+              </div>
+            </div>
+            <Link
+              to="/"
+              className="text-[#D0D0D0] hover:text-white p-2 rounded-xl hover:bg-white/10 transition-all duration-300"
+              title="Settings"
             >
-              <Plus className="h-4 w-4" />
-            </button>
+              <Settings className="h-5 w-5" />
+            </Link>
           </div>
 
-          <div className="flex items-center space-x-2 text-sm text-white/70">
-            <span>Welcome, {user?.name}</span>
+          {/* New Chat Button */}
+          <button
+            onClick={startNewChat}
+            className="w-full bg-gradient-to-r from-[#00f5ff] to-[#9d4edd] hover:from-[#9d4edd] hover:to-[#00f5ff] text-white py-3 px-4 rounded-2xl flex items-center justify-center space-x-2 transition-all duration-500 shadow-lg shadow-[#00f5ff]/20 hover:shadow-[#9d4edd]/30 transform hover:scale-105 font-semibold"
+          >
+            <Plus className="h-5 w-5" />
+            <span>New Chat</span>
+          </button>
+
+          {/* User Info */}
+          <div className="mt-4 p-4 rounded-2xl bg-gradient-to-r from-white/5 to-white/10 backdrop-blur-xl border border-white/10">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-[#00f5ff] to-[#9d4edd] rounded-full flex items-center justify-center shadow-lg">
+                  <span className="text-white font-bold text-sm">
+                    {user?.name?.charAt(0).toUpperCase() || "U"}
+                  </span>
+                </div>
+                <div>
+                  <p className="text-white font-medium text-sm">
+                    {user?.name || "User"}
+                  </p>
+                  <p className="text-[#D0D0D0] text-xs">{user?.email}</p>
+                </div>
+              </div>
+              <button
+                onClick={logout}
+                className="text-[#D0D0D0] hover:text-red-400 p-2 rounded-xl hover:bg-white/10 transition-all duration-300"
+                title="Logout"
+              >
+                <LogOut className="h-4 w-4" />
+              </button>
+            </div>
           </div>
         </div>
 
         {/* Chat List - Scrollable Area */}
         <div className="flex-1 overflow-y-auto p-4 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent hover:scrollbar-thumb-white/30">
-          <div className="space-y-2">
+          <div className="space-y-3">
             {chats.length === 0 ? (
               <div className="text-center text-white/50 py-8">
-                <MessageCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                <p className="text-sm">No chats yet</p>
-                <p className="text-xs">
-                  Start a conversation to see your chats here
-                </p>
+                <div className="bg-gradient-to-br from-white/5 to-white/10 backdrop-blur-xl rounded-3xl p-8 border border-white/10">
+                  <MessageCircle className="h-12 w-12 mx-auto mb-4 text-[#00f5ff]" />
+                  <h3 className="text-lg font-semibold text-white mb-2">
+                    No Conversations Yet
+                  </h3>
+                  <p className="text-sm text-[#D0D0D0]">
+                    Start a new chat to begin your AI conversation journey
+                  </p>
+                </div>
               </div>
             ) : (
               chats.map((chat) => (
                 <div
                   key={chat._id}
-                  className={`group p-3 rounded-lg cursor-pointer transition-all duration-200 ${
+                  className={`group p-4 rounded-2xl cursor-pointer transition-all duration-300 backdrop-blur-xl border ${
                     currentChat?._id === chat._id
-                      ? "bg-primary-600/20 border border-primary-500/30"
-                      : "hover:bg-white/5"
+                      ? "bg-gradient-to-r from-[#00f5ff]/20 to-[#9d4edd]/20 border-[#00f5ff]/30 shadow-lg shadow-[#00f5ff]/10"
+                      : "bg-gradient-to-r from-white/5 to-white/10 border-white/10 hover:from-white/10 hover:to-white/15 hover:border-[#40e0d0]/20 hover:shadow-lg hover:shadow-[#40e0d0]/5"
                   }`}
                   onClick={() => selectChat(chat)}
                 >
@@ -199,101 +241,138 @@ const Dashboard: React.FC = () => {
                           e.key === "Enter" &&
                           updateChatTitle(chat._id, newTitle)
                         }
-                        className="bg-transparent text-white text-sm outline-none flex-1"
+                        className="bg-transparent text-white text-sm outline-none flex-1 placeholder-[#D0D0D0]"
                         autoFocus
                       />
                     ) : (
-                      <h3 className="text-white text-sm font-medium truncate flex-1">
+                      <h3 className="text-white text-sm font-semibold truncate flex-1">
                         {chat.title || "New Chat"}
                       </h3>
                     )}
 
-                    <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-all duration-300">
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           setEditingTitle(chat._id);
                           setNewTitle(chat.title || "");
                         }}
-                        className="p-1 hover:bg-white/10 rounded"
+                        className="p-2 hover:bg-white/20 rounded-xl transition-all duration-300 hover:shadow-lg"
                         title="Edit title"
                       >
-                        <Edit2 className="h-3 w-3 text-white/60" />
+                        <Edit2 className="h-3 w-3 text-[#D0D0D0] hover:text-[#00f5ff]" />
                       </button>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           shareChat(chat._id);
                         }}
-                        className="p-1 hover:bg-white/10 rounded"
+                        className="p-2 hover:bg-white/20 rounded-xl transition-all duration-300 hover:shadow-lg"
                         title="Share chat"
                       >
-                        <Share2 className="h-3 w-3 text-white/60" />
+                        <Share2 className="h-3 w-3 text-[#D0D0D0] hover:text-[#9d4edd]" />
                       </button>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           deleteChat(chat._id);
                         }}
-                        className="p-1 hover:bg-white/10 rounded"
+                        className="p-2 hover:bg-red-500/20 rounded-xl transition-all duration-300 hover:shadow-lg"
                         title="Delete chat"
                       >
-                        <Trash2 className="h-3 w-3 text-white/60" />
+                        <Trash2 className="h-3 w-3 text-[#D0D0D0] hover:text-red-400" />
                       </button>
                     </div>
                   </div>
 
-                  <p className="text-white/50 text-xs mt-1 truncate">
-                    {chat.messages[chat.messages.length - 1]?.content ||
-                      "No messages yet"}
+                  <p className="text-[#D0D0D0] text-xs mt-2 truncate leading-relaxed">
+                    {chat.messages[chat.messages.length - 1]?.content?.slice(
+                      0,
+                      80
+                    ) + "..." || "No messages yet"}
                   </p>
+
+                  <div className="flex items-center justify-between mt-2">
+                    <span className="text-[#40e0d0] text-xs font-medium">
+                      {chat.messages.length} messages
+                    </span>
+                    <span className="text-[#D0D0D0] text-xs">
+                      {new Date(chat.updatedAt).toLocaleDateString()}
+                    </span>
+                  </div>
                 </div>
               ))
             )}
           </div>
         </div>
-
-        {/* Bottom Actions */}
-        <div className="p-4 border-t border-white/10 space-y-2 flex-shrink-0">
-          <Link
-            to="/settings"
-            className="flex items-center space-x-2 p-2 rounded-lg hover:bg-white/5 text-white/70 hover:text-white transition-colors"
-          >
-            <Settings className="h-4 w-4" />
-            <span>Settings</span>
-          </Link>
-
-          <button
-            onClick={logout}
-            className="flex items-center space-x-2 p-2 rounded-lg hover:bg-white/5 text-white/70 hover:text-white transition-colors w-full"
-          >
-            <LogOut className="h-4 w-4" />
-            <span>Logout</span>
-          </button>
-        </div>
       </div>
 
       {/* Main Chat Area - Offset by sidebar width */}
-      <div className="flex-1 flex flex-col ml-80 h-screen">
+      <div className="flex-1 flex flex-col ml-80 h-screen bg-gradient-to-br from-[#030637] via-[#1a1a2e] to-[#16213e] backdrop-blur-xl">
         {/* Chat Header */}
-        <div className="p-4 border-b border-white/10 bg-white/5 backdrop-blur-sm flex-shrink-0">
-          <h1 className="text-xl font-semibold text-white">
-            {currentChat?.title || "New Chat"}
-          </h1>
+        <div className="p-6 border-b border-white/10 bg-gradient-to-r from-white/5 to-white/10 backdrop-blur-xl flex-shrink-0 shadow-lg">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="bg-gradient-to-br from-[#00f5ff]/20 to-[#9d4edd]/20 rounded-2xl p-3 border border-[#00f5ff]/30">
+                <MessageCircle className="h-6 w-6 text-[#00f5ff]" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-white tracking-tight">
+                  {currentChat?.title || "New Conversation"}
+                </h1>
+                <p className="text-[#D0D0D0] text-sm">
+                  {currentChat
+                    ? `${messages.length} messages`
+                    : "Start typing to begin"}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="px-4 py-2 bg-gradient-to-r from-[#00f5ff]/10 to-[#9d4edd]/10 rounded-xl border border-[#00f5ff]/20">
+                <span className="text-[#00f5ff] text-sm font-medium">
+                  Claude 3.5 Sonnet
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Messages - Scrollable Area */}
-        <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent hover:scrollbar-thumb-white/30 pb-28">
-          <div className="max-w-4xl mx-auto p-4 space-y-4">
+        <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent hover:scrollbar-thumb-white/30 pb-32">
+          <div className="max-w-5xl mx-auto p-6 space-y-6">
             {messages.length === 0 ? (
-              <div className="text-center text-white/50 mt-20">
-                <MessageCircle className="h-16 w-16 mx-auto mb-4 opacity-50" />
-                <h3 className="text-xl font-medium mb-2">
-                  Start a conversation
-                </h3>
-                <p>
-                  Ask me anything and I'll help you with detailed responses.
-                </p>
+              <div className="text-center mt-20">
+                <div className="bg-gradient-to-br from-white/5 to-white/10 backdrop-blur-xl rounded-3xl p-12 border border-white/10 max-w-2xl mx-auto">
+                  <div className="bg-gradient-to-br from-[#00f5ff]/20 to-[#9d4edd]/20 rounded-full p-6 w-24 h-24 mx-auto mb-6 border border-[#00f5ff]/30">
+                    <MessageCircle className="h-12 w-12 text-[#00f5ff] mx-auto" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-white mb-4">
+                    Ready to Chat
+                  </h3>
+                  <p className="text-[#D0D0D0] text-lg leading-relaxed">
+                    I'm here to help you with any questions or tasks. Start a
+                    conversation and let's explore what we can accomplish
+                    together.
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
+                    <div className="bg-gradient-to-r from-[#00f5ff]/10 to-[#40e0d0]/10 p-4 rounded-2xl border border-[#00f5ff]/20">
+                      <h4 className="text-[#00f5ff] font-semibold mb-2">
+                        Ask Questions
+                      </h4>
+                      <p className="text-[#D0D0D0] text-sm">
+                        Get detailed answers on any topic
+                      </p>
+                    </div>
+                    <div className="bg-gradient-to-r from-[#9d4edd]/10 to-[#40e0d0]/10 p-4 rounded-2xl border border-[#9d4edd]/20">
+                      <h4 className="text-[#9d4edd] font-semibold mb-2">
+                        Get Help
+                      </h4>
+                      <p className="text-[#D0D0D0] text-sm">
+                        Solve problems and learn new things
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
             ) : (
               messages.map((message, index) => (
@@ -303,14 +382,34 @@ const Dashboard: React.FC = () => {
                     message.role === "user" ? "justify-end" : "justify-start"
                   }`}
                 >
-                  <div
-                    className={`max-w-3xl p-4 rounded-lg ${
-                      message.role === "user"
-                        ? "bg-white/5 text-white"
-                        : "bg-white/10 backdrop-blur-sm text-white"
-                    }`}
-                  >
-                    <p className="whitespace-pre-wrap">{message.content}</p>
+                  <div className="flex items-start space-x-4 max-w-4xl">
+                    {message.role === "assistant" && (
+                      <div className="bg-gradient-to-br from-[#00f5ff]/20 to-[#9d4edd]/20 rounded-2xl p-3 border border-[#00f5ff]/30 flex-shrink-0">
+                        <MessageCircle className="h-5 w-5 text-[#00f5ff]" />
+                      </div>
+                    )}
+                    <div
+                      className={`p-6 rounded-3xl backdrop-blur-xl shadow-lg ${
+                        message.role === "user"
+                          ? "bg-gradient-to-r from-[#9d4edd]/20 to-[#40e0d0]/20 border border-[#9d4edd]/30 text-white ml-auto"
+                          : "bg-gradient-to-r from-white/5 to-white/10 border border-white/10 text-white"
+                      }`}
+                    >
+                      <div className="prose prose-invert max-w-none">
+                        <p className="whitespace-pre-wrap leading-relaxed text-sm md:text-base">
+                          {message.content}
+                        </p>
+                      </div>
+                    </div>
+                    {message.role === "user" && (
+                      <div className="bg-gradient-to-br from-[#9d4edd]/20 to-[#40e0d0]/20 rounded-2xl p-3 border border-[#9d4edd]/30 flex-shrink-0">
+                        <div className="w-5 h-5 bg-gradient-to-br from-[#9d4edd] to-[#40e0d0] rounded-full flex items-center justify-center">
+                          <span className="text-white font-bold text-xs">
+                            {user?.name?.charAt(0).toUpperCase() || "U"}
+                          </span>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))
@@ -318,19 +417,26 @@ const Dashboard: React.FC = () => {
 
             {loading && (
               <div className="flex justify-start">
-                <div className="bg-white/10 backdrop-blur-sm text-white p-4 rounded-lg">
-                  <div className="flex items-center space-x-2">
-                    <div className="animate-pulse">Thinking...</div>
-                    <div className="flex space-x-1">
-                      <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce"></div>
-                      <div
-                        className="w-2 h-2 bg-white/60 rounded-full animate-bounce"
-                        style={{ animationDelay: "0.1s" }}
-                      ></div>
-                      <div
-                        className="w-2 h-2 bg-white/60 rounded-full animate-bounce"
-                        style={{ animationDelay: "0.2s" }}
-                      ></div>
+                <div className="flex items-start space-x-4 max-w-4xl">
+                  <div className="bg-gradient-to-br from-[#00f5ff]/20 to-[#9d4edd]/20 rounded-2xl p-3 border border-[#00f5ff]/30 flex-shrink-0">
+                    <MessageCircle className="h-5 w-5 text-[#00f5ff]" />
+                  </div>
+                  <div className="bg-gradient-to-r from-white/5 to-white/10 backdrop-blur-xl border border-white/10 text-white p-6 rounded-3xl shadow-lg">
+                    <div className="flex items-center space-x-3">
+                      <div className="flex space-x-1">
+                        <div className="w-2 h-2 bg-[#00f5ff] rounded-full animate-bounce"></div>
+                        <div
+                          className="w-2 h-2 bg-[#9d4edd] rounded-full animate-bounce"
+                          style={{ animationDelay: "0.1s" }}
+                        ></div>
+                        <div
+                          className="w-2 h-2 bg-[#40e0d0] rounded-full animate-bounce"
+                          style={{ animationDelay: "0.2s" }}
+                        ></div>
+                      </div>
+                      <span className="text-[#D0D0D0] font-medium">
+                        Thinking...
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -339,70 +445,79 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Input Area */}
-  
-        <div className="bottom-0 left-80 right-0 p-4 z-20">
-          <div className="max-w-3xl mx-auto">
-            <div className="flex items-center space-x-4">
-              {/* Input field */}
-              <div className="flex-1 relative">
-                <input
-                  type="text"
-                  value={inputMessage}
-                  onChange={(e) => setInputMessage(e.target.value)}
-                  onKeyPress={(e) =>
-                    e.key === "Enter" && !loading && sendMessage()
-                  }
-                  placeholder="Type your message..."
-                  className="w-full px-6 py-4 bg-white/5 text-white placeholder-gray-400 rounded-2xl border border-[#910A67] focus:outline-none focus:ring-2 focus:ring-[#910A67] focus:border-transparent text-base"
-                  disabled={loading}
-                />
-                {inputMessage && (
-                  <button
-                    onClick={() => setInputMessage("")}
-                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
+        {/* Input Area - Fixed at Bottom */}
+        <div className="fixed bottom-0 left-80 right-0 p-6 bg-gradient-to-t from-[#030637] via-[#1a1a2e]/95 to-transparent backdrop-blur-xl border-t border-white/10 z-20">
+          <div className="max-w-4xl mx-auto">
+            <div className="bg-gradient-to-r from-white/5 to-white/10 backdrop-blur-xl rounded-3xl border border-white/20 shadow-2xl shadow-black/20 p-2">
+              <div className="flex items-end space-x-4">
+                {/* Input field */}
+                <div className="flex-1 relative">
+                  <textarea
+                    value={inputMessage}
+                    onChange={(e) => setInputMessage(e.target.value)}
+                    onKeyPress={(e) => {
+                      if (e.key === "Enter" && !e.shiftKey && !loading) {
+                        e.preventDefault();
+                        sendMessage();
+                      }
+                    }}
+                    placeholder="Type your message... (Shift + Enter for new line)"
+                    className="w-full px-6 py-4 bg-transparent text-white placeholder-[#D0D0D0] rounded-2xl border-none focus:outline-none resize-none scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent text-base leading-relaxed"
+                    disabled={loading}
+                    rows={1}
+                    style={{
+                      minHeight: "24px",
+                      maxHeight: "120px",
+                      overflow: "auto",
+                    }}
+                    onInput={(e) => {
+                      const target = e.target as HTMLTextAreaElement;
+                      target.style.height = "24px";
+                      target.style.height = target.scrollHeight + "px";
+                    }}
+                  />
+                  {inputMessage && (
+                    <button
+                      onClick={() => setInputMessage("")}
+                      className="absolute right-4 top-1/2 transform -translate-y-1/2 text-[#D0D0D0] hover:text-white transition-colors p-1 rounded-xl hover:bg-white/10"
                     >
-                      <path
-                        fillRule="evenodd"
-                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </button>
-                )}
-              </div>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </button>
+                  )}
+                </div>
 
-              {/* Send Button */}
-              <button
-                onClick={sendMessage}
-                disabled={loading || !inputMessage.trim()}
-                className="px-6 py-4 bg-[#ff22b97c] hover:bg-[#720455] disabled:bg-[#3C0753] disabled:cursor-not-allowed text-white rounded-2xl transition-colors focus:outline-none focus:ring-2 focus:ring-[#910A67] flex items-center justify-center min-w-[120px]"
-              >
-                {loading ? (
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                ) : (
-                  <>
+                {/* Send Button */}
+                <button
+                  onClick={sendMessage}
+                  disabled={loading || !inputMessage.trim()}
+                  className="px-6 py-4 bg-gradient-to-r from-[#00f5ff] to-[#9d4edd] hover:from-[#9d4edd] hover:to-[#00f5ff] disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed text-white rounded-2xl transition-all duration-500 focus:outline-none focus:ring-2 focus:ring-[#00f5ff]/50 flex items-center justify-center min-w-[60px] shadow-lg shadow-[#00f5ff]/20 hover:shadow-[#9d4edd]/30 transform hover:scale-105 disabled:transform-none disabled:shadow-none"
+                >
+                  {loading ? (
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  ) : (
                     <Send className="h-5 w-5" />
-                    <span className="ml-2 hidden sm:inline">Send</span>
-                  </>
-                )}
-              </button>
+                  )}
+                </button>
+              </div>
             </div>
 
-            <p className="text-xs text-gray-400 mt-3 text-center">
-              AI may produce inaccurate information. Consider verifying
-              important details.
+            <p className="text-xs text-[#D0D0D0]/70 mt-4 text-center leading-relaxed">
+              AI responses are generated and may contain inaccuracies. Please
+              verify important information.
             </p>
           </div>
         </div>
-
-
       </div>
     </div>
   );
