@@ -1,12 +1,12 @@
-import { Response, NextFunction } from 'express';
-import { UserService } from './user.service';
+import { NextFunction, Response } from 'express';
 import { AuthRequest } from '../shared/middleware/auth';
-import { UpdateUserInput, UpdatePasswordInput } from './user.validation';
+import { UserService } from './user.service';
+import { UpdatePasswordInput, UpdateUserInput } from './user.validation';
 
 const userService = new UserService();
 
 export class UserController {
-  async getProfile(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
+  getProfile = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
       const userId = req.user!.id;
       const user = await userService.getUserProfile(userId);
@@ -21,7 +21,7 @@ export class UserController {
     }
   }
 
-  async updateProfile(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
+  updateProfile = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
       const userId = req.user!.id;
       const data: UpdateUserInput = req.body;
@@ -37,7 +37,7 @@ export class UserController {
     }
   }
 
-  async updatePassword(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
+  updatePassword = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
       const userId = req.user!.id;
       const data: UpdatePasswordInput = req.body;
@@ -52,7 +52,7 @@ export class UserController {
     }
   }
 
-  async deleteAccount(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
+  deleteAccount = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
       const userId = req.user!.id;
       const result = await userService.deleteAccount(userId);

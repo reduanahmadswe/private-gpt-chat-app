@@ -1,24 +1,15 @@
 {
-  "name": "private-gpt-chat-backend",
-  "version": 2,
-  "builds": [
-    {
-      "src": "dist/app.js",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "dist/app.js"
-    }
-  ],
-  "env": {
-    "NODE_ENV": "production"
-  },
-  "functions": {
-    "dist/app.js": {
-      "maxDuration": 30
-    }
-  }
+    "version": 2,
+    "builds": [
+        {
+            "src": "dist/server.js",
+            "use": "@vercel/node"
+        }
+    ],
+    "routes": [
+        {
+            "src": "/(.*)",
+            "dest": "dist/server.js"
+        }
+    ]
 }

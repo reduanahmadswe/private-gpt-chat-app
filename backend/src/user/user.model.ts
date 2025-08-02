@@ -1,5 +1,5 @@
-import mongoose, { Schema, Document } from 'mongoose';
 import bcrypt from 'bcryptjs';
+import mongoose, { Document, Schema } from 'mongoose';
 import { IUser, IUserMethods } from './user.interface';
 
 type UserDocument = Document & IUser & IUserMethods;
@@ -24,6 +24,7 @@ const userSchema = new Schema<UserDocument>(
       type: String,
       required: [true, 'Password is required'],
       minlength: [6, 'Password must be at least 6 characters'],
+      select: false, // Don't include password in queries by default
     },
   },
   {
@@ -34,7 +35,7 @@ const userSchema = new Schema<UserDocument>(
 // Hash password before saving
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
-  
+
   this.password = await bcrypt.hash(this.password, 12);
   next();
 });

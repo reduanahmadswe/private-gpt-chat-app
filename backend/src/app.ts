@@ -1,8 +1,7 @@
 import cors from 'cors'
-import dotenv from 'dotenv'
 import express from 'express'
 import rateLimit from 'express-rate-limit'
-import connectDB from './shared/database'
+import { envVars } from './config/env'
 import { authenticate } from './shared/middleware/auth'
 import { errorHandler, notFound } from './shared/middleware/errorHandler'
 
@@ -11,11 +10,7 @@ import authRoutes from './auth/auth.routes'
 import chatRoutes from './chat/chat.routes'
 import userRoutes from './user/user.routes'
 
-// Load environment variables
-dotenv.config()
-
 const app = express()
-const PORT = process.env.PORT || 5000
 
 // Rate limiting
 const limiter = rateLimit({
@@ -26,16 +21,89 @@ const limiter = rateLimit({
 
 // Middleware
 app.use(limiter)
+
+// CORS Configuration
+const allowedOrigins = [
+  envVars.FRONTEND_URL,
+  envVars.CLIENT_URL,
+  'https://ai-bondhu-tau.vercel.app',
+  'https://aibondhuai.vercel.app',
+  'http://localhost:3000',
+  'http://localhost:5173'
+];
+
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:3000',
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      console.log('❌ CORS blocked origin:', origin);
+      return callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
-}))
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'X-Requested-With', 'Accept'],
+}));
+app.options('*', cors());
+
 app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded({ extended: true }))
 
 // Health check
+app.get('/', (req, res) => {
+  res.json({
+    status: 'OK',
+    message: 'Private AI Bondhu API is running',
+    timestamp: new Date().toISOString(),
+  })
+})
+
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', timestamp: new Date().toISOString() })
+  res.json({
+    status: 'OK',
+    timestamp: new Date().toISOString(),
+    environment: envVars.NODE_ENV,
+    version: '1.0.0',
+    cors: {
+      frontend_url: envVars.FRONTEND_URL,
+      client_url: envVars.CLIENT_URL,
+      allowed_origins: [
+        envVars.FRONTEND_URL,
+        envVars.CLIENT_URL,
+        'https://ai-bondhu-tau.vercel.app',
+        'https://aibondhuai.vercel.app',
+        'http://localhost:3000',
+        'http://localhost:5173'
+      ]
+    }
+  })
+})
+
+// Test endpoint for debugging
+app.get('/api/test', (req, res) => {
+  res.json({
+    success: true,
+    message: 'API is working correctly',
+    headers: req.headers,
+    origin: req.get('origin'),
+    method: req.method
+  })
+})
+
+// CORS test endpoint
+app.all('/api/cors-test', (req, res) => {
+  res.json({
+    success: true,
+    message: 'CORS test successful',
+    method: req.method,
+    origin: req.get('origin'),
+    headers: req.headers,
+    allowedOrigins: [envVars.FRONTEND_URL, envVars.CLIENT_URL]
+  })
 })
 
 // Routes
@@ -47,25 +115,14 @@ app.use('/api/chat', authenticate, chatRoutes)
 app.use(notFound)
 app.use(errorHandler)
 
-// 404 handler
+// 404 handler for any remaining routes
 app.use('*', (req, res) => {
-  res.status(404).json({ message: 'Route not found' })
+  res.status(404).json({
+    message: 'Route not found',
+    path: req.originalUrl,
+    method: req.method,
+    timestamp: new Date().toISOString()
+  })
 })
-
-// Start server
-const startServer = async () => {
-  try {
-    await connectDB()
-    app.listen(PORT, () => {
-      console.log(`🚀 Server running on port ${PORT}`)
-      console.log(`📝 Environment: ${process.env.NODE_ENV}`)
-    })
-  } catch (error) {
-    console.error('❌ Failed to start server:', error)
-    process.exit(1)
-  }
-}
-
-startServer()
 
 export default app

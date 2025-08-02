@@ -1,7 +1,8 @@
-import { Request, Response, NextFunction } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import { User } from '../../user/user.model';
 import { IJWTPayload } from '../../auth/auth.interface';
+import { envVars } from '../../config/env';
+import { User } from '../../user/user.model';
 
 export interface AuthRequest extends Request {
   user?: {
@@ -28,15 +29,7 @@ export const authenticate = async (
     }
 
     const token = authHeader.substring(7);
-    const jwtSecret = process.env.JWT_SECRET;
-
-    if (!jwtSecret) {
-      res.status(500).json({
-        success: false,
-        message: 'JWT secret not configured',
-      });
-      return;
-    }
+    const jwtSecret = envVars.JWT_SECRET;
 
     const decoded = jwt.verify(token, jwtSecret) as IJWTPayload;
     const user = await User.findById(decoded.userId);

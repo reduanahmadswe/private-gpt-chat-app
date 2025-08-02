@@ -1,16 +1,13 @@
 import jwt from 'jsonwebtoken';
-import { User } from '../user/user.model';
-import { IAuthRequest, IRegisterRequest, IAuthResponse, IJWTPayload } from './auth.interface';
+import { envVars } from '../config/env';
 import { createError } from '../shared/middleware/errorHandler';
+import { User } from '../user/user.model';
+import { IAuthRequest, IAuthResponse, IJWTPayload, IRegisterRequest } from './auth.interface';
 
 export class AuthService {
   private generateTokens(userId: string, email: string): { token: string; refreshToken: string } {
-    const jwtSecret = process.env.JWT_SECRET;
-    const jwtRefreshSecret = process.env.JWT_REFRESH_SECRET;
-
-    if (!jwtSecret || !jwtRefreshSecret) {
-      throw createError('JWT secrets not configured', 500);
-    }
+    const jwtSecret = envVars.JWT_SECRET;
+    const jwtRefreshSecret = envVars.JWT_REFRESH_SECRET;
 
     const payload: IJWTPayload = { userId, email };
 
@@ -52,15 +49,18 @@ export class AuthService {
     // Find user and include password for comparison
     const user = await User.findOne({ email }).select('+password');
     if (!user) {
+      console.log(`❌ Login failed: User not found for email: ${email}`);
       throw createError('Invalid email or password', 401);
     }
 
     // Check password
     const isPasswordValid = await user.comparePassword(password);
     if (!isPasswordValid) {
+      console.log(`❌ Login failed: Invalid password for email: ${email}`);
       throw createError('Invalid email or password', 401);
     }
 
+    console.log(`✅ Login successful for email: ${email}`);
     // Generate tokens
     const tokens = this.generateTokens(user._id.toString(), user.email);
 
@@ -75,11 +75,7 @@ export class AuthService {
   }
 
   async refreshToken(refreshToken: string): Promise<{ token: string }> {
-    const jwtRefreshSecret = process.env.JWT_REFRESH_SECRET;
-
-    if (!jwtRefreshSecret) {
-      throw createError('JWT refresh secret not configured', 500);
-    }
+    const jwtRefreshSecret = envVars.JWT_REFRESH_SECRET;
 
     try {
       const decoded = jwt.verify(refreshToken, jwtRefreshSecret) as IJWTPayload;
@@ -90,10 +86,7 @@ export class AuthService {
       }
 
       // Generate new access token
-      const jwtSecret = process.env.JWT_SECRET;
-      if (!jwtSecret) {
-        throw createError('JWT secret not configured', 500);
-      }
+      const jwtSecret = envVars.JWT_SECRET;
 
       const token = jwt.sign(
         { userId: decoded.userId, email: decoded.email },

@@ -1,15 +1,12 @@
+import { envVars } from '../config/env';
 import { createError } from '../shared/middleware/errorHandler';
 import { IChatCreate, IChatResponse, IChatUpdate } from './chat.interface';
 import { Chat } from './chat.model';
 
 export class ChatService {
   private async callOpenRouterAPI(message: string): Promise<string> {
-    const apiKey = process.env.OPENROUTER_API_KEY;
-    const baseURL = process.env.OPENAI_API_BASE_URL || 'https://openrouter.ai/api/v1';
-
-    if (!apiKey) {
-      throw createError('OpenRouter API key not configured', 500);
-    }
+    const apiKey = envVars.OPENROUTER_API_KEY;
+    const baseURL = envVars.OPENAI_API_BASE_URL;
 
     try {
       const response = await fetch(`${baseURL}/chat/completions`, {
@@ -17,7 +14,7 @@ export class ChatService {
         headers: {
           'Authorization': `Bearer ${apiKey}`,
           'Content-Type': 'application/json',
-          'HTTP-Referer': process.env.CLIENT_URL || 'http://localhost:3000',
+          'HTTP-Referer': envVars.FRONTEND_URL,
           'X-Title': 'Private GPT Chat',
         },
         body: JSON.stringify({
@@ -173,7 +170,7 @@ export class ChatService {
 
     return {
       message: 'Chat shared successfully',
-      shareUrl: `${process.env.CLIENT_URL}/chat/${chatId}`,
+      shareUrl: `${envVars.CLIENT_URL}/chat/${chatId}`,
       chat,
     };
   }

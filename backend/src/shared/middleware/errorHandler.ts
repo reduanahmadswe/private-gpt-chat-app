@@ -1,5 +1,6 @@
-import { Request, Response, NextFunction } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { ZodError } from 'zod';
+import { envVars } from '../../config/env';
 
 export interface AppError extends Error {
   statusCode?: number;
@@ -53,7 +54,7 @@ export const errorHandler = (
     message = 'Token expired';
   }
   // Development error details
-  else if (process.env.NODE_ENV === 'development') {
+  else if (envVars.NODE_ENV === 'development') {
     message = error.message;
     console.error('Error Details:', error);
   }
@@ -62,7 +63,7 @@ export const errorHandler = (
     success: false,
     message,
     ...(errors.length > 0 && { errors }),
-    ...(process.env.NODE_ENV === 'development' && { stack: error.stack }),
+    ...(envVars.NODE_ENV === 'development' && { stack: error.stack }),
   });
 };
 

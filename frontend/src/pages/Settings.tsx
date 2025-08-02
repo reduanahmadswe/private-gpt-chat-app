@@ -6,7 +6,7 @@ import { useAuth } from "../contexts/AuthContext";
 import api from "../utils/api";
 
 const Settings: React.FC = () => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("profile");
   const [profileData, setProfileData] = useState({
     name: user?.name || "",
