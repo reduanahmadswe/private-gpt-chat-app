@@ -273,11 +273,11 @@ const Dashboard: React.FC = () => {
       {/* Main Chat Area - Offset by sidebar width */}
       <div className="flex-1 flex flex-col ml-80 h-screen">
         {/* Chat Header */}
-        <div className="p-4 border-b border-white/10 bg-white/5 backdrop-blur-sm flex-shrink-0">
+        {/* <div className="p-4 border-b border-white/10 bg-white/5 backdrop-blur-sm flex-shrink-0">
           <h1 className="text-xl font-semibold text-white">
             {currentChat?.title || "New Chat"}
           </h1>
-        </div>
+        </div> */}
 
         {/* Messages - Scrollable Area */}
         <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent hover:scrollbar-thumb-white/30">
