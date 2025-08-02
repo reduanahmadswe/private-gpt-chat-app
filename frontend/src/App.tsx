@@ -1,12 +1,13 @@
-import { Routes, Route } from 'react-router-dom'
-import { AuthProvider } from './contexts/AuthContext'
-import LandingPage from './pages/LandingPage'
-import SignUp from './pages/auth/SignUp'
-import SignIn from './pages/auth/SignIn'
-import Dashboard from './pages/Dashboard'
-import Settings from './pages/Settings'
-import ChatView from './pages/ChatView'
-import ProtectedRoute from './components/ProtectedRoute'
+import { Route, Routes } from "react-router-dom";
+import ProtectedRoute from "./components/ProtectedRoute";
+import PublicRoute from "./components/PublicRoute";
+import { AuthProvider } from "./contexts/AuthContext";
+import SignIn from "./pages/auth/SignIn";
+import SignUp from "./pages/auth/SignUp";
+import ChatView from "./pages/ChatView";
+import Dashboard from "./pages/Dashboard";
+import LandingPage from "./pages/LandingPage";
+import Settings from "./pages/Settings";
 
 function App() {
   return (
@@ -14,8 +15,22 @@ function App() {
       <div className="min-h-screen">
         <Routes>
           <Route path="/" element={<LandingPage />} />
-          <Route path="/auth/signup" element={<SignUp />} />
-          <Route path="/auth/signin" element={<SignIn />} />
+          <Route
+            path="/auth/signup"
+            element={
+              <PublicRoute>
+                <SignUp />
+              </PublicRoute>
+            }
+          />
+          <Route
+            path="/auth/signin"
+            element={
+              <PublicRoute>
+                <SignIn />
+              </PublicRoute>
+            }
+          />
           <Route
             path="/dashboard"
             element={
@@ -43,7 +58,7 @@ function App() {
         </Routes>
       </div>
     </AuthProvider>
-  )
+  );
 }
 
-export default App
+export default App;

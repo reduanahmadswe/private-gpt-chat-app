@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { ChatController } from './chat.controller';
 import { validate } from '../shared/middleware/validation';
-import { createChatSchema, updateChatSchema, chatParamsSchema } from './chat.validation';
+import { ChatController } from './chat.controller';
+import { chatParamsSchema, createChatSchema, updateChatSchema } from './chat.validation';
 
 const router = Router();
 const chatController = new ChatController();

@@ -1,14 +1,19 @@
 import { NextFunction, Request, Response } from 'express';
-import { AuthRequest } from '../shared/middleware/auth';
 import { ChatService } from './chat.service';
 import { CreateChatInput, UpdateChatInput } from './chat.validation';
 
 const chatService = new ChatService();
 
+// Helper function to get user ID from request
+const getUserId = (req: Request): string => {
+  const user = req.user as any;
+  return user._id?.toString() || user.id;
+};
+
 export class ChatController {
-  createChat = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  createChat = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const userId = req.user!.id;
+      const userId = getUserId(req);
       const data: CreateChatInput = req.body;
       const result = await chatService.createOrUpdateChat(userId, data);
 
@@ -22,9 +27,9 @@ export class ChatController {
     }
   }
 
-  getChats = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  getChats = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const userId = req.user!.id;
+      const userId = getUserId(req);
       const chats = await chatService.getUserChats(userId);
 
       res.status(200).json({
@@ -40,7 +45,7 @@ export class ChatController {
   getChatById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { id } = req.params;
-      const userId = (req as AuthRequest).user?.id; // Optional for shared chats
+      const userId = req.user ? getUserId(req) : undefined; // Optional for shared chats
 
       const chat = await chatService.getChatById(id, userId);
 
@@ -54,9 +59,9 @@ export class ChatController {
     }
   }
 
-  updateChat = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  updateChat = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const userId = req.user!.id;
+      const userId = getUserId(req);
       const { id } = req.params;
       const data: UpdateChatInput = req.body;
 
@@ -72,9 +77,9 @@ export class ChatController {
     }
   }
 
-  deleteChat = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  deleteChat = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const userId = req.user!.id;
+      const userId = getUserId(req);
       const { id } = req.params;
 
       const result = await chatService.deleteChat(id, userId);
@@ -88,9 +93,9 @@ export class ChatController {
     }
   }
 
-  shareChat = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  shareChat = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const userId = req.user!.id;
+      const userId = getUserId(req);
       const { id } = req.params;
 
       const result = await chatService.shareChat(id, userId);
@@ -104,9 +109,9 @@ export class ChatController {
     }
   }
 
-  unshareChat = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  unshareChat = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const userId = req.user!.id;
+      const userId = getUserId(req);
       const { id } = req.params;
 
       const result = await chatService.unshareChat(id, userId);

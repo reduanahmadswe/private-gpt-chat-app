@@ -1,6 +1,7 @@
 import { ArrowLeft, Brain, Lock, Mail } from "lucide-react";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import GoogleLoginButton from "../../components/GoogleLoginButton";
 import { useAuth } from "../../contexts/AuthContext";
 
 const SignIn: React.FC = () => {
@@ -111,6 +112,23 @@ const SignIn: React.FC = () => {
               {loading ? "Signing In..." : "Sign In"}
             </button>
           </form>
+
+          {/* Divider */}
+          <div className="mt-8 mb-6">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-white/20"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-4 bg-[#030637] text-[#E0E0E0]/60 font-light">
+                  Or continue with
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Google Login Button */}
+          <GoogleLoginButton />
 
           <div className="mt-8 text-center">
             <p className="text-[#E0E0E0] font-light">

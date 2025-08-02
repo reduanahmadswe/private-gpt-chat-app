@@ -1,24 +1,36 @@
-import React from 'react'
-import { Navigate } from 'react-router-dom'
-import { useAuth } from '../contexts/AuthContext'
-import LoadingSpinner from './LoadingSpinner'
+import React from "react";
+import { Navigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import LoadingSpinner from "./LoadingSpinner";
 
 interface ProtectedRouteProps {
-  children: React.ReactNode
+  children: React.ReactNode;
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const { user, loading } = useAuth()
+  const { user, isLoading } = useAuth();
 
-  if (loading) {
-    return <LoadingSpinner />
+  console.log(
+    "🛡️ ProtectedRoute - isLoading:",
+    isLoading,
+    "user:",
+    user?.email || "none"
+  );
+
+  if (isLoading) {
+    console.log("🔄 ProtectedRoute - Still loading, showing spinner");
+    return <LoadingSpinner />;
   }
 
   if (!user) {
-    return <Navigate to="/auth/signin" replace />
+    console.log("🚫 ProtectedRoute - No user, redirecting to signin");
+    return <Navigate to="/auth/signin" replace />;
   }
 
-  return <>{children}</>
-}
+  console.log(
+    "✅ ProtectedRoute - User authenticated, showing protected content"
+  );
+  return <>{children}</>;
+};
 
-export default ProtectedRoute
+export default ProtectedRoute;

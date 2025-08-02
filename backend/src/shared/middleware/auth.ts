@@ -2,18 +2,11 @@ import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { IJWTPayload } from '../../auth/auth.interface';
 import { envVars } from '../../config/env';
+import { IUser } from '../../user/user.interface';
 import { User } from '../../user/user.model';
 
-export interface AuthRequest extends Request {
-  user?: {
-    id: string;
-    email: string;
-    name: string;
-  };
-}
-
 export const authenticate = async (
-  req: AuthRequest,
+  req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
@@ -42,11 +35,9 @@ export const authenticate = async (
       return;
     }
 
-    req.user = {
-      id: user._id,
-      email: user.email,
-      name: user.name,
-    };
+    const userObj = user.toObject() as IUser;
+    userObj.id = userObj._id; // Add id alias for easier access
+    req.user = userObj;
 
     next();
   } catch (error) {

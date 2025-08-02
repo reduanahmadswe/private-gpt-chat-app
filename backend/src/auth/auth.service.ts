@@ -1,8 +1,9 @@
 import jwt from 'jsonwebtoken';
 import { envVars } from '../config/env';
 import { createError } from '../shared/middleware/errorHandler';
+import { IUser } from '../user/user.interface';
 import { User } from '../user/user.model';
-import { IAuthRequest, IAuthResponse, IJWTPayload, IRegisterRequest } from './auth.interface';
+import { IAuthRequest, IAuthResponse, IGoogleOAuthResponse, IJWTPayload, IRegisterRequest } from './auth.interface';
 
 export class AuthService {
   private generateTokens(userId: string, email: string): { token: string; refreshToken: string } {
@@ -39,6 +40,8 @@ export class AuthService {
         id: user._id.toString(),
         name: user.name,
         email: user.email,
+        avatar: user.avatar,
+        authProvider: user.authProvider,
       },
     };
   }
@@ -70,6 +73,8 @@ export class AuthService {
         id: user._id.toString(),
         name: user.name,
         email: user.email,
+        avatar: user.avatar,
+        authProvider: user.authProvider,
       },
     };
   }
@@ -98,5 +103,32 @@ export class AuthService {
     } catch (error) {
       throw createError('Invalid refresh token', 401);
     }
+  }
+
+  async handleGoogleOAuth(user: IUser): Promise<IGoogleOAuthResponse> {
+    console.log('🔑 Handling Google OAuth for user:', user.email);
+
+    // Generate tokens
+    const tokens = this.generateTokens(user._id!.toString(), user.email);
+
+    return {
+      ...tokens,
+      user: {
+        id: user._id!.toString(),
+        name: user.name,
+        email: user.email,
+        avatar: user.avatar,
+        authProvider: 'google',
+      },
+    };
+  }
+
+  async logout(userId: string): Promise<void> {
+    console.log('🚪 Logging out user:', userId);
+
+    // Clear refresh token from database
+    await User.findByIdAndUpdate(userId, {
+      $unset: { refreshToken: 1 }
+    });
   }
 }

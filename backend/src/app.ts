@@ -1,7 +1,9 @@
 import cors from 'cors'
 import express from 'express'
 import rateLimit from 'express-rate-limit'
+import session from 'express-session'
 import { envVars } from './config/env'
+import passport from './config/passport'
 import { authenticate } from './shared/middleware/auth'
 import { errorHandler, notFound } from './shared/middleware/errorHandler'
 
@@ -13,14 +15,14 @@ import userRoutes from './user/user.routes'
 const app = express()
 
 // Rate limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
-  message: 'Too many requests from this IP, please try again later.',
-})
+// const limiter = rateLimit({
+//   windowMs: 15 * 60 * 1000, // 15 minutes
+//   max: 100, // limit each IP to 10000 requests per windowMs
+//   message: 'Too many requests from this IP, please try again later.',
+// })
 
-// Middleware
-app.use(limiter)
+// // Middleware
+// app.use(limiter)
 
 // CORS Configuration
 const allowedOrigins = [
@@ -49,6 +51,21 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'X-Requested-With', 'Accept'],
 }));
 app.options('*', cors());
+
+// Session configuration for passport
+app.use(session({
+  secret: envVars.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: envVars.NODE_ENV === 'production',
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+  },
+}));
+
+// Initialize passport
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded({ extended: true }))
