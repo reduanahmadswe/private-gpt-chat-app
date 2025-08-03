@@ -156,12 +156,26 @@ frontend/
 │   │   │   ├── CallToAction.tsx # Secondary CTA with gradient button
 │   │   │   ├── Contact.tsx      # Contact form with validation
 │   │   │   └── Footer.tsx       # Footer with social links
+│   │   ├── 📁 dashboard/
+│   ├── DashboardLayout.tsx     # Main container
+│   │   │   ├── 📁 sidebar/
+│   │   │   │   ├── Sidebar.tsx     # Left sidebar
+│   │   │   ├── 📁 chat/
+│   │   │   │   ├── ChatArea.tsx        # Chat container
+│   │   │   │   ├── ChatHeader.tsx      # Chat header
+│   │   │   │   ├── ChatMessages.tsx    # Messages display
+│   │   │   │   ├── ChatInput.tsx       # Input form
+│   │   │   ├── 📁 settings/
+│   │   │   │   ├── SettingsPanel.tsx   #Settings
 │   │   ├── GoogleLoginButton.tsx # Google OAuth integration
 │   │   ├── FacebookLoginButton.tsx # Facebook OAuth integration
 │   │   ├── LoadingSpinner.tsx   # Reusable loading component
 │   │   ├── ProtectedRoute.tsx   # Authentication wrapper
 │   │   ├── PublicRoute.tsx      # Public route wrapper
 │   │   └── SessionExpiryTest.tsx # Development testing component
+│   ├── 📁 hooks/
+│   │   ├── useChat.ts              # Chat functionality
+│   │   ├── useSpeechSynthesis.ts   # TTS functionality  
 │   ├── 📁 contexts/             # React Context providers
 │   │   └── AuthContext.tsx      # Authentication state management
 │   ├── 📁 pages/                # Page components
