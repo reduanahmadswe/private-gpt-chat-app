@@ -58,8 +58,6 @@ const Dashboard: React.FC = () => {
   const [playingMessageIndex, setPlayingMessageIndex] = useState<number | null>(
     null
   );
-  const [detectedLanguages, setDetectedLanguages] = useState<{ [key: number]: string }>({});
-  const [selectedLanguages, setSelectedLanguages] = useState<{ [key: number]: string }>({});
   const [speechSynthesis, setSpeechSynthesis] =
     useState<SpeechSynthesis | null>(null);
 
@@ -260,112 +258,40 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  // Detect language from text content
-  const detectLanguage = (text: string): string => {
-    // Simple language detection based on common patterns
-    const cleanText = text.toLowerCase().trim();
-    
-    // Arabic detection
-    if (/[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/.test(text)) {
-      return 'ar';
-    }
-    
-    // Chinese detection (Simplified and Traditional)
-    if (/[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]/.test(text)) {
-      return 'zh';
-    }
-    
-    // Japanese detection
-    if (/[\u3040-\u309f\u30a0-\u30ff\u31f0-\u31ff\uff66-\uff9f]/.test(text)) {
-      return 'ja';
-    }
-    
-    // Korean detection
-    if (/[\uac00-\ud7af\u1100-\u11ff\u3130-\u318f\ua960-\ua97f\ud7b0-\ud7ff]/.test(text)) {
-      return 'ko';
-    }
-    
-    // Russian detection
-    if (/[\u0400-\u04FF]/.test(text)) {
-      return 'ru';
-    }
-    
-    // Hindi detection
-    if (/[\u0900-\u097F]/.test(text)) {
-      return 'hi';
-    }
-    
-    // Bangla/Bengali detection
-    if (/[\u0980-\u09FF]/.test(text)) {
-      return 'bn';
-    }
-    
-    // Bangla common words detection (backup method using common Bengali words)
-    if (/\b(আমি|তুমি|তিনি|আপনি|সে|আমরা|তোমরা|তারা|এটা|ওটা|এই|ঐ|যে|কে|কি|কেন|কখন|কোথায়|কিভাবে|কোন|কত|এবং|অথবা|কিন্তু|যদি|তাহলে|তবে|না|হ্যাঁ|নিশ্চয়ই|সম্ভবত|অবশ্যই|আছে|ছিল|হবে|করা|করি|করে|করেন|করেছি|করেছে|করব|করবে|বলা|বলি|বলে|বলেন|বলেছি|বলেছে|বলব|বলবে|যাওয়া|যাই|যায়|যান|গেছি|গেছে|যাব|যাবে|আসা|আসি|আসে|আসেন|এসেছি|এসেছে|আসব|আসবে|দেখা|দেখি|দেখে|দেখেন|দেখেছি|দেখেছে|দেখব|দেখবে|শোনা|শুনি|শুনে|শুনেন|শুনেছি|শুনেছে|শুনব|শুনবে|খাওয়া|খাই|খায়|খান|খেয়েছি|খেয়েছে|খাব|খাবে|পান|পানি|পড়া|পড়ি|পড়ে|পড়েন|পড়েছি|পড়েছে|পড়ব|পড়বে|লেখা|লিখি|লিখে|লিখেন|লিখেছি|লিখেছে|লিখব|লিখবে|ভাল|ভালো|মন্দ|বড়|ছোট|উচ্চ|নিচু|দীর্ঘ|খাটো|সুন্দর|কুৎসিত|নতুন|পুরাতন|তরুণ|বৃদ্ধ|গরম|ঠান্ডা|শুকনো|ভেজা|সহজ|কঠিন|দ্রুত|ধীর|শক্তিশালী|দুর্বল|পরিষ্কার|নোংরা|স্বচ্ছ|অন্ধকার|উজ্জ্বল|রঙিন|কালো|সাদা|লাল|নীল|সবুজ|হলুদ|গোলাপী|বেগুনী|কমলা|বাদামী|ধূসর|রৌপ্য|সোনা|একটি|দুটি|তিনটি|চারটি|পাঁচটি|ছয়টি|সাতটি|আটটি|নয়টি|দশটি|শূন্য|প্রথম|দ্বিতীয়|তৃতীয়|চতুর্থ|পঞ্চম|ষষ্ঠ|সপ্তম|অষ্টম|নবম|দশম|গতকাল|আজ|আগামীকাল|সকাল|দুপুর|বিকাল|সন্ধ্যা|রাত|সপ্তাহ|মাস|বছর|দিন|ঘন্টা|মিনিট|সেকেন্ড|সময়|ঠিকানা|বাড়ি|ঘর|অফিস|স্কুল|কলেজ|বিশ্ববিদ্যালয়|হাসপাতাল|দোকান|বাজার|রাস্তা|পার্ক|নদী|সমুদ্র|পাহাড়|বন|মাঠ|আকাশ|সূর্য|চাঁদ|তারা|বৃষ্টি|বাতাস|আগুন|পানি|মাটি|গাছ|ফুল|ফল|সবজি|মাছ|মাংস|চাল|রুটি|দুধ|চা|কফি|চিনি|লবণ|তেল|ডিম|মুরগি|গরু|ছাগল|কুকুর|বিড়াল|পাখি|মাছি|মশা|প্রজাপতি|মৌমাছি|পিঁপড়া|মাকড়সা|সাপ|ব্যাঙ|হাতি|বাঘ|সিংহ|ভালুক|বানর|হরিণ|খরগোশ|ইঁদুর|ঘোড়া|গাধা|উট|ভেড়া|শূকর|পাখা|চোখ|নাক|মুখ|কান|হাত|পা|মাথা|গলা|বুক|পেট|পিঠ|কাঁধ|হাঁটু|আঙ্গুল|নখ|চুল|দাঁত|জিভ|হৃদয়|মন|মস্তিষ্ক|আত্মা|শরীর|রক্ত|হাড়|মাংস|চামড়া|কাপড়|জামা|প্যান্ট|শার্ট|টি-শার্ট|জুতা|মোজা|টুপি|চশমা|ঘড়ি|আংটি|হার|কানের|দুল|ব্যাগ|মানিব্যাগ|টাকা|পয়সা|রুপি|ডলার|ইউরো|পাউন্ড|কার্ড|চেক|ব্যাংক|হিসাব|ঋণ|সুদ|বিনিয়োগ|ব্যবসা|কাজ|চাকরি|বেতন|আয়|খরচ|লাভ|ক্ষতি|বিক্রয়|ক্রয়|কেনা|বেচা|দেওয়া|নেওয়া|দান|উপহার|ভাড়া|মূল্য|দাম|সস্তা|দামি|বিনামূল্যে|প্রেম|ভালোবাসা|বন্ধুত্ব|বিয়ে|পরিবার|মা|বাবা|ছেলে|মেয়ে|ভাই|বোন|স্বামী|স্ত্রী|দাদা|দাদি|নানা|নানি|চাচা|চাচি|মামা|মামি|ফুপু|খালা|জ্ঞাতি|আত্মীয়|প্রতিবেশী|বন্ধু|শত্রু|অতিথি|মেহমান|সভা|অনুষ্ঠান|উৎসব|জন্মদিন|বিবাহ|মৃত্যু|জানাজা|নামাজ|রোজা|হজ|যাকাত|দান|সাদাকা|দোয়া|তসবিহ|কোরআন|হাদিস|ইসলাম|মুসলিম|হিন্দু|বৌদ্ধ|খ্রিস্টান|ধর্ম|আল্লাহ|ভগবান|ঈশ্বর|পূজা|প্রার্থনা|মন্দির|মসজিদ|গির্জা|প্যাগোডা|ধর্মীয়|আধ্যাত্মিক|পবিত্র|অপবিত্র|পাপ|পুণ্য|নরক|স্বর্গ|মৃত্যুর|পরে|পরকাল|ইহকাল|জীবন|মরণ|জন্ম|মৃত্যু|শ্বাস|নিঃশ্বাস|স্বাস্থ্য|অসুস্থতা|রোগ|ব্যাধি|ওষুধ|চিকিৎসা|ডাক্তার|নার্স|রোগী|হাসপাতাল|ক্লিনিক|অস্ত্রোপচার|ইনজেকশন|গোলি|সিরাপ|ক্রিম|মলম|ব্যান্ডেজ|প্রাথমিক|চিকিৎসা|জরুরি|অবস্থা|দুর্ঘটনা|আঘাত|ব্যথা|ক্লান্তি|দুর্বলতা|মাথাব্যথা|পেটব্যথা|জ্বর|সর্দি|কাশি|হাঁচি|ডায়রিয়া|বমি|মাথা|ঘোরা|অজ্ঞান|রক্তপাত|ক্ষত|সংক্রমণ|ভাইরাস|ব্যাকটেরিয়া|জীবাণু|প্রতিরোধ|টিকা|পরীক্ষা|ফলাফল|রিপোর্ট|এক্স-রে|আল্ট্রাসাউন্ড|ইসিজি|রক্ত|পরীক্ষা|প্রস্রাব|পরীক্ষা|মল|পরীক্ষা|চোখের|পরীক্ষা|কানের|পরীক্ষা|দাঁতের|পরীক্ষা|শিক্ষা|শেখা|পড়াশোনা|জ্ঞান|বিদ্যা|শিক্ষক|ছাত্র|ছাত্রী|ক্লাস|পাঠ|বই|খাতা|কলম|পেন্সিল|রাবার|শার্পনার|স্কেল|কম্পাস|ক্যালকুলেটর|কম্পিউটার|ল্যাপটপ|ট্যাবলেট|মোবাইল|ফোন|ইন্টারনেট|ইমেইল|ফেসবুক|হোয়াটসঅ্যাপ|ইউটিউব|গুগল|ওয়েবসাইট|অ্যাপ|গেম|ভিডিও|অডিও|ছবি|ফটো|ক্যামেরা|ভিডিও|ক্যামেরা|রেকর্ডার|স্পিকার|হেডফোন|মাইক্রোফোন|কিবোর্ড|মাউস|মনিটর|প্রিন্টার|স্ক্যানার|পেন|ড্রাইভ|মেমোরি|কার্ড|চার্জার|ব্যাটারি|পাওয়ার|ব্যাংক|ক্যাবল|ওয়াইফাই|ব্লুটুথ|এনএফসি|জিপিএস|লোকেশন|ম্যাপ|দিক|নির্দেশনা|উত্তর|দক্ষিণ|পূর্ব|পশ্চিম|বাম|ডান|সামনে|পিছনে|উপরে|নিচে|ভিতরে|বাইরে|কাছে|দূরে|মধ্যে|মাঝখানে|কোণে|পাশে|সাথে|ছাড়া|বিনা|সহ|দিয়ে|জন্য|কারণে|উদ্দেশ্যে|লক্ষ্যে|দিকে|প্রতি|বিপরীতে|বিরুদ্ধে|পক্ষে|অনুকূলে|প্রতিকূলে|সুবিধা|অসুবিধা|লাভ|ক্ষতি|হার|জিত|পরাজয়|সফলতা|ব্যর্থতা|উন্নতি|অবনতি|প্রগতি|পশ্চাদপদতা|আগে|পরে|আগামী|গত|বর্তমান|ভবিষ্যৎ|অতীত|এখন|তখন|কখনো|সবসময়|কখনো|না|মাঝে|মধ্যে|দ্রুত|ধীরে|তাড়াতাড়ি|দেরি|সময়মতো|অসময়ে|যথাসময়ে|ঠিক|সময়ে|শীঘ্র|অতি|শীঘ্র|অবিলম্বে|তাৎক্ষণিক|দ্রুততম|ধীরতম|সর্বোচ্চ|সর্বনিম্ন|বেশি|কম|অনেক|কিছু|সব|সকল|সমস্ত|কেউ|কেউই|না|কিছুই|না|সবকিছু|যা|কিছু|যেকোনো|কিছু|বিশেষ|কিছু|নির্দিষ্ট|কিছু|অনির্দিষ্ট|কিছু|গুরুত্বপূর্ণ|কিছু|অগুরুত্বপূর্ণ|কিছু|প্রয়োজনীয়|কিছু|অপ্রয়োজনীয়|কিছু|দরকারি|কিছু|অদরকারি|কিছু|উপকারী|কিছু|ক্ষতিকর|কিছু|ভাল|কিছু|মন্দ|কিছু|সঠিক|কিছু|ভুল|কিছু|সত্য|কিছু|মিথ্যা|কিছু|সহজ|কিছু|কঠিন|কিছু|সম্ভব|কিছু|অসম্ভব|কিছু|নিশ্চিত|কিছু|অনিশ্চিত|কিছু|স্পষ্ট|কিছু|অস্পষ্ট|কিছু|পরিষ্কার|কিছু|অপরিষ্কার|কিছু|সুন্দর|কিছু|কুৎসিত|কিছু|আকর্ষণীয়|কিছু|বিকর্ষণকারী|কিছু|মজার|কিছু|বিরক্তিকর|কিছু|আনন্দদায়ক|কিছু|দুঃখজনক|কিছু|খুশির|কিছু|দুঃখের|কিছু|হাসির|কিছু|কান্নার|কিছু|প্রেমের|কিছু|ঘৃণার|কিছু|বন্ধুত্বের|কিছু|শত্রুতার|কিছু|শান্তির|কিছু|যুদ্ধের|কিছু|সুখের|কিছু|দুঃখের|কিছু|আশার|কিছু|হতাশার|কিছু|স্বপ্নের|কিছু|দুঃস্বপ্নের|কিছু|ভয়ের|কিছু|সাহসের|কিছু|ভীতিকর|কিছু|সাহসী|কিছু|দুর্বল|কিছু|শক্তিশালী|কিছু|গুরুত্বপূর্ণ|কিছু|তুচ্ছ|কিছু|মূল্যবান|কিছু|মূল্যহীন|কিছু|দামি|কিছু|সস্তা|কিছু|বিনামূল্যে|কিছু|ব্যয়বহুল|কিছু|লাভজনক|কিছু|ক্ষতিকর|কিছু|উপকারী|কিছু|নিরীহ|কিছু|ক্ষতিকারক|কিছু|নিরাপদ|কিছু|বিপজ্জনক|কিছু|স্বাস্থ্যকর|কিছু|অস্বাস্থ্যকর|কিছু|প্রাকৃতিক|কিছু|কৃত্রিম|কিছু|আসল|কিছু|নকল|কিছু|খাঁটি|কিছু|ভেজাল|কিছু|তাজা|কিছু|বাসি|কিছু|নতুন|কিছু|পুরাতন|কিছু|আধুনিক|কিছু|প্রাচীন|কিছু|যুগোপযোগী|কিছু|সেকেলে|কিছু|ফ্যাশনেবল|কিছু|পুরানো|ধাঁচের|কিছু|জনপ্রিয়|কিছু|অজনপ্রিয়|কিছু|বিখ্যাত|কিছু|অখ্যাত|কিছু|প্রসিদ্ধ|কিছু|অপ্রসিদ্ধ|কিছু|নামকরা|কিছু|নামহীন|কিছু|পরিচিত|কিছু|অপরিচিত|কিছু|জানা|কিছু|অজানা|কিছু|স্পষ্ট|কিছু|গোপন|কিছু|প্রকাশ্য|কিছু|লুকানো|কিছু|খোলা|কিছু|বন্ধ|কিছু|চালু|কিছু|বন্ধ|কিছু|সক্রিয়|কিছু|নিষ্ক্রিয়|কিছু|জীবিত|কিছু|মৃত|কিছু|সজীব|কিছু|নির্জীব|কিছু|চলমান|কিছু|স্থির|কিছু|গতিশীল|কিছু|অচল|কিছু|দ্রুত|কিছু|ধীর|কিছু|তীব্র|কিছু|মৃদু|কিছু|জোরে|কিছু|আস্তে|কিছু|উচ্চ|কিছু|নিচু|কিছু|উঁচু|কিছু|খাটো|কিছু|লম্বা|কিছু|বেঁটে|কিছু|মোটা|কিছু|চিকন|কিছু|ভারী|কিছু|হালকা|কিছু|ঘন|কিছু|পাতলা|কিছু|পুরু|কিছু|সরু|কিছু|চওড়া|কিছু|সংকীর্ণ|কিছু|প্রশস্ত|কিছু|গভীর|কিছু|অগভীর|কিছু|উষ্ণ|কিছু|শীতল|কিছু|গরম|কিছু|ঠান্ডা|কিছু|শুকনো|কিছু|ভেজা|কিছু|আর্দ্র|কিছু|শুষ্ক|কিছু|মসৃণ|কিছু|রুক্ষ|কিছু|নরম|কিছু|শক্ত|কিছু|তরল|কিছু|কঠিন|কিছু|গ্যাসীয়|কিছু|তীক্ষ্ণ|কিছু|ভোঁতা|কিছু)\b/.test(cleanText)) {
-      return 'bn';
-    }
-    
-    // Spanish detection (common words and patterns)
-    if (/\b(el|la|los|las|un|una|de|en|que|es|se|no|te|lo|le|da|su|por|son|con|para|una|ser|estar|tener|hacer|poder|decir|todo|muy|bien|donde|cuando|como|porque|entre|durante|desde|hasta|hacia|sobre|bajo|ante|tras|según|sin|mediante|excepto|salvo|incluso|además|también|tampoco|sino|pero|aunque|mientras|si|porque|para|por|como|cuando|donde|quien|cual|cuyo|cuya|cuyos|cuyas)\b/.test(cleanText)) {
-      return 'es';
-    }
-    
-    // French detection (common words and patterns)
-    if (/\b(le|la|les|un|une|de|du|des|et|est|en|à|il|elle|on|nous|vous|ils|elles|ce|cette|ces|son|sa|ses|mon|ma|mes|ton|ta|tes|notre|nos|votre|vos|leur|leurs|pour|avec|par|sur|sous|dans|sans|entre|pendant|depuis|jusqu|vers|chez|contre|malgré|selon|sauf|hormis|outre|parmi|après|avant|devant|derrière|dessus|dessous|dedans|dehors|autour|auprès|près|loin|partout|nulle|quelque|chaque|tout|tous|toute|toutes|autre|autres|même|mêmes|tel|telle|tels|telles|quel|quelle|quels|quelles|qui|que|quoi|dont|où|comment|pourquoi|quand|combien|beaucoup|peu|assez|très|trop|plus|moins|aussi|autant|tant|si|oui|non|peut|être|avoir|faire|dire|aller|voir|savoir|vouloir|pouvoir|devoir|falloir|venir|donner|prendre|partir|arriver|rester|devenir|tenir|porter|mettre|suivre|vivre|mourir|naître|connaître|paraître|croire|sembler|regarder|écouter|entendre|parler|répondre|demander|penser|comprendre|apprendre|enseigner|oublier|se|souvenir|rappeler|espérer|souhaiter|désirer|aimer|détester|préférer|choisir|décider|essayer|réussir|échouer|gagner|perdre|trouver|chercher|attendre|rencontrer|quitter|laisser|garder|sauver|aider|servir|utiliser|employer|travailler|jouer|dormir|manger|boire|acheter|vendre|payer|coûter|valoir|peser|mesurer|compter|calculer|lire|écrire|dessiner|chanter|danser|rire|pleurer|sourire|crier|parler|se|taire|écouter|entendre|sentir|toucher|goûter|voir|regarder|montrer|cacher|ouvrir|fermer|commencer|finir|continuer|arrêter|partir|arriver|entrer|sortir|monter|descendre|tomber|lever|coucher|habiller|déshabiller|laver|nettoyer|salir|casser|réparer|construire|détruire|créer|inventer|découvrir|perdre|trouver|garder|laisser|prendre|donner|recevoir|envoyer|apporter|emporter|porter|jeter|ramasser|pousser|tirer|frapper|toucher|caresser|embrasser|serrer|lâcher|tenir|saisir|attraper|lancer|courir|marcher|sauter|nager|voler|conduire|voyager|visiter|habiter|demeurer|loger|rester|partir|revenir|retourner|rentrer|sortir|aller|venir|passer|traverser|suivre|précéder|accompagner|guider|mener|diriger|commander|obéir|interdire|permettre|autoriser|défendre|protéger|attaquer|se|défendre|combattre|vaincre|perdre|gagner|réussir|échouer|essayer|tenter|risquer|oser|craindre|avoir|peur|rassurer|calmer|énerver|fâcher|mettre|en|colère|pardonner|excuser|remercier|féliciter|encourager|décourager|consoler|plaindre|critiquer|louer|admirer|respecter|mépriser|hair|aimer|adorer|préférer|choisir|élire|nommer|appeler|surnommer|baptiser|marier|divorcer|séparer|unir|joindre|lier|attacher|détacher|nouer|dénouer|serrer|desserrer|fermer|ouvrir|allumer|éteindre|éclairer|assombrir|chauffer|refroidir|réchauffer|refroidir|geler|fondre|bouillir|cuire|rôtir|griller|frire|bouillir|mijoter|préparer|cuisiner|servir|goûter|manger|boire|avaler|mâcher|croquer|lécher|sucer|cracher|vomir|digérer|nourrir|affamer|rassasier|satisfaire|contenter|plaire|déplaire|ennuyer|amuser|divertir|intéresser|passionner|émouvoir|toucher|impressionner|surprendre|étonner|choquer|scandaliser|indigner|révolter|dégoûter|écœurer|attirer|repousser|séduire|charmer|fasciner|hypnotiser|endormir|réveiller|rêver|cauchemar|espérer|souhaiter|désirer|vouloir|exiger|demander|supplier|prier|implorer|ordonner|commander|conseiller|recommander|suggérer|proposer|offrir|refuser|accepter|accueillir|recevoir|inviter|convier|aller|voir|visiter|rencontrer|retrouver|rejoindre|quitter|abandonner|laisser|rester|demeurer|habiter|loger|vivre|exister|naître|mourir|tuer|assassiner|massacrer|exterminer|sauver|secourir|aider|assister|soutenir|encourager|motiver|inspirer|influencer|persuader|convaincre|séduire|tromper|mentir|dire|la|vérité|avouer|confesser|nier|cacher|dissimuler|révéler|dévoiler|montrer|cacher|exposer|présenter|représenter|symboliser|signifier|vouloir|dire|exprimer|traduire|interpréter|expliquer|clarifier|préciser|détailler|résumer|abréger|raccourcir|allonger|étendre|élargir|rétrécir|grandir|grossir|maigrir|mincir|vieillir|rajeunir|embellir|enlaidir|améliorer|empirer|réparer|abîmer|casser|détruire|construire|bâtir|édifier|ériger|démolir|raser|nettoyer|salir|laver|sécher|mouiller|tremper|imbiber|absorber|boire|étancher|arroser|inonder|noyer|sauver|couler|flotter|nager|plonger|émerger|remonter|descendre|monter|grimper|escalader|tomber|chuter|glisser|trébucher|se|relever|lever|coucher|allonger|étendre|plier|déplier|courber|redresser|pencher|incliner|balancer|osciller|trembler|frissonner|grelotter|suer|transpirer|haleter|souffler|respirer|inspirer|expirer|suffoquer|étouffer|asphyxier|revivre|ressusciter|renaître|mourir|décéder|périr|succomber|agoniser|survivre|résister|supporter|endurer|souffrir|souffrir|mal|avoir|mal|guérir|soigner|traiter|opérer|panser|bander|déshabiller|habiller|vêtir|revêtir|porter|mettre|enlever|ôter|retirer|chausser|déchausser|coiffer|décoiffer|maquiller|démaquiller|raser|se|raser|couper|tailler|rogner|élaguer|émonder|cueillir|ramasser|récolter|moissonner|semer|planter|arroser|bêcher|labourer|cultiver|jardiner|fleurir|faner|se|faner|pourrir|moisir|fermenter|aigrir|se|gâter|conserver|garder|préserver|protéger|abriter|couvrir|découvrir|dénuder|déshabiller|habiller|envelopper|développer|emballer|déballer|empaqueter|dépaqueter|ficeler|déficeler|nouer|dénouer|attacher|détacher|lier|délier|enchaîner|déchaîner|libérer|délivrer|affranchir|émanciper|asservir|asservir|exploiter|opprimer|dominer|régner|gouverner|diriger|administrer|gérer|organiser|désorganiser|ranger|déranger|classer|déclasser|trier|mélanger|mêler|séparer|diviser|partager|distribuer|répartir|rassembler|réunir|assembler|démonter|monter|installer|désinstaller|brancher|débrancher|connecter|déconnecter|allumer|éteindre|démarrer|arrêter|commencer|finir|terminer|achever|compléter|parfaire|perfectionner|améliorer|corriger|rectifier|redresser|réparer|raccommoder|rapiécer|ravauder|repriser|coudre|découdre|tricoter|détricoter|tisser|détisser|filer|défiler|enrouler|dérouler|plier|déplier|froisser|défroisser|repasser|chiffonner|lisser|aplanir|égaliser|niveler|creuser|combler|boucher|déboucher|percer|trouer|forer|perforateur|clouer|déclouer|visser|dévisser|boulonner|déboulonner|souder|dessouder|coller|décoller|scotcher|scotcher|agrafer|dégrafer|épingler|dépingler|punaise|épingle|attache|détache|accroche|décroche|suspend|pend|balance|oscille|remue|bouge|déplace|transporte|porte|emporte|apporte|ramène|emmène|amène|conduit|mène|guide|accompagne|suit|précède|devance|rattrape|poursuit|fuit|s|enfuit|s|échappe|s|évade|se|sauve|court|courre|galope|trotte|marche|se|promène|déambule|erre|vagabonde|voyage|se|déplace|circule|roule|navigue|vogue|navigue|pilote|conduit|dirige|manie|manipule|manœuvre|actionne|déclenche|provoque|cause|occasionne|entraîne|amène|mène|conduit|aboutit|résulte|découle|provient|vient|sort|émane|jaillit|surgit|apparaît|se|montre|se|manifeste|se|révèle|se|dévoile|cache|dissimule|masque|voile|couvre|recouvre|découvre|dévoile|révèle|expose|présente|montre|fait|voir|exhibe|étale|déploie|déplie|replie|plie|froisse|chiffonne|lisse|aplanit|égalise|nivelle|creuse|comble|bouche|débouche|perce|troue|fore|cloue|décloue|visse|dévisse|boulonne|déboulonne|soude|dessoude|colle|décolle|scotche|agrafe|dégrafe|épingle|dépingle|attache|détache|accroche|décroche|suspend|balance|remue|bouge|déplace|transporte|porte|emporte|apporte|ramène|emmène|amène|conduit|mène|guide|accompagne|suit|précède|devance|rattrape|poursuit|fuit|échappe|évade|sauve|court|galope|trotte|marche|promène|déambule|erre|vagabonde|voyage|déplace|circule|roule|navigue|vogue|pilote|conduit|dirige|manie|manipule|manœuvre|actionne|déclenche|provoque|cause|occasionne|entraîne|amène|mène|conduit|aboutit|résulte|découle|provient|vient|sort|émane|jaillit|surgit|apparaît|montre|manifeste|révèle|dévoile|cache|dissimule|masque|voile|couvre|recouvre|découvre|dévoile|révèle|expose|présente|montre|fait|voir|exhibe|étale|déploie|déplie|replie|plie|froisse|chiffonne|lisse|aplanit|égalise|nivelle|creuse|comble|bouche|débouche|perce|troue|fore|cloue|décloue|visse|dévisse|boulonne|déboulonne|soude|dessoude|colle|décolle|scotche|agrafe|dégrafe|épingle|dépingle|attache|détache|accroche|décroche|suspend|balance|remue|bouge|déplace|transporte|porte|emporte|apporte|ramène|emmène|amène|conduit|mène|guide|accompagne|suit|précède|devance|rattrape|poursuit|fuit|échappe|évade|sauve|court|galope|trotte|marche|promène|déambule|erre|vagabonde|voyage|déplace|circule|roule|navigue|vogue|pilote|conduit|dirige|manie|manipule|manœuvre|actionne|déclenche|provoque|cause|occasionne|entraîne|amène|mène|conduit|aboutit|résulte|découle|provient|vient|sort|émane|jaillit|surgit|apparaît|montre|manifeste|révèle|dévoile|cache|dissimule|masque|voile|couvre|recouvre|découvre|dévoile|révèle|expose|présente|montre|fait|voir|exhibe|étale|déploie)\b/.test(cleanText)) {
-      return 'fr';
-    }
-    
-    // German detection (common words and patterns)
-    if (/\b(der|die|das|den|dem|des|ein|eine|einen|einem|einer|eines|und|oder|aber|doch|jedoch|sondern|denn|weil|da|wenn|falls|als|während|nachdem|bevor|seit|bis|ob|dass|damit|um|zu|ohne|mit|bei|von|zu|nach|vor|über|unter|neben|zwischen|durch|für|gegen|wider|trotz|wegen|statt|anstatt|außer|bis|seit|während|wegen|trotz|statt|anstatt|außer|binnen|kraft|laut|mangels|mittels|vermöge|bezüglich|hinsichtlich|angesichts|anläßlich|aufgrund|infolge|zufolge|zwecks|halber|um|willen|ich|du|er|sie|es|wir|ihr|sie|mich|dich|ihn|sie|es|uns|euch|sie|mir|dir|ihm|ihr|ihm|uns|euch|ihnen|mein|dein|sein|ihr|sein|unser|euer|ihr|meine|deine|seine|ihre|seine|unsere|eure|ihre|meinen|deinen|seinen|ihren|seinen|unseren|euren|ihren|meinem|deinem|seinem|ihrem|seinem|unserem|eurem|ihrem|meiner|deiner|seiner|ihrer|seiner|unserer|eurer|ihrer|meines|deines|seines|ihres|seines|unseres|eures|ihres|dieser|diese|dieses|diesen|diesem|dieser|jener|jene|jenes|jenen|jenem|jener|welcher|welche|welches|welchen|welchem|welcher|alle|aller|alles|allen|allem|einige|einiger|einiges|einigen|einigem|viele|vieler|vieles|vielen|vielem|wenige|weniger|weniges|wenigen|wenigem|andere|anderer|anderes|anderen|anderem|beide|beider|beides|beiden|beidem|jede|jeder|jedes|jeden|jedem|keine|keiner|keines|keinen|keinem|solche|solcher|solches|solchen|solchem|sein|haben|werden|können|müssen|sollen|wollen|dürfen|mögen|lassen|gehen|kommen|sehen|hören|sagen|machen|tun|geben|nehmen|bringen|fahren|laufen|stehen|sitzen|liegen|schlafen|essen|trinken|kaufen|verkaufen|arbeiten|spielen|lernen|lehren|lesen|schreiben|sprechen|hören|verstehen|wissen|denken|glauben|meinen|fühlen|lieben|hassen|mögen|wünschen|hoffen|fürchten|sich|freuen|ärgern|wundern|kümmern|sorgen|helfen|danken|bitten|fragen|antworten|rufen|lachen|weinen|lächeln|schauen|blicken|zeigen|verstecken|finden|suchen|verlieren|bekommen|erhalten|geben|schenken|leihen|borgen|zahlen|kosten|wert|sein|wiegen|messen|zählen|rechnen|bauen|zerstören|reparieren|putzen|waschen|kochen|backen|braten|schneiden|öffnen|schließen|beginnen|anfangen|aufhören|enden|weitermachen|fortsetzen|bleiben|gehen|kommen|fahren|fliegen|reisen|besuchen|wohnen|leben|sterben|geboren|werden|heiraten|scheiden|lassen|trennen|verbinden|treffen|kennenlernen|verabschieden|grüßen|winken|rufen|schreien|flüstern|schweigen|reden|erzählen|berichten|erklären|beschreiben|kritisieren|loben|tadeln|ermutigen|trösten|beruhigen|ärgern|aufregen|erschrecken|überraschen|freuen|enttäuschen|langweilen|interessieren|begeistern|faszinieren|anziehen|abstoßen|gefallen|missfallen|passen|gehören|besitzen|haben|brauchen|benötigen|verwenden|benutzen|gebrauchen|anwenden|einsetzen|ausnutzen|missbrauchen|verschwenden|sparen|sammeln|anhäufen|verteilen|teilen|geben|nehmen|tauschen|handeln|verkaufen|kaufen|bezahlen|verdienen|ausgeben|investieren|anlegen|leihen|schulden|besitzen|gehören|erben|vererben|schenken|spenden|stiften|opfern|riskieren|wagen|versuchen|probieren|testen|prüfen|kontrollieren|überwachen|beobachten|zusehen|zuhören|lauschen|horchen|riechen|schmecken|fühlen|berühren|anfassen|streicheln|küssen|umarmen|drücken|schlagen|treten|stoßen|ziehen|schieben|heben|senken|fallen|lassen|werfen|fangen|treffen|verfehlen|zielen|schießen|kämpfen|streiten|sich|versöhnen|vergeben|verzeihen|entschuldigen|bereuen|bedauern|sich|schämen|stolz|sein|sich|freuen|ärgern|aufregen|beruhigen|entspannen|anspannen|müde|sein|sich|ausruhen|erholen|schlafen|träumen|aufwachen|aufstehen|sich|hinlegen|hinsetzen|hinstellen|gehen|laufen|rennen|springen|hüpfen|tanzen|singen|musizieren|malen|zeichnen|fotografieren|filmen|schreiben|lesen|rechnen|studieren|forschen|entdecken|erfinden|entwickeln|konstruieren|herstellen|produzieren|erzeugen|schaffen|kreieren|gestalten|formen|bilden|erziehen|unterrichten|ausbilden|schulen|trainieren|üben|praktizieren|spielen|wettkämpfen|gewinnen|verlieren|siegen|besiegen|unterliegen|scheitern|misslingen|gelingen|schaffen|erreichen|erzielen|verwirklichen|erfüllen|vollenden|beenden|abschließen|fertigstellen|vorbereiten|planen|organisieren|ordnen|sortieren|aufräumen|saubermachen|schmutzig|machen|beschmutzen|reinigen|säubern|waschen|trocknen|bügeln|nähen|stricken|häkeln|weben|spinnen|färben|bemalen|anstreichen|lackieren|polieren|schleifen|hobeln|sägen|bohren|hämmern|nageln|schrauben|kleben|leimen|schweißen|löten|reparieren|flicken|stopfen|ausbessern|erneuern|ersetzen|austauschen|wechseln|ändern|verändern|verwandeln|umwandeln|bekehren|überzeugen|überreden|beeinflussen|manipulieren|kontrollieren|beherrschen|regieren|leiten|führen|anführen|vorangehen|folgen|nachfolgen|begleiten|mitgehen|mitkommen|abholen|bringen|holen|wegbringen|fortbringen|mitnehmen|dalassen|zurücklassen|verlassen|im|Stich|lassen|helfen|unterstützen|beistehen|assistieren|dienen|bedienen|versorgen|pflegen|hegen|hüten|bewachen|beschützen|verteidigen|angreifen|kämpfen|gegen|widersetzen|sich|wehren|gegen|protestieren|demonstrieren|streiken|sich|beschweren|kritisieren|bemängeln|beanstanden|reklamieren|sich|ärgern|über|sich|freuen|über|sich|wundern|über|sich|sorgen|um|sich|kümmern|um|sich|interessieren|für|sich|begeistern|für|sich|einsetzen|für|sich|engagieren|für|sich|bemühen|um|sich|anstrengen|sich|Mühe|geben|sich|beeilen|sich|Zeit|lassen|warten|auf|hoffen|auf|rechnen|mit|zählen|auf|sich|verlassen|auf|vertrauen|auf|glauben|an|zweifeln|an|denken|an|sich|erinnern|an|sich|gewöhnen|an|sich|anpassen|an|reagieren|auf|antworten|auf|eingehen|auf|zurückkommen|auf|sich|beziehen|auf|hinweisen|auf|aufmerksam|machen|auf|achten|auf|aufpassen|auf|sich|konzentrieren|auf|sich|spezialisieren|auf|sich|beschränken|auf|sich|begrenzen|auf|verzichten|auf|ablehnen|verweigern|sich|weigern|protestieren|gegen|sich|wehren|gegen|kämpfen|gegen|ankämpfen|gegen|sich|durchsetzen|gegen|siegen|über|triumphieren|über|gewinnen|gegen|verlieren|gegen|unterliegen|scheitern|an|misslingen|gelingen|glücken|klappen|funktionieren|arbeiten|laufen|gehen|fahren|fliegen|schwimmen|tauchen|klettern|steigen|fallen|sinken|untergehen|aufgehen|scheinen|leuchten|strahlen|glänzen|funkeln|blitzen|donnern|regnen|schneien|hageln|stürmen|wehen|blasen|pfeifen|rauschen|brausen|tosen|dröhnen|klingen|tönen|hallen|schallen|widerhallen|erklingen|ertönen|verstummen|schweigen|still|sein|ruhig|sein|sich|beruhigen|sich|aufregen|sich|ärgern|sich|freuen|sich|wundern|sich|fürchten|sich|erschrecken|sich|schämen|sich|blamieren|sich|genieren|sich|schämen|für|stolz|sein|auf|sich|freuen|über|sich|ärgern|über|sich|wundern|über|sich|fürchten|vor|Angst|haben|vor|sich|sorgen|um|sich|kümmern|um|sich|interessieren|für|sich|begeistern|für|sich|einsetzen|für|sich|engagieren|für|sich|bemühen|um|sich|anstrengen|sich|Mühe|geben|sich|beeilen|sich|Zeit|lassen|warten|auf|hoffen|auf|rechnen|mit|zählen|auf|sich|verlassen|auf|vertrauen|auf|glauben|an|zweifeln|an|denken|an|sich|erinnern|an|sich|gewöhnen|an|sich|anpassen|an|reagieren|auf|antworten|auf|eingehen|auf|zurückkommen|auf|sich|beziehen|auf|hinweisen|auf|aufmerksam|machen|auf|achten|auf|aufpassen|auf|sich|konzentrieren|auf|sich|spezialisieren|auf|sich|beschränken|auf|sich|begrenzen|auf|verzichten|auf|ablehnen|verweigern|sich|weigern|protestieren|gegen|sich|wehren|gegen|kämpfen|gegen|ankämpfen|gegen|sich|durchsetzen|gegen|siegen|über|triumphieren|über|gewinnen|gegen|verlieren|gegen|unterliegen|scheitern|an|misslingen|gelingen|glücken|klappen|funktionieren|arbeiten|laufen|gehen|fahren|fliegen|schwimmen|tauchen|klettern|steigen|fallen|sinken|untergehen|aufgehen|scheinen|leuchten|strahlen|glänzen|funkeln|blitzen|donnern|regnen|schneien|hageln|stürmen|wehen|blasen|pfeifen|rauschen|brausen|tosen|dröhnen|klingen|tönen|hallen|schallen|widerhallen|erklingen|ertönen|verstummen|schweigen|still|sein|ruhig|sein|sich|beruhigen|sich|aufregen|sich|ärgern|sich|freuen|sich|wundern|sich|fürchten|sich|erschrecken|sich|schämen|sich|blamieren|sich|genieren)\b/.test(cleanText)) {
-      return 'de';
-    }
-    
-    // Italian detection (common words and patterns)
-    if (/\b(il|lo|la|gli|le|un|uno|una|di|a|da|in|con|su|per|tra|fra|e|o|ma|però|quindi|così|quando|dove|come|perché|se|che|cui|quale|chi|cosa|quanto|molto|poco|più|meno|anche|ancora|già|mai|sempre|spesso|qualche|ogni|tutto|tutti|tutte|altro|altri|altre|stesso|stessa|stessi|stesse|proprio|propria|propri|proprie|questo|questa|questi|queste|quello|quella|quelli|quelle|essere|avere|fare|dire|andare|venire|stare|dare|sapere|vedere|dovere|potere|volere|uscire|partire|tornare|rimanere|diventare|sembrare|parere|sentire|vivere|morire|nascere|crescere|amare|odiare|piacere|dispiacere|interessare|annoiare|divertire|sorprendere|stupire|meravigliare|spaventare|rassicurare|calmare|innervosire|arrabbiare|far|arrabbiare|perdonare|scusare|ringraziare|congratulare|incoraggiare|scoraggiare|consolare|compatire|criticare|lodare|ammirare|rispettare|disprezzare|odiare|amare|adorare|preferire|scegliere|eleggere|nominare|chiamare|soprannominare|battezzare|sposare|divorziare|separare|unire|congiungere|legare|attaccare|staccare|annodare|slegare|stringere|allentare|chiudere|aprire|accendere|spegnere|illuminare|oscurare|riscaldare|raffreddare|riscaldare|raffreddare|gelare|sciogliere|bollire|cuocere|arrostire|grigliare|friggere|bollire|cucinare|preparare|servire|assaggiare|mangiare|bere|ingoiare|masticare|mordere|leccare|succhiare|sputare|vomitare|digerire|nutrire|affamare|saziare|soddisfare|accontentare|piacere|dispiacere|annoiare|divertire|interessare|appassionare|commuovere|toccare|impressionare|sorprendere|stupire|scioccare|scandalizzare|indignare|rivoltare|disgustare|fare|schifo|attrarre|respingere|sedurre|affascinare|ipnotizzare|addormentare|svegliare|sognare|incubare|sperare|desiderare|volere|esigere|chiedere|supplicare|pregare|implorare|ordinare|comandare|consigliare|raccomandare|suggerire|proporre|offrire|rifiutare|accettare|accogliere|ricevere|invitare|andare|a|trovare|visitare|incontrare|ritrovare|raggiungere|lasciare|abbandonare|rimanere|restare|abitare|vivere|esistere|nascere|morire|uccidere|assassinare|massacrare|sterminare|salvare|soccorrere|aiutare|assistere|sostenere|incoraggiare|motivare|ispirare|influenzare|persuadere|convincere|sedurre|ingannare|mentire|dire|la|verità|confessare|negare|nascondere|dissimulare|rivelare|svelare|mostrare|nascondere|esporre|presentare|rappresentare|simboleggiare|significare|voler|dire|esprimere|tradurre|interpretare|spiegare|chiarire|precisare|dettagliare|riassumere|abbreviare|accorciare|allungare|estendere|allargare|restringere|crescere|ingrassare|dimagrire|invecchiare|ringiovanire|abbellire|imbruttire|migliorare|peggiorare|riparare|rovinare|rompere|distruggere|costruire|edificare|erigere|demolire|radere|pulire|sporcare|lavare|asciugare|bagnare|inzuppare|imbevere|assorbire|bere|dissetare|innaffiare|inondare|annegare|salvare|affondare|galleggiare|nuotare|tuffarsi|emergere|risalire|scendere|salire|arrampicarsi|scalare|cadere|scivolare|inciampare|rialzarsi|alzare|coricare|stendere|piegare|spiegare|curvare|raddrizzare|piegare|inclinare|dondolare|oscillare|tremare|rabbrividire|sudare|traspirare|ansimare|soffiare|respirare|inspirare|espirare|soffocare|strozzare|asfissiare|rivivere|risuscitare|rinascere|morire|decedere|perire|soccombere|agonizzare|sopravvivere|resistere|sopportare|sopportare|soffrire|star|male|aver|male|guarire|curare|trattare|operare|fasciare|bendare|svestire|vestire|indossare|portare|mettere|togliere|levare|calzare|scalzare|pettinare|spettinare|truccare|struccare|radere|radersi|tagliare|potare|cogliere|raccogliere|mietere|seminare|piantare|innaffiare|zappare|arare|coltivare|far|giardinaggio|fiorire|appassire|marcire|ammuffire|fermentare|inacidire|guastarsi|conservare|mantenere|preservare|proteggere|riparare|coprire|scoprire|denudare|svestire|vestire|avvolgere|sviluppare|imballare|disimballare|impacchettare|spacchettare|legare|slegare|attaccare|staccare|incatenare|liberare|schiavizzare|emancipare|sfruttare|opprimere|dominare|regnare|governare|dirigere|amministrare|gestire|organizzare|disorganizzare|sistemare|mettere|in|disordine|classificare|declassificare|selezionare|mescolare|separare|dividere|condividere|distribuire|ripartire|raccogliere|riunire|assemblare|smontare|montare|installare|disinstallare|collegare|scollegare|connettere|disconnettere|accendere|spegnere|avviare|fermare|iniziare|finire|terminare|completare|perfezionare|migliorare|correggere|rettificare|riparare|rammendare|cucire|scucire|lavorare|a|maglia|tessere|filare|sfilare|arrotolare|srotolare|piegare|spiegare|stropiicciare|stirare|sgualcire|lisciare|spianare|livellare|scavare|riempire|tappare|stappare|bucare|forare|inchiodare|schiodare|avvitare|svitare|imbullonare|sbullonare|saldare|dissaldare|incollare|scollare|attaccare|staccare|appendere|staccare|sospendere|dondolare|muovere|spostare|trasportare|portare|portar|via|portare|via|riportare|condurre|guidare|accompagnare|seguire|precedere|superare|raggiungere|inseguire|fuggire|scappare|evadere|salvarsi|correre|galoppare|trottare|camminare|passeggiare|vagare|viaggiare|spostarsi|circolare|rotolare|navigare|veleggiare|pilotare|guidare|dirigere|manovrare|azionare|far|scattare|provocare|causare|occasionare|trascinare|portare|condurre|risultare|derivare|provenire|venire|uscire|emanare|scaturire|sorgere|apparire|mostrarsi|manifestarsi|rivelarsi|svelarsi|nascondere|dissimulare|mascherare|velare|coprire|ricoprire|scoprire|svelare|rivelare|esporre|presentare|mostrare|far|vedere|esibire|mettere|in|mostra|spiegare|ripiegare|stropiicciare|sgualcire|lisciare|spianare|livellare|scavare|riempire|tappare|stappare|bucare|forare|inchiodare|schiodare|avvitare|svitare|imbullonare|sbullonare|saldare|dissaldare|incollare|scollare|attaccare|staccare|appendere|staccare|sospendere|dondolare|muovere|spostare|trasportare|portare|portar|via|portare|via|riportare|condurre|guidare|accompagnare|seguire|precedere|superare|raggiungere|inseguire|fuggire|scappare|evadere|salvarsi|correre|galoppare|trottare|camminare|passeggiare|vagare|viaggiare|spostarsi|circolare|rotolare|navigare|veleggiare|pilotare|guidare|dirigere|manovrare|azionare|far|scattare|provocare|causare|occasionare|trascinare|portare|condurre|risultare|derivare|provenire|venire|uscire|emanare|scaturire|sorgere|apparire|mostrarsi|manifestarsi|rivelarsi|svelarsi|nascondere|dissimulare|mascherare|velare|coprire|ricoprire|scoprire|svelare|rivelare|esporre|presentare|mostrare|far|vedere|esibire|mettere|in|mostra|spiegare|ripiegare)\b/.test(cleanText)) {
-      return 'it';
-    }
-    
-    // Portuguese detection (common words and patterns)
-    if (/\b(o|a|os|as|um|uma|uns|umas|de|do|da|dos|das|em|no|na|nos|nas|para|por|pelo|pela|pelos|pelas|com|sem|sobre|sob|entre|desde|até|durante|através|mediante|conforme|segundo|contra|perante|ante|após|diante|atrás|dentro|fora|cima|baixo|perto|longe|aqui|ali|lá|aí|onde|quando|como|porque|porquê|se|que|quem|qual|quanto|muito|pouco|mais|menos|também|ainda|já|nunca|sempre|às|vezes|talvez|sim|não|eu|tu|você|ele|ela|nós|vocês|eles|elas|me|te|lhe|nos|vos|lhes|meu|teu|seu|nosso|vosso|minha|tua|sua|nossa|vossa|meus|teus|seus|nossos|vossos|minhas|tuas|suas|nossas|vossas|este|esta|estes|estas|esse|essa|esses|essas|aquele|aquela|aqueles|aquelas|isto|isso|aquilo|ser|estar|ter|haver|fazer|dizer|ir|vir|ficar|dar|saber|ver|dever|poder|querer|sair|partir|voltar|ficar|tornar|parecer|sentir|viver|morrer|nascer|crescer|amar|odiar|gostar|desgostar|interessar|aborrecer|divertir|surpreender|espantar|maravilhar|assustar|tranquilizar|acalmar|irritar|zangar|perdoar|desculpar|agradecer|parabenizar|encorajar|desencorajar|consolar|lastimar|criticar|elogiar|admirar|respeitar|desprezar|odiar|amar|adorar|preferir|escolher|eleger|nomear|chamar|apelidar|batizar|casar|divorciar|separar|unir|juntar|ligar|atar|desatar|anodar|desanodar|apertar|afrouxar|fechar|abrir|acender|apagar|iluminar|escurecer|aquecer|esfriar|esquentar|resfriar|gelar|derreter|ferver|cozinhar|assar|grelhar|fritar|ferver|cozinhar|preparar|servir|provar|comer|beber|engolir|mastigar|morder|lamber|chupar|cuspir|vomitar|digerir|nutrir|faminto|saciar|satisfazer|contentar|agradar|desagradar|aborrecer|divertir|interessar|apaixonar|emocionar|tocar|impressionar|surpreender|espantar|chocar|escandalizar|indignar|revoltar|enojar|atrair|repelir|seduzir|encantar|fascinar|hipnotizar|adormecer|acordar|sonhar|ter|pesadelo|esperar|desejar|querer|exigir|pedir|suplicar|rezar|implorar|ordenar|mandar|aconselhar|recomendar|sugerir|propor|oferecer|recusar|aceitar|acolher|receber|convidar|ir|ver|visitar|encontrar|reencontrar|juntar|deixar|abandonar|ficar|permanecer|morar|viver|existir|nascer|morrer|matar|assassinar|massacrar|exterminar|salvar|socorrer|ajudar|auxiliar|apoiar|encorajar|motivar|inspirar|influenciar|persuadir|convencer|seduzir|enganar|mentir|dizer|verdade|confessar|negar|esconder|dissimular|revelar|desvelar|mostrar|esconder|expor|apresentar|representar|simbolizar|significar|querer|dizer|expressar|traduzir|interpretar|explicar|esclarecer|precisar|detalhar|resumir|abreviar|encurtar|alongar|estender|alargar|estreitar|crescer|engordar|emagrecer|envelhecer|rejuvenescer|embelezar|enfear|melhorar|piorar|reparar|estragar|quebrar|destruir|construir|edificar|erguer|demolir|arrasar|limpar|sujar|lavar|secar|molhar|ensopar|embeber|absorver|beber|matar|sede|regar|inundar|afogar|salvar|afundar|flutuar|nadar|mergulhar|emergir|subir|descer|subir|escalar|cair|escorregar|tropeçar|levantar|erguer|deitar|esticar|dobrar|desdobrar|curvar|endireitar|inclinar|balançar|oscilar|tremer|tiritar|suar|transpirar|ofegar|soprar|respirar|inspirar|expirar|sufocar|estrangular|asfixiar|reviver|ressuscitar|renascer|morrer|falecer|perecer|sucumbir|agonizar|sobreviver|resistir|suportar|aguentar|sofrer|doer|curar|tratar|operar|enfaixar|despir|vestir|usar|pôr|tirar|calçar|descalçar|pentear|despentear|maquiar|desmaquiar|barbear|fazer|barba|cortar|podar|colher|apanhar|ceifar|semear|plantar|regar|capinar|arar|cultivar|jardinar|florescer|murchar|apodrecer|bolorento|fermentar|azedar|estragar|conservar|manter|preservar|proteger|abrigar|cobrir|descobrir|despir|vestir|embrulhar|desenvolver|embalar|desembalar|empacotar|despacotar|amarrar|desamarrar|atar|desatar|acorrentar|libertar|escravizar|emancipar|explorar|oprimir|dominar|reinar|governar|dirigir|administrar|gerir|organizar|desorganizar|arrumar|desarrumar|classificar|desclassificar|escolher|misturar|separar|dividir|compartilhar|distribuir|repartir|juntar|reunir|montar|desmontar|montar|instalar|desinstalar|ligar|desligar|conectar|desconectar|acender|apagar|ligar|desligar|começar|acabar|terminar|completar|aperfeiçoar|melhorar|corrigir|consertar|remendar|costurar|descosturar|tricotar|destricotar|tecer|destecer|fiar|desfiar|enrolar|desenrolar|dobrar|desdobrar|amassar|desamassar|passar|amarrotar|alisar|aplanar|nivelar|cavar|encher|tapar|destapar|furar|pregar|despregar|aparafusar|desaparafusar|parafusar|desparafusar|soldar|dessoldar|colar|descolar|grudar|desgrudar|pendurar|despendurar|suspender|balançar|mexer|mover|deslocar|transportar|levar|trazer|conduzir|guiar|acompanhar|seguir|preceder|ultrapassar|alcançar|perseguir|fugir|escapar|evadir|salvar|correr|galopar|trotar|andar|passear|vagar|viajar|deslocar|circular|rolar|navegar|velejar|pilotar|conduzir|dirigir|manobrar|acionar|disparar|provocar|causar|ocasionar|arrastar|levar|conduzir|resultar|derivar|provir|vir|sair|emanar|brotar|surgir|aparecer|mostrar|manifestar|revelar|desvelar|esconder|dissimular|mascarar|velar|cobrir|recobrir|descobrir|desvelar|revelar|expor|apresentar|mostrar|fazer|ver|exibir|espalhar|explicar|redobrar)\b/.test(cleanText)) {
-      return 'pt';
-    }
-    
-    // Default to English if no other language is detected
-    return 'en';
-  };
-
   // Get the best voice for a specific language
-  const getBestVoiceForLanguage = (lang: string, voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice | null => {
-    // Language-specific voice preferences
+  const getBestVoiceForLanguage = (
+    lang: string,
+    voices: SpeechSynthesisVoice[]
+  ): SpeechSynthesisVoice | null => {
+    // Language-specific voice preferences - English only
     const languagePreferences: { [key: string]: string[] } = {
-      'en': ['Neural', 'Natural', 'Enhanced', 'Premium', 'Google', 'Microsoft', 'Amazon'],
-      'es': ['Google español', 'Microsoft', 'Neural', 'Natural', 'Enhanced'],
-      'fr': ['Google français', 'Microsoft', 'Neural', 'Natural', 'Enhanced'],
-      'de': ['Google Deutsch', 'Microsoft', 'Neural', 'Natural', 'Enhanced'],
-      'it': ['Google italiano', 'Microsoft', 'Neural', 'Natural', 'Enhanced'],
-      'pt': ['Google português', 'Microsoft', 'Neural', 'Natural', 'Enhanced'],
-      'ru': ['Google русский', 'Microsoft', 'Neural', 'Natural', 'Enhanced'],
-      'zh': ['Google 中文', 'Microsoft', 'Neural', 'Natural', 'Enhanced'],
-      'ja': ['Google 日本語', 'Microsoft', 'Neural', 'Natural', 'Enhanced'],
-      'ko': ['Google 한국어', 'Microsoft', 'Neural', 'Natural', 'Enhanced'],
-      'ar': ['Google العربية', 'Microsoft', 'Neural', 'Natural', 'Enhanced'],
-      'hi': ['Google हिन्दी', 'Microsoft', 'Neural', 'Natural', 'Enhanced'],
-      'bn': ['Google বাংলা', 'Microsoft', 'Neural', 'Natural', 'Enhanced']
+      en: [
+        "Neural",
+        "Natural",
+        "Enhanced",
+        "Premium",
+        "Google",
+        "Microsoft",
+        "Amazon",
+      ],
     };
 
-    const preferences = languagePreferences[lang] || languagePreferences['en'];
-    
-    // First, try to find voices that match the language
-    const languageVoices = voices.filter(voice => voice.lang.startsWith(lang));
-    
+    const preferences = languagePreferences[lang] || languagePreferences["en"];
+
+    // Find voices that match English language
+    const languageVoices = voices.filter((voice) =>
+      voice.lang.startsWith("en")
+    );
     if (languageVoices.length === 0) {
       // Fallback to English if no voices found for the language
-      return voices.find(voice => voice.lang.startsWith('en')) || voices[0] || null;
+      return (
+        voices.find((voice) => voice.lang.startsWith("en")) || voices[0] || null
+      );
     }
 
     // Try to find the best quality voice based on preferences
     for (const preference of preferences) {
-      const preferredVoice = languageVoices.find(voice => 
+      const preferredVoice = languageVoices.find((voice) =>
         voice.name.toLowerCase().includes(preference.toLowerCase())
       );
       if (preferredVoice) {
@@ -377,8 +303,8 @@ const Dashboard: React.FC = () => {
     return languageVoices[0];
   };
 
-  // Play message content as audio using text-to-speech with multi-language support
-  const playMessageAudio = (content: string, messageIndex: number, forceLanguage?: string) => {
+  // Play message content as audio using text-to-speech
+  const playMessageAudio = (content: string, messageIndex: number) => {
     try {
       if (!speechSynthesis) {
         toast.error("Text-to-speech not supported in this browser");
@@ -394,36 +320,23 @@ const Dashboard: React.FC = () => {
         }
       }
 
-      // Use forced language, selected language, or detect language
-      const targetLanguage = forceLanguage || selectedLanguages[messageIndex] || detectLanguage(content);
-      
-      // Store the detected/selected language for this message
-      setDetectedLanguages(prev => ({
-        ...prev,
-        [messageIndex]: targetLanguage
-      }));
-
-      if (forceLanguage) {
-        setSelectedLanguages(prev => ({
-          ...prev,
-          [messageIndex]: forceLanguage
-        }));
-      }
+      // Use English as the target language
+      const targetLanguage = "en";
 
       // Create speech utterance
       const utterance = new SpeechSynthesisUtterance(content);
 
-      // Configure speech settings based on language
-      utterance.rate = targetLanguage === 'ja' || targetLanguage === 'ko' ? 0.8 : 0.9; // Slower for complex languages
+      // Configure speech settings - standard rate for English
+      utterance.rate = 0.9;
       utterance.pitch = 1;
       utterance.volume = 1;
 
       // Get available voices
       const voices = speechSynthesis.getVoices();
-      
+
       // Try to get the best voice for the target language
       const selectedVoice = getBestVoiceForLanguage(targetLanguage, voices);
-      
+
       if (selectedVoice) {
         utterance.voice = selectedVoice;
         utterance.lang = selectedVoice.lang;
@@ -435,25 +348,7 @@ const Dashboard: React.FC = () => {
       // Event handlers
       utterance.onstart = () => {
         setPlayingMessageIndex(messageIndex);
-        const languageNames: { [key: string]: string } = {
-          'en': 'English',
-          'es': 'Spanish',
-          'fr': 'French',
-          'de': 'German',
-          'it': 'Italian',
-          'pt': 'Portuguese',
-          'ru': 'Russian',
-          'zh': 'Chinese',
-          'ja': 'Japanese',
-          'ko': 'Korean',
-          'ar': 'Arabic',
-          'hi': 'Hindi',
-          'bn': 'Bangla'
-        };
-        
-        const languageName = languageNames[targetLanguage] || 'Auto-detected';
-        const modeText = forceLanguage ? 'Selected' : selectedLanguages[messageIndex] ? 'Selected' : 'Auto-detected';
-        toast.success(`Playing audio in ${languageName} (${modeText})...`);
+        toast.success("Playing audio in English...");
       };
 
       utterance.onend = () => {
@@ -525,25 +420,28 @@ const Dashboard: React.FC = () => {
 
           {/* User Info */}
           <div className="mt-3 lg:mt-4 p-3 lg:p-4 rounded-xl lg:rounded-2xl bg-gradient-to-r from-white/5 to-white/10 backdrop-blur-xl border border-white/10">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2 lg:space-x-3">
-                <div className="w-8 h-8 lg:w-10 lg:h-10 bg-gradient-to-br from-[#00f5ff] to-[#9d4edd] rounded-full flex items-center justify-center shadow-lg">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center space-x-2 lg:space-x-3 min-w-0 flex-1">
+                <div className="w-8 h-8 lg:w-10 lg:h-10 bg-gradient-to-br from-[#00f5ff] to-[#9d4edd] rounded-full flex items-center justify-center shadow-lg flex-shrink-0">
                   <span className="text-white font-bold text-xs lg:text-sm">
                     {user?.name?.charAt(0).toUpperCase() || "U"}
                   </span>
                 </div>
-                <div>
-                  <p className="text-white font-medium text-xs lg:text-sm">
+                <div className="min-w-0 flex-1">
+                  <p className="text-white font-medium text-xs lg:text-sm truncate">
                     {user?.name || "User"}
                   </p>
-                  <p className="text-[#D0D0D0] text-xs truncate max-w-24 lg:max-w-none">
+                  <p
+                    className="text-[#D0D0D0] text-xs truncate w-full max-w-[120px] lg:max-w-[180px]"
+                    title={user?.email}
+                  >
                     {user?.email}
                   </p>
                 </div>
               </div>
               <button
                 onClick={logout}
-                className="text-[#D0D0D0] hover:text-red-400 p-1.5 lg:p-2 rounded-xl hover:bg-white/10 transition-all duration-300"
+                className="text-[#D0D0D0] hover:text-red-400 p-1.5 lg:p-2 rounded-xl hover:bg-white/10 transition-all duration-300 flex-shrink-0"
                 title="Logout"
               >
                 <LogOut className="h-3 w-3 lg:h-4 lg:w-4" />
@@ -1079,24 +977,7 @@ const Dashboard: React.FC = () => {
                               title={
                                 playingMessageIndex === index
                                   ? "Stop audio"
-                                  : `Play message as audio${detectedLanguages[index] ? ` (${(() => {
-                                      const languageNames: { [key: string]: string } = {
-                                        'en': 'EN',
-                                        'es': 'ES',
-                                        'fr': 'FR',
-                                        'de': 'DE',
-                                        'it': 'IT',
-                                        'pt': 'PT',
-                                        'ru': 'RU',
-                                        'zh': 'ZH',
-                                        'ja': 'JA',
-                                        'ko': 'KO',
-                                        'ar': 'AR',
-                                        'hi': 'HI',
-                                        'bn': 'BN'
-                                      };
-                                      return languageNames[detectedLanguages[index]] || 'AUTO';
-                                    })()})` : ''}`
+                                  : "Play message as audio"
                               }
                             >
                               <Volume2
@@ -1107,61 +988,11 @@ const Dashboard: React.FC = () => {
                                 }`}
                               />
                               <span className="hidden sm:inline">
-                                {playingMessageIndex === index ? "Stop" : "Listen"}
-                                {detectedLanguages[index] && (
-                                  <span className="ml-1 opacity-70 text-xs">
-                                    ({(() => {
-                                      const languageNames: { [key: string]: string } = {
-                                        'en': 'EN',
-                                        'es': 'ES',
-                                        'fr': 'FR',
-                                        'de': 'DE',
-                                        'it': 'IT',
-                                        'pt': 'PT',
-                                        'ru': 'RU',
-                                        'zh': 'ZH',
-                                        'ja': 'JA',
-                                        'ko': 'KO',
-                                        'ar': 'AR',
-                                        'hi': 'HI',
-                                        'bn': 'BN'
-                                      };
-                                      return languageNames[detectedLanguages[index]] || 'AUTO';
-                                    })()})
-                                  </span>
-                                )}
+                                {playingMessageIndex === index
+                                  ? "Stop"
+                                  : "Listen"}
                               </span>
                             </button>
-                            {/* Language selector dropdown */}
-                            <div className="relative">
-                              <select
-                                onChange={(e) => {
-                                  if (e.target.value) {
-                                    playMessageAudio(message.content, index, e.target.value);
-                                  }
-                                }}
-                                className="appearance-none bg-gradient-to-r from-white/5 to-white/10 hover:from-white/10 hover:to-white/15 border border-white/10 hover:border-[#40e0d0]/30 text-[#D0D0D0] hover:text-white rounded-xl px-2 py-2 text-xs font-medium transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#40e0d0]/50 cursor-pointer min-w-[45px] text-center"
-                                title="Select language for audio playback"
-                                value=""
-                              >
-                                <option value="" disabled className="bg-[#1a1a2e] text-[#D0D0D0]">
-                                  🌐
-                                </option>
-                                <option value="en" className="bg-[#1a1a2e] text-white">🇺🇸 English</option>
-                                <option value="es" className="bg-[#1a1a2e] text-white">🇪🇸 Spanish</option>
-                                <option value="fr" className="bg-[#1a1a2e] text-white">🇫🇷 French</option>
-                                <option value="de" className="bg-[#1a1a2e] text-white">🇩🇪 German</option>
-                                <option value="it" className="bg-[#1a1a2e] text-white">🇮🇹 Italian</option>
-                                <option value="pt" className="bg-[#1a1a2e] text-white">🇵🇹 Portuguese</option>
-                                <option value="ru" className="bg-[#1a1a2e] text-white">🇷🇺 Russian</option>
-                                <option value="zh" className="bg-[#1a1a2e] text-white">🇨🇳 Chinese</option>
-                                <option value="ja" className="bg-[#1a1a2e] text-white">🇯🇵 Japanese</option>
-                                <option value="ko" className="bg-[#1a1a2e] text-white">🇰🇷 Korean</option>
-                                <option value="ar" className="bg-[#1a1a2e] text-white">🇸🇦 Arabic</option>
-                                <option value="hi" className="bg-[#1a1a2e] text-white">🇮🇳 Hindi</option>
-                                <option value="bn" className="bg-[#1a1a2e] text-white">🇧🇩 Bangla</option>
-                              </select>
-                            </div>
                           </div>
                         )}
                       </div>

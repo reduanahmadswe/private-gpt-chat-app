@@ -150,7 +150,7 @@ const ChatView: React.FC = () => {
         {/* Footer */}
         <div className="mt-12 text-center">
           <p className="text-white/50 text-sm">
-            This conversation was generated using Private GPT Chat
+            This conversation was generated using Private AI Bondhu.
           </p>
         </div>
       </div>

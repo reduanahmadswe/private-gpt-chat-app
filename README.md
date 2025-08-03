@@ -1,6 +1,6 @@
-# 🤖 Private GPT Chat Application
+# 🤖 AI Bondhu - Private GPT Chat Application
 
-A modern, full-stack AI chat application built with React, Node.js, and TypeScript. Features secure user authentication, intelligent AI conversations powered by OpenRouter API (Claude 3.5 Sonnet), and a stunning deep-space themed UI with glassmorphism effects.
+A comprehensive, full-stack AI chat application built with React, Node.js, and TypeScript. Features secure multi-provider authentication, intelligent AI conversations powered by OpenRouter API (Claude 3.5 Sonnet), text-to-speech capabilities, and a stunning deep-space themed UI with glassmorphism effects.
 
 ![Private GPT Chat](https://img.shields.io/badge/Status-Production%20Ready-brightgreen)
 ![React](https://img.shields.io/badge/React-18.2.0-blue)
@@ -11,101 +11,294 @@ A modern, full-stack AI chat application built with React, Node.js, and TypeScri
 
 ## ✨ Features
 
-### 🔐 **Secure Authentication System**
+### 🔐 **Multi-Provider Authentication System**
 
-- JWT-based authentication with access and refresh tokens
-- Password hashing with bcryptjs
-- Session management with automatic token refresh
-- Protected routes with authentication middleware
+- **JWT-based Authentication**: Access and refresh tokens with automatic renewal
+- **Social OAuth Integration**: Google and Facebook login with Passport.js
+- **Local Authentication**: Email/password registration and login
+- **Password Security**: bcryptjs hashing with salt rounds
+- **Session Management**: Secure HTTP-only cookies with CSRF protection
+- **Account Linking**: Link multiple auth providers to single account
+- **Protected Routes**: Authentication middleware for API endpoints
 
-### 💬 **AI-Powered Conversations**
+### 💬 **Advanced AI-Powered Conversations**
 
-- Integration with OpenRouter API using Claude 3.5 Sonnet model
-- Real-time chat interface with message history
-- Context-aware AI responses with configurable parameters
-- Error handling and retry logic for API calls
+- **OpenRouter API Integration**: Claude 3.5 Sonnet model for intelligent responses
+- **Real-time Chat Interface**: Instant message display with typing indicators
+- **Context-Aware Responses**: Maintains conversation context across messages
+- **Message Persistence**: Complete chat history stored in MongoDB
+- **Error Handling**: Robust retry logic and fallback mechanisms
+- **Rate Limiting**: API abuse prevention with configurable limits
 
-### 🎨 **Modern UI/UX Design**
+### 🎤 **Text-to-Speech Features**
 
-- **Deep-Space Theme**: Stunning #030637 background with neon cyan (#00f5ff) and purple (#9d4edd) accents
-- **Glassmorphism Effects**: Frosted glass components with backdrop blur and transparency
-- **Responsive Dashboard**: Integrated sidebar with sliding settings panel and profile management
-- **Modular Landing Page**: Separated into Header, Hero, Features, CTA, Contact, and Footer components
-- **Enhanced Input Fields**: Hover effects, focus states, and shadow animations
-- **Mobile-First Design**: Optimized for all screen sizes with responsive breakpoints
-- **Custom Tailwind Components**: Extended color palette and custom animations
+- **English TTS Support**: High-quality voice synthesis for AI responses
+- **Voice Selection**: Intelligent voice selection with premium voice preferences
+- **Audio Controls**: Play/pause/stop functionality for each message
+- **Speech Synthesis API**: Browser-native TTS with fallback options
+- **Audio Status Indicators**: Visual feedback for playing/stopped states
+- **Responsive Audio UI**: Mobile-optimized audio controls
 
-### 🗂️ **Advanced Chat Management**
+### 🎨 **Modern Glassmorphism UI/UX**
 
-- **Integrated Chat Interface**: Inline input area with real-time message display
-- **Persistent Conversations**: MongoDB storage with complete message history
-- **Chat Operations**: Create, edit, rename, and delete chat conversations
-- **Public Sharing**: Share chat conversations with public links
-- **Real-time Updates**: Instant message status indicators and responses
-- **Message Management**: Full CRUD operations for chat messages
+- **Deep-Space Theme**: Stunning #030637 background with neon accents
+- **Color Palette**: Cyan (#00f5ff), Purple (#9d4edd), Turquoise (#40e0d0)
+- **Glassmorphism Effects**: Backdrop blur with rgba transparency
+- **Responsive Dashboard**: Integrated sidebar with sliding settings panel
+- **Custom Favicon System**: SVG favicons with AI chat branding
+- **Enhanced Input Areas**: Auto-expanding textarea with clear functionality
+- **Mobile-First Design**: Optimized for all screen sizes
+- **Smooth Animations**: CSS transitions and hover effects throughout
+
+### 🗂️ **Comprehensive Chat Management**
+
+- **Integrated Chat Interface**: Seamless message flow with real-time updates
+- **Chat Operations**: Create, edit, rename, and delete conversations
+- **Message Actions**: Copy, share, and listen to individual messages
+- **Public Sharing**: Generate shareable links for conversations
+- **Chat History**: Persistent storage with message timestamps
+- **Search & Filter**: Quick access to conversation history
+- **Export Functionality**: Download chat history for backup
 
 ### 👤 **Advanced User Management**
 
-- **Integrated Settings Panel**: Profile and password management within the dashboard
-- **Tabbed Interface**: Seamless switching between account and password settings
-- **Real-time Validation**: Form validation with instant feedback
-- **Profile Updates**: Name and email modification with proper validation
-- **Secure Password Changes**: Current password verification with new password confirmation
-- **Account Management**: Complete user profile control and data management
+- **Integrated Settings Panel**: In-dashboard profile and password management
+- **Account Information**: Display current plan, member since date
+- **Profile Updates**: Real-time name and email modification
+- **Password Management**: Secure password changes with validation
+- **Social Account Display**: Show connected OAuth providers
+- **Account Deletion**: Complete user data removal options
+- **Profile Pictures**: Avatar support from social providers
 
-### 🛡️ **Security & Performance**
+### 🛡️ **Enterprise-Grade Security**
 
-- Rate limiting to prevent API abuse (100 requests per 15 minutes)
-- CORS protection with configurable origins
-- Input validation using Zod schemas
-- Comprehensive error handling and logging
-- Request/response interceptors for token management
+- **CORS Protection**: Configurable origins with credentials support
+- **Input Validation**: Zod schemas for type-safe API requests
+- **Rate Limiting**: 100 requests per 15 minutes per IP
+- **SQL Injection Prevention**: MongoDB ODM with parameterized queries
+- **XSS Protection**: Content sanitization and CSP headers
+- **Authentication Middleware**: Route-level access control
+- **Session Security**: Secure cookie settings with SameSite
 
 ## 🛠️ Tech Stack
 
-### **Frontend**
+### **Frontend Architecture**
 
-- **React 18** - Modern React with hooks and functional components
-- **TypeScript** - Type-safe development
-- **Vite** - Lightning-fast development and build tool
-- **Tailwind CSS** - Utility-first CSS framework with custom design system
-- **React Router** - Client-side routing with protected routes
-- **Axios** - HTTP client with interceptors for authentication
-- **React Hot Toast** - Beautiful toast notifications
-- **Lucide React** - Modern icon library
+- **React 18** - Modern React with hooks, functional components, and Suspense
+- **TypeScript** - Full type safety with strict mode enabled
+- **Vite** - Lightning-fast development with hot module replacement
+- **Tailwind CSS** - Utility-first CSS with custom design system
+- **React Router** - Client-side routing with protected route components
+- **Axios** - HTTP client with request/response interceptors
+- **React Hot Toast** - Beautiful toast notifications with custom styling
+- **Lucide React** - Modern icon library with consistent styling
+- **Context API** - State management for authentication and user data
 
-### **Backend**
+### **Backend Architecture**
 
-- **Node.js** with **Express.js** - RESTful API server
-- **TypeScript** - Type-safe backend development
+- **Node.js** with **Express.js** - RESTful API server with middleware
+- **TypeScript** - Type-safe backend development with interfaces
 - **MongoDB** with **Mongoose ODM** - NoSQL database with schema validation
-- **JWT** - JSON Web Tokens for authentication
-- **Zod** - Runtime type validation and parsing
-- **bcryptjs** - Password hashing and verification
-- **express-rate-limit** - Rate limiting middleware
-- **CORS** - Cross-origin resource sharing configuration
+- **Passport.js** - Authentication middleware with OAuth strategies
+- **JWT** - JSON Web Tokens for stateless authentication
+- **Zod** - Runtime type validation and schema parsing
+- **bcryptjs** - Password hashing with configurable salt rounds
+- **express-rate-limit** - Rate limiting middleware with Redis support
+- **CORS** - Cross-origin resource sharing with custom configuration
 
-### **AI Integration**
+### **AI & External Services**
 
-- **OpenRouter API** - Access to multiple AI models
-- **Claude 3.5 Sonnet** - Advanced AI model by Anthropic
-- **Fetch API** - Modern HTTP requests for AI integration
+- **OpenRouter API** - Access to multiple AI models with unified interface
+- **Claude 3.5 Sonnet** - Advanced AI model by Anthropic for conversations
+- **Google OAuth 2.0** - Social authentication with Google accounts
+- **Facebook OAuth 2.0** - Social authentication with Facebook accounts
+- **Web Speech API** - Browser-native text-to-speech functionality
 
-### **Development Tools**
+### **Development & Deployment**
 
-- **ESLint** - Code linting and formatting
-- **Nodemon** - Development server with auto-reload
-- **VS Code Tasks** - Integrated development workflow
+- **ESLint** - Code linting with TypeScript and React configurations
+- **Prettier** - Code formatting with consistent style rules
+- **Nodemon** - Development server with auto-reload functionality
+- **VS Code Tasks** - Integrated development workflow automation
+- **Vercel** - Frontend deployment with automatic previews
+- **Railway/Heroku** - Backend deployment with environment management
 
-### **Design System**
+### **Design System & Theming**
 
-- **Color Palette**: Deep-space primary (#030637) with neon accents
-  - Primary Background: `#030637` (Deep Space Blue)
-  - Accent Colors: `#00f5ff` (Cyan), `#9d4edd` (Purple), `#40e0d0` (Turquoise)
-  - Glass Effects: Backdrop blur with rgba transparency
-- **Typography**: Clean, modern font stack with proper hierarchy
+- **Color Palette**:
+  - Primary: `#030637` (Deep Space Blue)
+  - Accent: `#00f5ff` (Cyan), `#9d4edd` (Purple), `#40e0d0` (Turquoise)
+  - Glass Effects: Backdrop blur with rgba(255,255,255,0.1) transparency
+- **Typography**: Inter font family with optimized font loading
 - **Component Architecture**: Modular, reusable components with consistent theming
-- **Responsive Breakpoints**: Mobile-first approach with Tailwind CSS utilities
+- **Responsive Design**: Mobile-first approach with 4 breakpoint system
+- **Animation Library**: CSS transitions with easing functions
+
+## 🏗️ Project Architecture
+
+### **Frontend Structure**
+
+```
+frontend/
+├── 📁 public/                    # Static assets and favicons
+│   ├── favicon.svg              # Custom AI-themed SVG favicon
+│   ├── favicon-16x16.svg        # Fallback favicon for older browsers
+│   └── index.html               # Main HTML template with meta tags
+├── 📁 src/
+│   ├── 📄 main.tsx              # Application entry point with providers
+│   ├── 📄 App.tsx               # Main app component with routing
+│   ├── 📄 index.css             # Global styles and Tailwind imports
+│   ├── 📁 components/           # Reusable React components
+│   │   ├── 📁 landing/          # Landing page components
+│   │   │   ├── Header.tsx       # Navigation with mobile menu
+│   │   │   ├── Hero.tsx         # Hero section with gradient text
+│   │   │   ├── Features.tsx     # Three-column feature showcase
+│   │   │   ├── CallToAction.tsx # Secondary CTA with gradient button
+│   │   │   ├── Contact.tsx      # Contact form with validation
+│   │   │   └── Footer.tsx       # Footer with social links
+│   │   ├── GoogleLoginButton.tsx # Google OAuth integration
+│   │   ├── FacebookLoginButton.tsx # Facebook OAuth integration
+│   │   ├── LoadingSpinner.tsx   # Reusable loading component
+│   │   ├── ProtectedRoute.tsx   # Authentication wrapper
+│   │   ├── PublicRoute.tsx      # Public route wrapper
+│   │   └── SessionExpiryTest.tsx # Development testing component
+│   ├── 📁 contexts/             # React Context providers
+│   │   └── AuthContext.tsx      # Authentication state management
+│   ├── 📁 pages/                # Page components
+│   │   ├── LandingPage.tsx      # Public homepage
+│   │   ├── Dashboard.tsx        # Main chat interface with TTS
+│   │   ├── ChatView.tsx         # Individual chat view
+│   │   ├── Settings.tsx         # User settings panel
+│   │   └── 📁 auth/             # Authentication pages
+│   │       ├── SignIn.tsx       # Login form with OAuth
+│   │       └── SignUp.tsx       # Registration form with OAuth
+│   ├── 📁 types/                # TypeScript type definitions
+│   │   └── auth.ts              # Authentication interfaces
+│   └── 📁 utils/                # Utility functions
+│       └── api.ts               # Axios configuration with interceptors
+```
+
+### **Backend Structure**
+
+```
+backend/
+├── 📁 src/
+│   ├── 📄 app.ts                # Express app configuration
+│   ├── 📄 server.ts             # Server startup and database connection
+│   ├── 📁 auth/                 # Authentication module
+│   │   ├── auth.controller.ts   # OAuth and JWT controllers
+│   │   ├── auth.service.ts      # Authentication business logic
+│   │   ├── auth.routes.ts       # Auth route definitions
+│   │   ├── auth.interface.ts    # Authentication interfaces
+│   │   └── auth.validation.ts   # Zod validation schemas
+│   ├── 📁 chat/                 # Chat management module
+│   │   ├── chat.controller.ts   # Chat CRUD operations
+│   │   ├── chat.service.ts      # AI integration and chat logic
+│   │   ├── chat.model.ts        # MongoDB chat schema
+│   │   ├── chat.routes.ts       # Chat route definitions
+│   │   ├── chat.interface.ts    # Chat type definitions
+│   │   └── chat.validation.ts   # Chat validation schemas
+│   ├── 📁 user/                 # User management module
+│   │   ├── user.controller.ts   # User profile operations
+│   │   ├── user.service.ts      # User business logic
+│   │   ├── user.model.ts        # MongoDB user schema
+│   │   ├── user.routes.ts       # User route definitions
+│   │   ├── user.interface.ts    # User interfaces
+│   │   └── user.validation.ts   # User validation schemas
+│   ├── 📁 config/               # Configuration modules
+│   │   ├── env.ts               # Environment variable validation
+│   │   ├── passport.ts          # Passport OAuth strategies
+│   │   └── database.ts          # MongoDB connection setup
+│   ├── 📁 shared/               # Shared utilities
+│   │   ├── database.ts          # Database connection utilities
+│   │   └── 📁 middleware/       # Express middleware
+│   │       ├── auth.ts          # JWT authentication middleware
+│   │       ├── errorHandler.ts  # Global error handling
+│   │       └── validation.ts    # Request validation middleware
+│   └── 📁 types/                # Global type definitions
+│       └── express.d.ts         # Express type extensions
+├── 📄 package.json              # Dependencies and scripts
+├── 📄 tsconfig.json             # TypeScript configuration
+├── 📄 nodemon.json              # Development server configuration
+└── 📄 vercel.json               # Deployment configuration
+```
+
+## ⚙️ Environment Variables
+
+### Backend Configuration
+
+Create a `.env` file in the `backend` directory:
+
+```env
+# Server Configuration
+NODE_ENV=development
+PORT=5001
+
+# Database Configuration
+# Local MongoDB
+MONGO_URI=mongodb://localhost:27017/private-gpt-chat
+# Or MongoDB Atlas (recommended for production)
+# MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/private-gpt-chat
+
+# JWT Configuration (Generate secure 64+ character strings)
+JWT_SECRET=your_super_secret_jwt_key_here_make_it_long_and_secure_2024
+JWT_REFRESH_SECRET=your_super_secret_refresh_jwt_key_here_make_it_long_and_secure_2024
+
+# OpenRouter API Configuration
+OPENROUTER_API_KEY=your_openrouter_api_key_here
+OPENAI_API_BASE_URL=https://openrouter.ai/api/v1
+
+# Client Configuration
+CLIENT_URL=http://localhost:3000
+FRONTEND_URL=http://localhost:3000
+
+# Session Secret for Passport
+SESSION_SECRET=your_session_secret_key_here_make_it_secure
+
+# Google OAuth Configuration (Optional)
+GOOGLE_CLIENT_ID=your_google_client_id_here
+GOOGLE_CLIENT_SECRET=your_google_client_secret_here
+GOOGLE_CALLBACK_URL=http://localhost:5001/api/auth/google/callback
+
+# Facebook OAuth Configuration (Optional)
+FACEBOOK_CLIENT_ID=your_facebook_app_id_here
+FACEBOOK_CLIENT_SECRET=your_facebook_app_secret_here
+FACEBOOK_CALLBACK_URL=http://localhost:5001/api/auth/facebook/callback
+```
+
+### Frontend Configuration
+
+Create a `.env` file in the `frontend` directory:
+
+```env
+# API Configuration
+VITE_API_BASE_URL=http://localhost:5001
+
+# App Configuration
+VITE_APP_NAME=AI Bondhu
+VITE_APP_VERSION=1.0.0
+```
+
+### OAuth Setup Instructions
+
+#### Google OAuth Setup
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a new project or select existing one
+3. Enable Google+ API
+4. Create OAuth 2.0 credentials
+5. Add authorized redirect URIs:
+   - `http://localhost:5001/api/auth/google/callback`
+   - `https://yourdomain.com/api/auth/google/callback`
+
+#### Facebook OAuth Setup
+
+1. Go to [Facebook Developers](https://developers.facebook.com/)
+2. Create a new app
+3. Add Facebook Login product
+4. Configure Valid OAuth Redirect URIs:
+   - `http://localhost:5001/api/auth/facebook/callback`
+   - `https://yourdomain.com/api/auth/facebook/callback`
 
 ## 🚀 Quick Start
 
@@ -114,6 +307,8 @@ A modern, full-stack AI chat application built with React, Node.js, and TypeScri
 - **Node.js** (v18 or higher)
 - **MongoDB** (local installation or MongoDB Atlas)
 - **OpenRouter API Account** (get your key from [OpenRouter](https://openrouter.ai/keys))
+- **Google OAuth App** (optional, for Google login)
+- **Facebook OAuth App** (optional, for Facebook login)
 
 ### Installation
 
@@ -147,123 +342,6 @@ A modern, full-stack AI chat application built with React, Node.js, and TypeScri
    - Frontend: `http://localhost:3000`
    - Backend API: `http://localhost:5001`
    - Health Check: `http://localhost:5001/api/health`
-
-## ⚙️ Environment Variables
-
-### Backend Configuration
-
-Create a `.env` file in the `backend` directory:
-
-```env
-# Server Configuration
-NODE_ENV=development
-PORT=5001
-
-# Database Configuration
-# Local MongoDB
-MONGO_URI=mongodb://localhost:27017/private-gpt-chat
-# Or MongoDB Atlas (recommended for production)
-# MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/private-gpt-chat
-
-# JWT Configuration (Generate secure 64+ character strings)
-JWT_SECRET=your_super_secret_jwt_key_here_make_it_long_and_secure_2024
-JWT_REFRESH_SECRET=your_super_secret_refresh_jwt_key_here_make_it_long_and_secure_2024
-
-# OpenRouter API Configuration
-OPENROUTER_API_KEY=your_openrouter_api_key_here
-OPENAI_API_BASE_URL=https://openrouter.ai/api/v1
-
-# Client Configuration
-CLIENT_URL=http://localhost:3000
-```
-
-### Frontend Configuration
-
-Create a `.env` file in the `frontend` directory (optional):
-
-```env
-# For production deployment
-VITE_API_BASE_URL=https://your-backend-domain.com
-```
-
-## 📁 Project Structure
-
-```
-private-gpt-chat-app/
-├── 📁 backend/                    # Express.js backend server
-│   ├── 📁 src/
-│   │   ├── 📁 auth/               # Authentication module
-│   │   │   ├── auth.controller.ts # Auth request handlers
-│   │   │   ├── auth.interface.ts  # Auth type definitions
-│   │   │   ├── auth.routes.ts     # Auth API routes
-│   │   │   ├── auth.service.ts    # Auth business logic
-│   │   │   └── auth.validation.ts # Auth input validation
-│   │   ├── 📁 user/               # User management module
-│   │   │   ├── user.controller.ts # User request handlers
-│   │   │   ├── user.interface.ts  # User type definitions
-│   │   │   ├── user.model.ts      # MongoDB user schema
-│   │   │   ├── user.routes.ts     # User API routes
-│   │   │   ├── user.service.ts    # User business logic
-│   │   │   └── user.validation.ts # User input validation
-│   │   ├── 📁 chat/               # Chat functionality module
-│   │   │   ├── chat.controller.ts # Chat request handlers
-│   │   │   ├── chat.interface.ts  # Chat type definitions
-│   │   │   ├── chat.model.ts      # MongoDB chat schema
-│   │   │   ├── chat.routes.ts     # Chat API routes
-│   │   │   ├── chat.service.ts    # AI integration & chat logic
-│   │   │   └── chat.validation.ts # Chat input validation
-│   │   ├── 📁 shared/             # Shared utilities and middleware
-│   │   │   ├── 📁 middleware/
-│   │   │   │   ├── auth.ts        # JWT authentication middleware
-│   │   │   │   ├── errorHandler.ts# Error handling middleware
-│   │   │   │   └── validation.ts  # Zod validation middleware
-│   │   │   └── database.ts        # MongoDB connection setup
-│   │   └── app.ts                 # Express app configuration
-│   ├── 📄 .env.example           # Environment template
-│   ├── 📄 .gitignore             # Git ignore rules
-│   ├── 📄 nodemon.json           # Nodemon configuration
-│   ├── 📄 package.json           # Dependencies and scripts
-│   ├── 📄 tsconfig.json          # TypeScript configuration
-│   └── 📄 vercel.json            # Vercel deployment config
-├── 📁 frontend/                   # React frontend application
-│   ├── 📁 src/
-│   │   ├── 📁 components/         # Reusable React components
-│   │   │   ├── 📁 landing/        # Landing page components
-│   │   │   │   ├── Header.tsx     # Navigation header component
-│   │   │   │   ├── Hero.tsx       # Hero section with main CTA
-│   │   │   │   ├── Features.tsx   # Features showcase section
-│   │   │   │   ├── CallToAction.tsx # Secondary CTA section
-│   │   │   │   ├── Contact.tsx    # Contact information section
-│   │   │   │   └── Footer.tsx     # Footer with links and info
-│   │   │   ├── LoadingSpinner.tsx # Loading indicator component
-│   │   │   └── ProtectedRoute.tsx # Route protection component
-│   │   ├── 📁 contexts/           # React context providers
-│   │   │   └── AuthContext.tsx    # Authentication state management
-│   │   ├── 📁 pages/              # Page components
-│   │   │   ├── 📁 auth/           # Authentication pages
-│   │   │   │   ├── SignIn.tsx     # Login page with deep-space theme
-│   │   │   │   └── SignUp.tsx     # Registration page with enhanced styling
-│   │   │   ├── ChatView.tsx       # Individual chat page
-│   │   │   ├── Dashboard.tsx      # Main dashboard with integrated settings
-│   │   │   ├── LandingPage.tsx    # Modular marketing landing page
-│   │   │   └── Settings.tsx       # Standalone user settings page
-│   │   ├── 📁 utils/              # Utility functions
-│   │   │   └── api.ts             # Axios configuration with interceptors
-│   │   ├── App.tsx                # Main app component with routing
-│   │   ├── index.css              # Global styles with Tailwind
-│   │   └── main.tsx               # React app entry point
-│   ├── 📄 .env.example           # Environment template
-│   ├── 📄 .gitignore             # Git ignore rules
-│   ├── 📄 index.html             # HTML template
-│   ├── 📄 package.json           # Dependencies and scripts
-│   ├── 📄 postcss.config.js      # PostCSS configuration
-│   ├── 📄 tailwind.config.js     # Tailwind CSS configuration
-│   ├── 📄 tsconfig.json          # TypeScript configuration
-│   ├── 📄 vercel.json            # Vercel deployment config
-│   └── 📄 vite.config.ts         # Vite build configuration
-├── 📄 .gitignore                 # Root git ignore
-└── 📄 README.md                  # Project documentation
-```
 
 ## 🔧 Development Commands
 
