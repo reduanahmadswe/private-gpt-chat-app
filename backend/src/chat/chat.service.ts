@@ -26,14 +26,14 @@ export class ChatService {
     // Try multiple free models in order of reliability
     const models = [
       'google/gemma-2-9b-it:free',
-      'microsoft/phi-3-mini-128k-instruct:free', 
+      'microsoft/phi-3-mini-128k-instruct:free',
       'meta-llama/llama-3.1-8b-instruct:free'
     ];
 
     for (let i = 0; i < models.length; i++) {
       const model = models[i];
       console.log(`🔄 Trying model ${i + 1}/${models.length}: ${model}`);
-      
+
       try {
         // Create AbortController for timeout
         const controller = new AbortController();
@@ -51,7 +51,7 @@ export class ChatService {
             model: model,
             messages: [
               {
-                role: 'user', 
+                role: 'user',
                 content: message,
               },
             ],
@@ -66,10 +66,10 @@ export class ChatService {
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
           console.error(`❌ Model ${model} failed:`, errorData);
-          
+
           // Try next model if available
           if (i < models.length - 1) continue;
-          
+
           // Last model failed, throw error
           throw new Error(`All models failed. Last error: ${JSON.stringify(errorData)}`);
         }
@@ -78,15 +78,15 @@ export class ChatService {
         const result = data.choices[0]?.message?.content || 'No response generated';
         console.log(`✅ Success with model: ${model}`);
         return result;
-        
+
       } catch (error: any) {
         console.error(`❌ Error with model ${model}:`, error.message);
-        
+
         // If it's the last model, throw the error
         if (i === models.length - 1) {
           throw error;
         }
-        
+
         // Continue to next model
         continue;
       }
@@ -97,22 +97,22 @@ export class ChatService {
 
   private generateFallbackResponse(message: string): string {
     console.log('🔄 Generating fallback response');
-    
+
     // Simple keyword-based responses when AI is down
     const lowerMessage = message.toLowerCase();
-    
+
     if (lowerMessage.includes('hello') || lowerMessage.includes('hi') || lowerMessage.includes('হাই') || lowerMessage.includes('হ্যালো')) {
       return 'Hello! I apologize, but our AI service is temporarily experiencing high demand. Please try again in a few moments. How can I help you today?';
     }
-    
+
     if (lowerMessage.includes('how are you') || lowerMessage.includes('কেমন আছেন')) {
       return 'I\'m doing well, thank you! Our AI service is currently under heavy load, but I\'m here to help. Please try your question again in a moment.';
     }
-    
+
     if (lowerMessage.includes('what') || lowerMessage.includes('কি') || lowerMessage.includes('কী')) {
       return 'I understand you\'re asking about something. Our AI service is temporarily overloaded due to high demand. Please try asking your question again in a few seconds for a detailed response.';
     }
-    
+
     if (lowerMessage.includes('help') || lowerMessage.includes('সাহায্য')) {
       return 'I\'d be happy to help! Our AI service is experiencing temporary delays due to high traffic. Please try your question again shortly, and I\'ll provide you with a comprehensive answer.';
     }
