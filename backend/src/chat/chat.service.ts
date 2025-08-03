@@ -8,7 +8,16 @@ export class ChatService {
     const apiKey = envVars.OPENROUTER_API_KEY;
     const baseURL = envVars.OPENAI_API_BASE_URL;
 
+    console.log('🤖 Starting OpenRouter API call...');
+    console.log('📝 Message length:', message.length);
+    console.log('🔑 API Key present:', !!apiKey);
+    console.log('🌐 Base URL:', baseURL);
+
     try {
+      // Create AbortController for timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+
       const response = await fetch(`${baseURL}/chat/completions`, {
         method: 'POST',
         headers: {
@@ -18,21 +27,26 @@ export class ChatService {
           'X-Title': 'Private GPT Chat',
         },
         body: JSON.stringify({
-          model: 'anthropic/claude-3.5-sonnet',
+          model: 'openai/gpt-3.5-turbo', // More stable and faster model
           messages: [
             {
               role: 'user',
               content: message,
             },
           ],
-          max_tokens: message.length > 500 ? 500 : 700,
+          max_tokens: message.length > 500 ? 400 : 600, // Further reduced for faster response
           temperature: 0.7,
         }),
+        signal: controller.signal, // Add timeout signal
       });
+
+      clearTimeout(timeoutId); // Clear timeout if request succeeds
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         console.error('OpenRouter API Error:', errorData);
+        console.error('Response status:', response.status);
+        console.error('Response statusText:', response.statusText);
 
         if (response.status === 401) {
           throw createError('Invalid API key', 401);
@@ -46,7 +60,7 @@ export class ChatService {
           throw createError('Rate limit exceeded - please try again later', 429);
         }
 
-        throw createError('Failed to get AI response', 500);
+        throw createError(`API Error: ${response.status} - ${JSON.stringify(errorData)}`, 500);
       }
 
       const data: any = await response.json();
@@ -55,10 +69,19 @@ export class ChatService {
       console.error('OpenRouter API Error:', error.message);
 
       if (error.name === 'AbortError') {
-        throw createError('Request timeout - please try again', 408);
+        throw createError('Request timeout - please try a shorter message or try again later', 408);
       }
 
-      throw createError('Failed to get AI response', 500);
+      if (error.code === 'ECONNRESET' || error.code === 'ETIMEDOUT') {
+        throw createError('Network timeout - please check your connection and try again', 408);
+      }
+
+      // If it's a fetch error (network issues)
+      if (error.message.includes('fetch')) {
+        throw createError('Network error - please try again later', 500);
+      }
+
+      throw createError('Failed to get AI response - please try again', 500);
     }
   }
 
