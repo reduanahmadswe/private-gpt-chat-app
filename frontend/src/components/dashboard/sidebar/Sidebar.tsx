@@ -1,5 +1,6 @@
 import {
   ChevronLeft,
+  Download,
   Edit2,
   LogOut,
   MessageCircle,
@@ -27,6 +28,7 @@ interface SidebarProps {
   selectChat: (chat: Chat) => void;
   updateChatTitle: (chatId: string, title: string) => void;
   shareChat: (chatId: string) => void;
+  downloadChat: (chatId: string) => void;
   deleteChat: (chatId: string) => void;
 }
 
@@ -45,6 +47,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   selectChat,
   updateChatTitle,
   shareChat,
+  downloadChat,
   deleteChat,
 }) => {
   const { user, logout } = useAuth();
@@ -255,6 +258,16 @@ const Sidebar: React.FC<SidebarProps> = ({
                         title="Share chat"
                       >
                         <Share2 className="h-2.5 w-2.5 lg:h-3 lg:w-3 text-[#D0D0D0] hover:text-[#9d4edd]" />
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          downloadChat(chat._id);
+                        }}
+                        className="p-1.5 lg:p-2 hover:bg-white/20 rounded-lg lg:rounded-xl transition-all duration-300 hover:shadow-lg"
+                        title="Download chat as PDF"
+                      >
+                        <Download className="h-2.5 w-2.5 lg:h-3 lg:w-3 text-[#D0D0D0] hover:text-[#40e0d0]" />
                       </button>
                       <button
                         onClick={(e) => {

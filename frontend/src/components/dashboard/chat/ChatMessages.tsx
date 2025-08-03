@@ -1,4 +1,4 @@
-import { Copy, MessageCircle, Share2, Volume2 } from "lucide-react";
+import { Copy, Download, MessageCircle, Share2, Volume2 } from "lucide-react";
 import React from "react";
 import toast from "react-hot-toast";
 import { useAuth } from "../../../contexts/AuthContext";
@@ -10,6 +10,7 @@ interface ChatMessagesProps {
   loading: boolean;
   playingMessageIndex: number | null;
   playMessageAudio: (content: string, messageIndex: number) => void;
+  downloadMessage: (content: string, messageIndex: number) => void;
   streamingMessageIndex?: number | null;
 }
 
@@ -18,6 +19,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
   loading,
   playingMessageIndex,
   playMessageAudio,
+  downloadMessage,
   streamingMessageIndex = null,
 }) => {
   const { user } = useAuth();
@@ -58,7 +60,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
     <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent hover:scrollbar-thumb-white/30">
       <div
         className="max-w-4xl lg:max-w-5xl mx-auto p-4 lg:p-6 space-y-4 lg:space-y-6"
-        style={{ paddingBottom: "300px" }}
+        style={{ paddingBottom: "250px" }}
       >
         {messages.length === 0 ? (
           <div className="text-center mt-12 lg:mt-20">
@@ -182,6 +184,16 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
                           <span className="hidden sm:inline">
                             {playingMessageIndex === index ? "Stop" : "Listen"}
                           </span>
+                        </button>
+                        <button
+                          onClick={() =>
+                            downloadMessage(message.content, index)
+                          }
+                          className="flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-white/5 to-white/10 hover:from-white/10 hover:to-white/15 border border-white/10 hover:border-[#22c55e]/30 text-[#D0D0D0] hover:text-white transition-all duration-300 text-xs font-medium shadow-sm hover:shadow-lg hover:shadow-[#22c55e]/10 transform hover:scale-105"
+                          title="Download message as PDF"
+                        >
+                          <Download className="h-3.5 w-3.5" />
+                          <span className="hidden sm:inline">Download</span>
                         </button>
                       </div>
                     )}

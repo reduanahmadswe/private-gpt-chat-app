@@ -14,6 +14,7 @@ interface ChatAreaProps {
   playingMessageIndex: number | null;
   streamingMessageIndex: number | null;
   playMessageAudio: (content: string, messageIndex: number) => void;
+  downloadMessage: (content: string, messageIndex: number) => void;
   onSendMessage: (message: string) => void;
 }
 
@@ -27,6 +28,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
   playingMessageIndex,
   streamingMessageIndex,
   playMessageAudio,
+  downloadMessage,
   onSendMessage,
 }) => {
   return (
@@ -48,6 +50,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
         playingMessageIndex={playingMessageIndex}
         streamingMessageIndex={streamingMessageIndex}
         playMessageAudio={playMessageAudio}
+        downloadMessage={downloadMessage}
       />
 
       <ChatInput loading={loading} onSendMessage={onSendMessage} />
