@@ -808,21 +808,21 @@ const Dashboard: React.FC = () => {
                         
                         {/* Copy and Share buttons for AI responses */}
                         {message.role === "assistant" && (
-                          <div className="flex items-center justify-end space-x-2 mt-3 pt-3 border-t border-white/10">
+                          <div className="flex items-center justify-end space-x-2 mt-4 pt-3 border-t border-white/10">
                             <button
                               onClick={() => copyMessageContent(message.content)}
-                              className="flex items-center space-x-1 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-[#D0D0D0] hover:text-white transition-all duration-200 text-xs"
-                              title="Copy message"
+                              className="flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-white/5 to-white/10 hover:from-white/10 hover:to-white/15 border border-white/10 hover:border-[#00f5ff]/30 text-[#D0D0D0] hover:text-white transition-all duration-300 text-xs font-medium shadow-sm hover:shadow-lg hover:shadow-[#00f5ff]/10 transform hover:scale-105"
+                              title="Copy message to clipboard"
                             >
-                              <Copy className="h-3 w-3" />
+                              <Copy className="h-3.5 w-3.5" />
                               <span>Copy</span>
                             </button>
                             <button
                               onClick={() => shareMessageContent(message.content)}
-                              className="flex items-center space-x-1 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-[#D0D0D0] hover:text-white transition-all duration-200 text-xs"
-                              title="Share message"
+                              className="flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-white/5 to-white/10 hover:from-white/10 hover:to-white/15 border border-white/10 hover:border-[#9d4edd]/30 text-[#D0D0D0] hover:text-white transition-all duration-300 text-xs font-medium shadow-sm hover:shadow-lg hover:shadow-[#9d4edd]/10 transform hover:scale-105"
+                              title="Share this message"
                             >
-                              <Share2 className="h-3 w-3" />
+                              <Share2 className="h-3.5 w-3.5" />
                               <span>Share</span>
                             </button>
                           </div>
