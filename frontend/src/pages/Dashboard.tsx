@@ -16,6 +16,7 @@ import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useAuth } from "../contexts/AuthContext";
 import api from "../utils/api";
+import MarkdownMessage from "../components/MarkdownMessage";
 
 interface Chat {
   _id: string;
@@ -1038,11 +1039,7 @@ const Dashboard: React.FC = () => {
                             : "bg-gradient-to-r from-white/5 to-white/10 border border-white/10 text-white"
                         }`}
                       >
-                        <div className="prose prose-invert max-w-none">
-                          <p className="whitespace-pre-wrap leading-relaxed text-sm lg:text-base">
-                            {message.content}
-                          </p>
-                        </div>
+                       <MarkdownMessage message={message.content} />
 
                         {/* Copy, Share and Audio buttons for AI responses */}
                         {message.role === "assistant" && (
