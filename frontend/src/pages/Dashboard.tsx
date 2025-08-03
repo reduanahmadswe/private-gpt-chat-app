@@ -888,7 +888,7 @@ const Dashboard: React.FC = () => {
 
                         {/* Copy, Share and Audio buttons for AI responses */}
                         {message.role === "assistant" && (
-                          <div className="flex items-center justify-end space-x-2 mt-4 pt-3 border-t border-white/10">
+                          <div className="flex items-center justify-end space-x-2 mt-4 pt-3 border-t border-white/10 flex-wrap gap-2">
                             <button
                               onClick={() =>
                                 copyMessageContent(message.content)
@@ -897,7 +897,7 @@ const Dashboard: React.FC = () => {
                               title="Copy message to clipboard"
                             >
                               <Copy className="h-3.5 w-3.5" />
-                              <span>Copy</span>
+                              <span className="hidden sm:inline">Copy</span>
                             </button>
                             <button
                               onClick={() =>
@@ -907,7 +907,7 @@ const Dashboard: React.FC = () => {
                               title="Share this message"
                             >
                               <Share2 className="h-3.5 w-3.5" />
-                              <span>Share</span>
+                              <span className="hidden sm:inline">Share</span>
                             </button>
                             <button
                               onClick={() => playMessageAudio(message.content, index)}
@@ -917,7 +917,7 @@ const Dashboard: React.FC = () => {
                               title={playingMessageIndex === index ? "Stop audio" : "Play message as audio"}
                             >
                               <Volume2 className={`h-3.5 w-3.5 ${playingMessageIndex === index ? 'animate-pulse' : ''}`} />
-                              <span>{playingMessageIndex === index ? 'Stop' : 'Listen'}</span>
+                              <span className="hidden sm:inline">{playingMessageIndex === index ? 'Stop' : 'Listen'}</span>
                             </button>
                           </div>
                         )}
