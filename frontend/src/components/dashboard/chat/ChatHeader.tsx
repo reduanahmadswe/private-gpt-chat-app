@@ -1,4 +1,4 @@
-import { Menu, MessageCircle } from "lucide-react";
+import { Menu, MessageCircle, Mic, MicOff } from "lucide-react";
 import React from "react";
 import { Chat } from "../../../hooks/useChat";
 
@@ -8,6 +8,8 @@ interface ChatHeaderProps {
   sidebarCollapsed: boolean;
   setSidebarCollapsed: (collapsed: boolean) => void;
   isHeaderVisible?: boolean;
+  onToggleVoice?: () => void;
+  isVoiceMode?: boolean;
 }
 
 const ChatHeader: React.FC<ChatHeaderProps> = ({
@@ -16,6 +18,8 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
   sidebarCollapsed,
   setSidebarCollapsed,
   isHeaderVisible = true,
+  onToggleVoice,
+  isVoiceMode = false,
 }) => {
   return (
     <div
@@ -51,6 +55,25 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
           </div>
         </div>
         <div className="flex items-center space-x-2">
+          {onToggleVoice && (
+            <button
+              onClick={onToggleVoice}
+              className={`p-2 lg:p-3 rounded-xl transition-all duration-300 ${
+                isVoiceMode
+                  ? "bg-gradient-to-r from-[#00f5ff]/20 to-[#9d4edd]/20 text-[#00f5ff] border border-[#00f5ff]/30"
+                  : "text-[#D0D0D0] hover:text-white hover:bg-white/10"
+              }`}
+              title={
+                isVoiceMode ? "Switch to Text Mode" : "Switch to Voice Mode"
+              }
+            >
+              {isVoiceMode ? (
+                <Mic className="h-4 w-4 lg:h-5 lg:w-5" />
+              ) : (
+                <MicOff className="h-4 w-4 lg:h-5 lg:w-5" />
+              )}
+            </button>
+          )}
           <div className="px-3 lg:px-4 py-1.5 lg:py-2 bg-gradient-to-r from-[#00f5ff]/10 to-[#9d4edd]/10 rounded-lg lg:rounded-xl border border-[#00f5ff]/20">
             <span className="text-[#00f5ff] text-xs lg:text-sm font-medium">
               Claude 3.5 Sonnet

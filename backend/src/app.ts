@@ -30,6 +30,7 @@ const allowedOrigins = [
   envVars.CLIENT_URL,
   'https://ai-bondhu-tau.vercel.app',
   'https://aibondhuai.vercel.app',
+  'https://aibondhu.vercel.app',
   'http://localhost:3000',
   'http://localhost:5173'
 ];

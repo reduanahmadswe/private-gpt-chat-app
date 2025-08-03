@@ -1,13 +1,16 @@
 import { Router } from 'express';
 import { validate } from '../shared/middleware/validation';
 import { ChatController } from './chat.controller';
-import { chatParamsSchema, createChatSchema, updateChatSchema } from './chat.validation';
+import { chatParamsSchema, createChatSchema, updateChatSchema, voiceChatSchema } from './chat.validation';
 
 const router = Router();
 const chatController = new ChatController();
 
 // POST /api/chat - Send message to AI
 router.post('/', validate(createChatSchema), chatController.createChat);
+
+// POST /api/chat/voice - Voice chat endpoint
+router.post('/voice', validate(voiceChatSchema), chatController.voiceChat);
 
 // GET /api/chat - Get all user chats
 router.get('/', chatController.getChats);

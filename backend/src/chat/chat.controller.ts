@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { ChatService } from './chat.service';
-import { CreateChatInput, UpdateChatInput } from './chat.validation';
+import { CreateChatInput, UpdateChatInput, VoiceChatInput } from './chat.validation';
 
 const chatService = new ChatService();
 
@@ -21,6 +21,24 @@ export class ChatController {
         success: true,
         message: 'Message sent successfully',
         ...result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  voiceChat = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const userId = getUserId(req);
+      const data: VoiceChatInput = req.body;
+
+      // Get AI response using the existing OpenRouter service
+      const response = await (chatService as any).callOpenRouterAPI(data.message);
+
+      res.status(200).json({
+        success: true,
+        message: 'Voice response generated successfully',
+        response,
       });
     } catch (error) {
       next(error);

@@ -75,7 +75,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
                 I'm here to help you with any questions or tasks. Start a
                 conversation and let's explore what we can accomplish together.
               </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 lg:gap-4 mt-6 lg:mt-8">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 lg:gap-4 mt-6 lg:mt-8">
                 <div className="bg-gradient-to-r from-[#00f5ff]/10 to-[#40e0d0]/10 p-3 lg:p-4 rounded-xl lg:rounded-2xl border border-[#00f5ff]/20">
                   <h4 className="text-[#00f5ff] font-semibold mb-1 lg:mb-2 text-sm lg:text-base">
                     Ask Questions
@@ -90,6 +90,14 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
                   </h4>
                   <p className="text-[#D0D0D0] text-xs lg:text-sm">
                     Solve problems and learn new things
+                  </p>
+                </div>
+                <div className="bg-gradient-to-r from-[#ff6b6b]/10 to-[#ffd93d]/10 p-3 lg:p-4 rounded-xl lg:rounded-2xl border border-[#ff6b6b]/20">
+                  <h4 className="text-[#ff6b6b] font-semibold mb-1 lg:mb-2 text-sm lg:text-base">
+                    🎤 Voice Chat
+                  </h4>
+                  <p className="text-[#D0D0D0] text-xs lg:text-sm">
+                    Toggle voice mode in header to start speaking
                   </p>
                 </div>
               </div>

@@ -33,6 +33,19 @@ export const chatParamsSchema = z.object({
   }),
 });
 
+export const voiceChatSchema = z.object({
+  body: z.object({
+    message: z
+      .string({
+        required_error: 'Voice message is required',
+      })
+      .min(1, 'Voice message cannot be empty')
+      .max(5000, 'Voice message cannot exceed 5000 characters')
+      .trim(),
+  }),
+});
+
 export type CreateChatInput = z.infer<typeof createChatSchema>['body'];
 export type UpdateChatInput = z.infer<typeof updateChatSchema>['body'];
 export type ChatParamsInput = z.infer<typeof chatParamsSchema>['params'];
+export type VoiceChatInput = z.infer<typeof voiceChatSchema>['body'];
