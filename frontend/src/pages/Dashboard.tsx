@@ -10,6 +10,7 @@ import {
   Share2,
   Trash2,
   User,
+  Volume2,
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -54,6 +55,25 @@ const Dashboard: React.FC = () => {
     confirmPassword: "",
   });
   const [settingsLoading, setSettingsLoading] = useState(false);
+  const [playingMessageIndex, setPlayingMessageIndex] = useState<number | null>(null);
+  const [speechSynthesis, setSpeechSynthesis] = useState<SpeechSynthesis | null>(null);
+
+  useEffect(() => {
+    // Initialize speech synthesis
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      setSpeechSynthesis(window.speechSynthesis);
+    }
+  }, []);
+
+  useEffect(() => {
+    // Stop any ongoing speech when messages change
+    return () => {
+      if (speechSynthesis && speechSynthesis.speaking) {
+        speechSynthesis.cancel();
+        setPlayingMessageIndex(null);
+      }
+    };
+  }, [messages, speechSynthesis]);
 
   useEffect(() => {
     // Fetch chats when component mounts
@@ -232,6 +252,66 @@ const Dashboard: React.FC = () => {
       if (error instanceof Error && error.name !== "AbortError") {
         toast.error("Failed to share message");
       }
+    }
+  };
+
+  // Play message content as audio using text-to-speech
+  const playMessageAudio = (content: string, messageIndex: number) => {
+    try {
+      if (!speechSynthesis) {
+        toast.error("Text-to-speech not supported in this browser");
+        return;
+      }
+
+      // Stop any currently playing speech
+      if (speechSynthesis.speaking) {
+        speechSynthesis.cancel();
+        if (playingMessageIndex === messageIndex) {
+          setPlayingMessageIndex(null);
+          return;
+        }
+      }
+
+      // Create speech utterance
+      const utterance = new SpeechSynthesisUtterance(content);
+      
+      // Configure speech settings
+      utterance.rate = 0.9; // Slightly slower for better comprehension
+      utterance.pitch = 1;
+      utterance.volume = 1;
+
+      // Try to use a more natural voice if available
+      const voices = speechSynthesis.getVoices();
+      const preferredVoice = voices.find(voice => 
+        voice.lang.startsWith('en') && 
+        (voice.name.includes('Natural') || voice.name.includes('Neural') || voice.name.includes('Enhanced'))
+      ) || voices.find(voice => voice.lang.startsWith('en')) || voices[0];
+      
+      if (preferredVoice) {
+        utterance.voice = preferredVoice;
+      }
+
+      // Event handlers
+      utterance.onstart = () => {
+        setPlayingMessageIndex(messageIndex);
+        toast.success("Playing audio...");
+      };
+
+      utterance.onend = () => {
+        setPlayingMessageIndex(null);
+      };
+
+      utterance.onerror = (event) => {
+        setPlayingMessageIndex(null);
+        toast.error(`Audio playback failed: ${event.error}`);
+      };
+
+      // Start speaking
+      speechSynthesis.speak(utterance);
+
+    } catch (error) {
+      toast.error("Failed to play audio");
+      setPlayingMessageIndex(null);
     }
   };
 
@@ -805,12 +885,14 @@ const Dashboard: React.FC = () => {
                             {message.content}
                           </p>
                         </div>
-                        
-                        {/* Copy and Share buttons for AI responses */}
+
+                        {/* Copy, Share and Audio buttons for AI responses */}
                         {message.role === "assistant" && (
                           <div className="flex items-center justify-end space-x-2 mt-4 pt-3 border-t border-white/10">
                             <button
-                              onClick={() => copyMessageContent(message.content)}
+                              onClick={() =>
+                                copyMessageContent(message.content)
+                              }
                               className="flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-white/5 to-white/10 hover:from-white/10 hover:to-white/15 border border-white/10 hover:border-[#00f5ff]/30 text-[#D0D0D0] hover:text-white transition-all duration-300 text-xs font-medium shadow-sm hover:shadow-lg hover:shadow-[#00f5ff]/10 transform hover:scale-105"
                               title="Copy message to clipboard"
                             >
@@ -818,12 +900,24 @@ const Dashboard: React.FC = () => {
                               <span>Copy</span>
                             </button>
                             <button
-                              onClick={() => shareMessageContent(message.content)}
+                              onClick={() =>
+                                shareMessageContent(message.content)
+                              }
                               className="flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-white/5 to-white/10 hover:from-white/10 hover:to-white/15 border border-white/10 hover:border-[#9d4edd]/30 text-[#D0D0D0] hover:text-white transition-all duration-300 text-xs font-medium shadow-sm hover:shadow-lg hover:shadow-[#9d4edd]/10 transform hover:scale-105"
                               title="Share this message"
                             >
                               <Share2 className="h-3.5 w-3.5" />
                               <span>Share</span>
+                            </button>
+                            <button
+                              onClick={() => playMessageAudio(message.content, index)}
+                              className={`flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-white/5 to-white/10 hover:from-white/10 hover:to-white/15 border border-white/10 hover:border-[#40e0d0]/30 text-[#D0D0D0] hover:text-white transition-all duration-300 text-xs font-medium shadow-sm hover:shadow-lg hover:shadow-[#40e0d0]/10 transform hover:scale-105 ${
+                                playingMessageIndex === index ? 'bg-[#40e0d0]/20 border-[#40e0d0]/50 text-[#40e0d0]' : ''
+                              }`}
+                              title={playingMessageIndex === index ? "Stop audio" : "Play message as audio"}
+                            >
+                              <Volume2 className={`h-3.5 w-3.5 ${playingMessageIndex === index ? 'animate-pulse' : ''}`} />
+                              <span>{playingMessageIndex === index ? 'Stop' : 'Listen'}</span>
                             </button>
                           </div>
                         )}
