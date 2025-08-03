@@ -50,9 +50,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
         playMessageAudio={playMessageAudio}
       />
 
-      <div className="p-4 lg:p-6">
-        <ChatInput loading={loading} onSendMessage={onSendMessage} />
-      </div>
+      <ChatInput loading={loading} onSendMessage={onSendMessage} />
     </div>
   );
 };
