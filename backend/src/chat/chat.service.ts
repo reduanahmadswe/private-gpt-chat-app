@@ -23,7 +23,7 @@ export class ChatService {
     try {
       // Create AbortController for timeout
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // Reduced to 15 seconds
 
       const response = await fetch(`${baseURL}/chat/completions`, {
         method: 'POST',
@@ -34,14 +34,14 @@ export class ChatService {
           'X-Title': 'Private GPT Chat',
         },
         body: JSON.stringify({
-          model: 'meta-llama/llama-3.1-8b-instruct:free', // Free model with better availability
+          model: 'microsoft/phi-3-mini-128k-instruct:free', // Different free model
           messages: [
             {
               role: 'user',
               content: message,
             },
           ],
-          max_tokens: 150, // Smaller for free model
+          max_tokens: 100, // Even smaller for faster response
           temperature: 0.7,
         }),
         signal: controller.signal, // Add timeout signal

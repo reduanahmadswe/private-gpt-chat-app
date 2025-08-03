@@ -1,6 +1,5 @@
 import cors from 'cors'
 import express from 'express'
-import rateLimit from 'express-rate-limit'
 import session from 'express-session'
 import { envVars } from './config/env'
 import passport from './config/passport'
@@ -10,8 +9,8 @@ import { errorHandler, notFound } from './shared/middleware/errorHandler'
 // Route imports
 import authRoutes from './auth/auth.routes'
 import chatRoutes from './chat/chat.routes'
-import userRoutes from './user/user.routes'
 import { TestController } from './chat/test.controller'
+import userRoutes from './user/user.routes'
 
 const app = express()
 
