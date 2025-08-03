@@ -23,11 +23,14 @@ export class ChatService {
     console.log('📝 Message length:', message.length);
     console.log('🔑 API Key present:', !!apiKey);
 
-    // Try multiple free models in order of reliability
+    // Try premium models first for better responses, then fallback to free models
     const models = [
-      'google/gemma-2-9b-it:free',
-      'microsoft/phi-3-mini-128k-instruct:free',
-      'meta-llama/llama-3.1-8b-instruct:free'
+      'anthropic/claude-3.5-sonnet', // Premium model - detailed responses
+      'anthropic/claude-3-haiku', // Faster premium model
+      'openai/gpt-4o-mini', // OpenAI premium model
+      'openai/gpt-3.5-turbo', // Popular OpenAI model
+      'google/gemma-2-9b-it:free', // Free fallback
+      'microsoft/phi-3-mini-128k-instruct:free', // Free fallback
     ];
 
     for (let i = 0; i < models.length; i++) {
@@ -37,7 +40,7 @@ export class ChatService {
       try {
         // Create AbortController for timeout
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000); // Even shorter: 10 seconds
+        const timeoutId = setTimeout(() => controller.abort(), 20000); // Increased to 20 seconds for premium models
 
         const response = await fetch(`${baseURL}/chat/completions`, {
           method: 'POST',
@@ -55,7 +58,7 @@ export class ChatService {
                 content: message,
               },
             ],
-            max_tokens: 80, // Very small for speed
+            max_tokens: model.includes(':free') ? 150 : 500, // More tokens for premium models
             temperature: 0.7,
           }),
           signal: controller.signal,
@@ -102,11 +105,39 @@ export class ChatService {
     const lowerMessage = message.toLowerCase();
 
     if (lowerMessage.includes('hello') || lowerMessage.includes('hi') || lowerMessage.includes('হাই') || lowerMessage.includes('হ্যালো')) {
-      return 'Hello! I apologize, but our AI service is temporarily experiencing high demand. Please try again in a few moments. How can I help you today?';
+      return `Hello! Nice to meet you! 👋
+
+I'm your AI assistant, but I'm currently experiencing some technical difficulties due to high demand on our AI models. Here's what I can tell you:
+
+🤖 **About me**: I'm designed to help you with various tasks including:
+- Answering questions on different topics
+- Creative writing and content creation  
+- Problem-solving and analysis
+- General conversation and support
+
+🔧 **Current status**: Our premium AI models (Claude 3.5 Sonnet, GPT-4) are temporarily overloaded, but they should be back soon!
+
+Please try asking your question again in a moment, and I'll provide you with a detailed and helpful response. What would you like to know about?`;
     }
 
     if (lowerMessage.includes('how are you') || lowerMessage.includes('কেমন আছেন')) {
-      return 'I\'m doing well, thank you! Our AI service is currently under heavy load, but I\'m here to help. Please try your question again in a moment.';
+      return `I'm doing great, thank you for asking! 😊
+
+Even though I'm experiencing some technical challenges right now, I'm here and ready to help you. Here's my current status:
+
+✅ **What's working**: 
+- I can receive and understand your messages
+- Basic conversation and keyword recognition
+- Saving our chat history
+
+⚠️ **What's temporarily limited**:
+- Full AI processing due to high server demand
+- Detailed analysis and complex reasoning
+- Real-time model responses
+
+🚀 **What to expect**: Our premium AI models (Claude 3.5 Sonnet, GPT-4) should be available shortly, and then I'll be able to provide you with comprehensive, detailed answers to any questions you have.
+
+How are you doing today? Feel free to ask me anything - I'll do my best to help once the models are back online!`;
     }
 
     if (lowerMessage.includes('what') || lowerMessage.includes('কি') || lowerMessage.includes('কী')) {
