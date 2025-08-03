@@ -117,7 +117,7 @@ if (envVars.FACEBOOK_CLIENT_ID && envVars.FACEBOOK_CLIENT_SECRET && envVars.FACE
                     // For Facebook, we'll use the Facebook ID as the primary identifier
                     // Email might not be available due to Facebook's privacy changes
                     let email = profile.emails?.[0]?.value;
-                    
+
                     // If no email, create a placeholder email using Facebook ID
                     if (!email) {
                         email = `facebook_${profile.id}@facebook.placeholder.com`;

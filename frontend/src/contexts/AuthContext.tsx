@@ -52,9 +52,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const provider = urlParams.get("provider");
 
       // If OAuth callback is present, process it first
-      if (authSuccess === "success" && urlToken && provider === "google") {
+      if (
+        authSuccess === "success" &&
+        urlToken &&
+        (provider === "google" || provider === "facebook")
+      ) {
         console.log(
-          "🔑 Processing OAuth callback with token:",
+          `🔑 Processing ${provider} OAuth callback with token:`,
           urlToken.substring(0, 20) + "..."
         );
 
@@ -69,7 +73,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         );
 
         // Show success message
-        toast.success("Successfully logged in with Google!");
+        toast.success(
+          `Successfully logged in with ${
+            provider.charAt(0).toUpperCase() + provider.slice(1)
+          }!`
+        );
 
         console.log("✅ OAuth callback processed, now checking auth...");
       }
