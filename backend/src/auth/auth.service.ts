@@ -3,7 +3,7 @@ import { envVars } from '../config/env';
 import { createError } from '../shared/middleware/errorHandler';
 import { IUser } from '../user/user.interface';
 import { User } from '../user/user.model';
-import { IAuthRequest, IAuthResponse, IGoogleOAuthResponse, IJWTPayload, IRegisterRequest } from './auth.interface';
+import { IAuthRequest, IAuthResponse, IFacebookOAuthResponse, IGoogleOAuthResponse, IJWTPayload, IRegisterRequest } from './auth.interface';
 
 export class AuthService {
   private generateTokens(userId: string, email: string): { token: string; refreshToken: string } {
@@ -119,6 +119,24 @@ export class AuthService {
         email: user.email,
         avatar: user.avatar,
         authProvider: 'google',
+      },
+    };
+  }
+
+  async handleFacebookOAuth(user: IUser): Promise<IFacebookOAuthResponse> {
+    console.log('🔑 Handling Facebook OAuth for user:', user.email);
+
+    // Generate tokens
+    const tokens = this.generateTokens(user._id!.toString(), user.email);
+
+    return {
+      ...tokens,
+      user: {
+        id: user._id!.toString(),
+        name: user.name,
+        email: user.email,
+        avatar: user.avatar,
+        authProvider: 'facebook',
       },
     };
   }

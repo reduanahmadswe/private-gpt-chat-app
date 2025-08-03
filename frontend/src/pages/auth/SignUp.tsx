@@ -1,6 +1,7 @@
 import { ArrowLeft, Brain, Lock, Mail, User } from "lucide-react";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import FacebookLoginButton from "../../components/FacebookLoginButton";
 import GoogleLoginButton from "../../components/GoogleLoginButton";
 import { useAuth } from "../../contexts/AuthContext";
 
@@ -162,8 +163,12 @@ const SignUp: React.FC = () => {
             </div>
           </div>
 
-          {/* Google Login Button */}
+          {/* OAuth Login Buttons */}
           <GoogleLoginButton />
+
+          <div className="mt-4">
+            <FacebookLoginButton />
+          </div>
 
           <div className="mt-8 text-center">
             <p className="text-[#E0E0E0] font-light">

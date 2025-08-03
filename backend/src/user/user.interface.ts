@@ -5,9 +5,10 @@ export interface IUser {
   email: string;
   password?: string; // Optional for OAuth users
   googleId?: string; // Google OAuth ID
+  facebookId?: string; // Facebook OAuth ID
   avatar?: string; // Profile picture URL
   refreshToken?: string; // Store refresh token
-  authProvider: 'local' | 'google'; // Authentication provider
+  authProvider: 'local' | 'google' | 'facebook' | 'multiple'; // Authentication provider
   createdAt?: Date;
   updatedAt?: Date;
 }

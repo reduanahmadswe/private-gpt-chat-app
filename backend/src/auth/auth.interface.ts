@@ -17,7 +17,7 @@ export interface IAuthResponse {
     name: string;
     email: string;
     avatar?: string;
-    authProvider: 'local' | 'google';
+    authProvider: 'local' | 'google' | 'facebook' | 'multiple';
   };
 }
 
@@ -35,5 +35,17 @@ export interface IGoogleOAuthResponse {
     email: string;
     avatar?: string;
     authProvider: 'google';
+  };
+}
+
+export interface IFacebookOAuthResponse {
+  token: string;
+  refreshToken: string;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    avatar?: string;
+    authProvider: 'facebook';
   };
 }

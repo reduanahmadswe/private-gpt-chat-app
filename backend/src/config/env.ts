@@ -22,6 +22,11 @@ interface EnvConfig {
     GOOGLE_CLIENT_SECRET: string;
     GOOGLE_CALLBACK_URL: string;
     SESSION_SECRET: string;
+
+    // Facebook OAuth
+    FACEBOOK_CLIENT_ID?: string;
+    FACEBOOK_CLIENT_SECRET?: string;
+    FACEBOOK_CALLBACK_URL?: string;
 }
 
 const loadEnvVariables = (): EnvConfig => {
@@ -39,6 +44,7 @@ const loadEnvVariables = (): EnvConfig => {
         'GOOGLE_CLIENT_SECRET',
         'GOOGLE_CALLBACK_URL',
         'SESSION_SECRET',
+        // Facebook OAuth variables are optional for now
     ];
 
     requiredEnvVariables.forEach((key) => {
@@ -66,6 +72,10 @@ const loadEnvVariables = (): EnvConfig => {
         GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET as string,
         GOOGLE_CALLBACK_URL: process.env.GOOGLE_CALLBACK_URL as string,
         SESSION_SECRET: process.env.SESSION_SECRET as string,
+
+        FACEBOOK_CLIENT_ID: process.env.FACEBOOK_CLIENT_ID,
+        FACEBOOK_CLIENT_SECRET: process.env.FACEBOOK_CLIENT_SECRET,
+        FACEBOOK_CALLBACK_URL: process.env.FACEBOOK_CALLBACK_URL,
     };
 };
 

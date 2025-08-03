@@ -153,6 +153,70 @@ export class AuthController {
     }
   }
 
+  facebookCallback = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const user = req.user as IUser;
+
+      if (!user) {
+        console.error('❌ No user found in Facebook OAuth callback');
+        const errorUrl = `${envVars.CLIENT_URL}/auth/signin?error=oauth_failed`;
+        return res.redirect(errorUrl);
+      }
+
+      console.log('🎉 Facebook OAuth successful for:', user.email);
+      console.log('🔑 Handling Facebook OAuth for user:', user.email);
+      console.log('🌍 CLIENT_URL:', envVars.CLIENT_URL);
+      console.log('🌍 NODE_ENV:', envVars.NODE_ENV);
+
+      // Generate tokens for the authenticated user
+      const result = await authService.handleFacebookOAuth(user);
+
+      // Set secure HTTP-only cookies for enhanced security
+      const isProduction = envVars.NODE_ENV === 'production';
+
+      // Set access token cookie
+      res.cookie('token', result.token, {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: isProduction ? 'none' : 'lax',
+        maxAge: 24 * 60 * 60 * 1000, // 1 day
+        path: '/',
+      });
+
+      // Set refresh token cookie
+      res.cookie('refreshToken', result.refreshToken, {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: isProduction ? 'none' : 'lax',
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        path: '/',
+      });
+
+      // For development: also pass token as query parameter for easier testing
+      // In production, rely on cookies only for security
+      let redirectUrl: string;
+
+      if (isProduction) {
+        // Production: Use secure cookies AND pass token for compatibility
+        redirectUrl = `${envVars.CLIENT_URL}/dashboard?auth=success&provider=facebook&token=${result.token}`;
+      } else {
+        // Development: Also pass token in query for easier testing
+        redirectUrl = `${envVars.CLIENT_URL}/dashboard?auth=success&provider=facebook&token=${result.token}`;
+      }
+
+      console.log('🚀 Redirecting to:', redirectUrl);
+      res.redirect(redirectUrl);
+
+    } catch (error) {
+      console.error('❌ Facebook OAuth callback error:', error);
+      console.log('🌍 CLIENT_URL when error:', envVars.CLIENT_URL);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorUrl = `${envVars.CLIENT_URL}/auth/signin?error=oauth_failed&message=${encodeURIComponent(errorMessage)}`;
+      console.log('🚀 Error redirect URL:', errorUrl);
+      res.redirect(errorUrl);
+    }
+  }
+
   // Get current user info
   getCurrentUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {

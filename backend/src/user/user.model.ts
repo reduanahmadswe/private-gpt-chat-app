@@ -32,6 +32,10 @@ const userSchema = new Schema<UserDocument>(
       type: String,
       sparse: true, // Allow multiple null values
     },
+    facebookId: {
+      type: String,
+      sparse: true, // Allow multiple null values
+    },
     avatar: {
       type: String,
       default: null,
@@ -42,7 +46,7 @@ const userSchema = new Schema<UserDocument>(
     },
     authProvider: {
       type: String,
-      enum: ['local', 'google'],
+      enum: ['local', 'google', 'facebook', 'multiple'],
       default: 'local',
       required: true,
     },

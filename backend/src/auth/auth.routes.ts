@@ -37,6 +37,22 @@ router.get('/google/callback',
     authController.googleCallback
 );
 
+// Facebook OAuth Routes
+// GET /api/auth/facebook
+router.get('/facebook',
+    passport.authenticate('facebook', {
+        scope: ['public_profile']
+    })
+);
+
+// GET /api/auth/facebook/callback
+router.get('/facebook/callback',
+    passport.authenticate('facebook', {
+        session: false
+    }),
+    authController.facebookCallback
+);
+
 // GET /api/auth/me - Get current user
 router.get('/me', authenticate, authController.getCurrentUser);
 
