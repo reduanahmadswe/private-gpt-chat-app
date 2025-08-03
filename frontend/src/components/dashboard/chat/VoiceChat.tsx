@@ -1,6 +1,14 @@
-import { Mic, MicOff, Square, Volume2, VolumeX } from "lucide-react";
+import { ArrowLeft, Mic, MicOff, Square, Volume2, VolumeX } from "lucide-react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
+
+// Extend Window interface for Speech Recognition
+declare global {
+  interface Window {
+    SpeechRecognition?: new () => VoiceSpeechRecognition;
+    webkitSpeechRecognition?: new () => VoiceSpeechRecognition;
+  }
+}
 
 // Speech Recognition types
 interface VoiceSpeechRecognition extends EventTarget {
@@ -43,7 +51,7 @@ interface VoiceSpeechRecognitionErrorEvent {
 
 interface VoiceChatProps {
   loading: boolean;
-  onVoiceMessage: (message: string) => Promise<string>;
+  onBack?: () => void;
 }
 
 enum VoiceState {
@@ -53,7 +61,7 @@ enum VoiceState {
   SPEAKING = "speaking",
 }
 
-const VoiceChat: React.FC<VoiceChatProps> = ({ loading, onVoiceMessage }) => {
+const VoiceChat: React.FC<VoiceChatProps> = ({ loading, onBack }) => {
   const [voiceState, setVoiceState] = useState<VoiceState>(VoiceState.IDLE);
   const [speechSupported, setSpeechSupported] = useState(false);
   const [currentTranscript, setCurrentTranscript] = useState("");
@@ -149,26 +157,45 @@ const VoiceChat: React.FC<VoiceChatProps> = ({ loading, onVoiceMessage }) => {
     };
   }, []);
 
-  const processVoiceInput = useCallback(
-    async (transcript: string) => {
-      if (!transcript.trim()) return;
+  const processVoiceInput = useCallback(async (transcript: string) => {
+    if (!transcript.trim()) return;
 
-      try {
-        setVoiceState(VoiceState.PROCESSING);
-        const response = await onVoiceMessage(transcript.trim());
+    try {
+      setVoiceState(VoiceState.PROCESSING);
 
-        if (response) {
-          await speakResponse(response);
-        }
-      } catch (error) {
-        console.error("Error processing voice input:", error);
-        toast.error("Failed to process your message.");
-        setVoiceState(VoiceState.IDLE);
+      // Call the voice chat API
+      const API_BASE_URL =
+        import.meta.env.VITE_API_BASE_URL || "http://localhost:5001";
+      const cleanUrl = API_BASE_URL.endsWith("/")
+        ? API_BASE_URL.slice(0, -1)
+        : API_BASE_URL;
+
+      const response = await fetch(`${cleanUrl}/api/chat/voice`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({ message: transcript.trim() }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Voice chat API failed");
       }
-    },
-    [onVoiceMessage]
-  );
 
+      const data = await response.json();
+
+      if (data.response) {
+        await speakResponse(data.response);
+      } else {
+        throw new Error("No response from API");
+      }
+    } catch (error) {
+      console.error("Error processing voice input:", error);
+      toast.error("Failed to process your message.");
+      setVoiceState(VoiceState.IDLE);
+    }
+  }, []);
   const speakResponse = useCallback(async (text: string) => {
     if (!synthRef.current || !text) {
       setVoiceState(VoiceState.IDLE);
@@ -283,14 +310,14 @@ const VoiceChat: React.FC<VoiceChatProps> = ({ loading, onVoiceMessage }) => {
     switch (voiceState) {
       case VoiceState.IDLE:
         return {
-          icon: <Mic className="h-8 w-8 lg:h-10 lg:w-10" />,
+          icon: <Mic className="h-12 w-12 lg:h-16 lg:w-16" />,
           text: "Click to speak",
           className:
             "bg-gradient-to-r from-[#00f5ff] to-[#9d4edd] hover:from-[#9d4edd] hover:to-[#00f5ff] shadow-[#00f5ff]/30",
         };
       case VoiceState.LISTENING:
         return {
-          icon: <MicOff className="h-8 w-8 lg:h-10 lg:w-10" />,
+          icon: <MicOff className="h-12 w-12 lg:h-16 lg:w-16" />,
           text: "Listening... Click to stop",
           className:
             "bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 shadow-red-500/30 animate-pulse",
@@ -298,7 +325,7 @@ const VoiceChat: React.FC<VoiceChatProps> = ({ loading, onVoiceMessage }) => {
       case VoiceState.PROCESSING:
         return {
           icon: (
-            <div className="w-8 h-8 lg:w-10 lg:h-10 border-4 border-white/30 border-t-white rounded-full animate-spin" />
+            <div className="w-12 h-12 lg:w-16 lg:h-16 border-4 border-white/30 border-t-white rounded-full animate-spin" />
           ),
           text: "Processing...",
           className:
@@ -306,7 +333,7 @@ const VoiceChat: React.FC<VoiceChatProps> = ({ loading, onVoiceMessage }) => {
         };
       case VoiceState.SPEAKING:
         return {
-          icon: <Volume2 className="h-8 w-8 lg:h-10 lg:w-10 animate-pulse" />,
+          icon: <Volume2 className="h-12 w-12 lg:h-16 lg:w-16 animate-pulse" />,
           text: "Speaking... Click to stop",
           className:
             "bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 shadow-green-500/30",
@@ -318,8 +345,8 @@ const VoiceChat: React.FC<VoiceChatProps> = ({ loading, onVoiceMessage }) => {
 
   if (!speechSupported) {
     return (
-      <div className="absolute bottom-0 left-0 right-0 p-4 lg:p-6">
-        <div className="w-full max-w-4xl mx-auto text-center">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-[#030637] via-[#1a1a2e] to-[#16213e]">
+        <div className="w-full max-w-4xl mx-auto text-center p-6">
           <div className="bg-gradient-to-r from-red-500/20 to-red-600/20 backdrop-blur-xl rounded-2xl lg:rounded-3xl border border-red-500/30 p-6">
             <VolumeX className="h-12 w-12 text-red-400 mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-white mb-2">
@@ -336,11 +363,25 @@ const VoiceChat: React.FC<VoiceChatProps> = ({ loading, onVoiceMessage }) => {
   }
 
   return (
-    <div className="absolute bottom-0 left-0 right-0 p-4 lg:p-6">
-      <div className="w-full max-w-4xl mx-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-[#030637] via-[#1a1a2e] to-[#16213e]">
+      <div className="w-full h-full flex flex-col items-center justify-center p-4 lg:p-6">
+        {/* Back Button */}
+        {onBack && (
+          <div className="absolute top-6 left-6">
+            <button
+              onClick={onBack}
+              className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-white/10 to-white/15 hover:from-white/15 hover:to-white/20 border border-white/20 text-white rounded-xl transition-all duration-300 hover:scale-105"
+              title="Back to Text Mode"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              <span className="text-sm">Text Mode</span>
+            </button>
+          </div>
+        )}
+
         {/* Voice Activity Indicator */}
         {voiceState === VoiceState.LISTENING && currentTranscript && (
-          <div className="mb-4 text-center">
+          <div className="absolute top-6 left-1/2 transform -translate-x-1/2">
             <div className="bg-gradient-to-r from-white/10 to-white/15 backdrop-blur-xl rounded-xl border border-white/20 p-3">
               <p className="text-white/80 text-sm">
                 <span className="text-[#00f5ff]">Hearing:</span> "
@@ -350,12 +391,12 @@ const VoiceChat: React.FC<VoiceChatProps> = ({ loading, onVoiceMessage }) => {
           </div>
         )}
 
-        {/* Main Voice Control */}
-        <div className="flex justify-center">
+        {/* Main Voice Control - Centered */}
+        <div className="flex flex-col items-center justify-center space-y-8">
           <button
             onClick={handleMainAction}
             disabled={loading || voiceState === VoiceState.PROCESSING}
-            className={`relative p-6 lg:p-8 rounded-full transition-all duration-300 transform hover:scale-105 disabled:transform-none shadow-2xl ${
+            className={`relative p-8 lg:p-12 rounded-full transition-all duration-300 transform hover:scale-105 disabled:transform-none shadow-2xl ${
               buttonContent.className
             } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
             title={buttonContent.text}
@@ -368,43 +409,43 @@ const VoiceChat: React.FC<VoiceChatProps> = ({ loading, onVoiceMessage }) => {
             {/* Button content */}
             <div className="relative z-10 text-white">{buttonContent.icon}</div>
           </button>
-        </div>
 
-        {/* Status Text */}
-        <div className="text-center mt-4">
-          <p className="text-white font-medium text-lg mb-1">
-            {voiceState === VoiceState.IDLE && "Ready to chat"}
-            {voiceState === VoiceState.LISTENING && "Listening..."}
-            {voiceState === VoiceState.PROCESSING && "Thinking..."}
-            {voiceState === VoiceState.SPEAKING && "Speaking..."}
-          </p>
-          <p className="text-white/60 text-sm">
-            {voiceState === VoiceState.IDLE &&
-              "Click the microphone to start voice conversation"}
-            {voiceState === VoiceState.LISTENING &&
-              "Speak clearly and wait for processing"}
-            {voiceState === VoiceState.PROCESSING &&
-              "AI is generating response..."}
-            {voiceState === VoiceState.SPEAKING && "Playing AI response"}
-          </p>
-        </div>
-
-        {/* Additional Controls */}
-        {voiceState === VoiceState.SPEAKING && (
-          <div className="flex justify-center mt-4 space-x-3">
-            <button
-              onClick={stopSpeaking}
-              className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-red-500/20 to-red-600/20 hover:from-red-500/30 hover:to-red-600/30 border border-red-500/30 text-red-200 hover:text-white rounded-xl transition-all duration-300"
-              title="Stop speaking"
-            >
-              <Square className="h-4 w-4" />
-              <span className="text-sm">Stop</span>
-            </button>
+          {/* Status Text */}
+          <div className="text-center">
+            <p className="text-white font-medium text-xl lg:text-2xl mb-2">
+              {voiceState === VoiceState.IDLE && "Ready to chat"}
+              {voiceState === VoiceState.LISTENING && "Listening..."}
+              {voiceState === VoiceState.PROCESSING && "Thinking..."}
+              {voiceState === VoiceState.SPEAKING && "Speaking..."}
+            </p>
+            <p className="text-white/60 text-base lg:text-lg">
+              {voiceState === VoiceState.IDLE &&
+                "Click the microphone to start voice conversation"}
+              {voiceState === VoiceState.LISTENING &&
+                "Speak clearly and wait for processing"}
+              {voiceState === VoiceState.PROCESSING &&
+                "AI is generating response..."}
+              {voiceState === VoiceState.SPEAKING && "Playing AI response"}
+            </p>
           </div>
-        )}
+
+          {/* Additional Controls */}
+          {voiceState === VoiceState.SPEAKING && (
+            <div className="flex justify-center space-x-3">
+              <button
+                onClick={stopSpeaking}
+                className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-red-500/20 to-red-600/20 hover:from-red-500/30 hover:to-red-600/30 border border-red-500/30 text-red-200 hover:text-white rounded-xl transition-all duration-300"
+                title="Stop speaking"
+              >
+                <Square className="h-4 w-4" />
+                <span className="text-sm">Stop</span>
+              </button>
+            </div>
+          )}
+        </div>
 
         {/* Footer Info */}
-        <div className="text-center mt-6">
+        <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 text-center">
           <p className="text-xs text-white/50 leading-relaxed">
             🎤 Voice-only AI chat • No text display • Hands-free conversation
             <br />

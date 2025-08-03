@@ -166,6 +166,7 @@ const addFormattedText = (
 const DashboardLayout: React.FC = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [isVoiceMode, setIsVoiceMode] = useState(false);
 
   // Chat functionality
   const {
@@ -328,41 +329,49 @@ const DashboardLayout: React.FC = () => {
     sendMessage(inputMessage);
   };
 
+  const handleVoiceModeChange = (voiceMode: boolean) => {
+    setIsVoiceMode(voiceMode);
+  };
+
   return (
     <div className="min-h-screen bg-[#030637] flex overflow-hidden font-sans relative">
       {/* Backdrop overlay for mobile settings */}
-      {showSettings && (
+      {showSettings && !isVoiceMode && (
         <div
           className="fixed inset-0 bg-black/50 backdrop-blur-sm z-25 lg:hidden"
           onClick={() => setShowSettings(false)}
         />
       )}
 
-      {/* Sidebar */}
-      <Sidebar
-        chats={chats}
-        currentChat={currentChat}
-        editingTitle={editingTitle}
-        newTitle={newTitle}
-        showSettings={showSettings}
-        setShowSettings={setShowSettings}
-        sidebarCollapsed={sidebarCollapsed}
-        setSidebarCollapsed={setSidebarCollapsed}
-        setEditingTitle={setEditingTitle}
-        setNewTitle={setNewTitle}
-        startNewChat={startNewChat}
-        selectChat={selectChat}
-        updateChatTitle={updateChatTitle}
-        shareChat={shareChat}
-        downloadChat={downloadChatAsPDF}
-        deleteChat={deleteChat}
-      />
+      {/* Sidebar - Hidden in voice mode */}
+      {!isVoiceMode && (
+        <Sidebar
+          chats={chats}
+          currentChat={currentChat}
+          editingTitle={editingTitle}
+          newTitle={newTitle}
+          showSettings={showSettings}
+          setShowSettings={setShowSettings}
+          sidebarCollapsed={sidebarCollapsed}
+          setSidebarCollapsed={setSidebarCollapsed}
+          setEditingTitle={setEditingTitle}
+          setNewTitle={setNewTitle}
+          startNewChat={startNewChat}
+          selectChat={selectChat}
+          updateChatTitle={updateChatTitle}
+          shareChat={shareChat}
+          downloadChat={downloadChatAsPDF}
+          deleteChat={deleteChat}
+        />
+      )}
 
-      {/* Settings Panel */}
-      <SettingsPanel
-        showSettings={showSettings}
-        setShowSettings={setShowSettings}
-      />
+      {/* Settings Panel - Hidden in voice mode */}
+      {!isVoiceMode && (
+        <SettingsPanel
+          showSettings={showSettings}
+          setShowSettings={setShowSettings}
+        />
+      )}
 
       {/* Main Chat Area */}
       <ChatArea
@@ -377,6 +386,7 @@ const DashboardLayout: React.FC = () => {
         playMessageAudio={playMessageAudio}
         downloadMessage={downloadMessageAsPDF}
         onSendMessage={handleSendMessage}
+        onVoiceModeChange={handleVoiceModeChange}
       />
     </div>
   );
