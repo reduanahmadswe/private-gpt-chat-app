@@ -7,6 +7,7 @@ interface ChatHeaderProps {
   messagesCount: number;
   sidebarCollapsed: boolean;
   setSidebarCollapsed: (collapsed: boolean) => void;
+  isHeaderVisible?: boolean;
 }
 
 const ChatHeader: React.FC<ChatHeaderProps> = ({
@@ -14,9 +15,16 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
   messagesCount,
   sidebarCollapsed,
   setSidebarCollapsed,
+  isHeaderVisible = true,
 }) => {
   return (
-    <div className="p-4 lg:p-6 border-b border-white/10 bg-gradient-to-r from-white/5 to-white/10 backdrop-blur-xl flex-shrink-0 shadow-lg">
+    <div
+      className={`absolute top-0 left-0 right-0 z-10 p-4 lg:p-6 border-b border-white/10 bg-gradient-to-r from-white/5 to-white/10 backdrop-blur-xl shadow-lg transition-all duration-300 ${
+        isHeaderVisible
+          ? "transform translate-y-0 opacity-100"
+          : "transform -translate-y-full opacity-0 pointer-events-none"
+      }`}
+    >
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3 lg:space-x-4">
           {sidebarCollapsed && (

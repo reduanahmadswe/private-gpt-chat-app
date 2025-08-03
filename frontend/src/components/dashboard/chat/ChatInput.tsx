@@ -1,5 +1,51 @@
-import { Send } from "lucide-react";
-import React, { useState } from "react";
+import { Mic, MicOff, Send } from "lucide-react";
+import React, { useEffect, useRef, useState } from "react";
+import toast from "react-hot-toast";
+
+// Extend Window interface for Speech Recognition
+declare global {
+  interface Window {
+    SpeechRecognition?: new () => SpeechRecognition;
+    webkitSpeechRecognition?: new () => SpeechRecognition;
+  }
+}
+
+interface SpeechRecognition extends EventTarget {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  start(): void;
+  stop(): void;
+  onstart: (() => void) | null;
+  onresult: ((event: SpeechRecognitionEvent) => void) | null;
+  onerror: ((event: SpeechRecognitionErrorEvent) => void) | null;
+  onend: (() => void) | null;
+}
+
+interface SpeechRecognitionEvent {
+  resultIndex: number;
+  results: SpeechRecognitionResultList;
+}
+
+interface SpeechRecognitionResultList {
+  length: number;
+  [index: number]: SpeechRecognitionResult;
+}
+
+interface SpeechRecognitionResult {
+  length: number;
+  isFinal: boolean;
+  [index: number]: SpeechRecognitionAlternative;
+}
+
+interface SpeechRecognitionAlternative {
+  transcript: string;
+  confidence: number;
+}
+
+interface SpeechRecognitionErrorEvent {
+  error: string;
+}
 
 interface ChatInputProps {
   loading: boolean;
@@ -8,6 +54,109 @@ interface ChatInputProps {
 
 const ChatInput: React.FC<ChatInputProps> = ({ loading, onSendMessage }) => {
   const [inputMessage, setInputMessage] = useState("");
+  const [isListening, setIsListening] = useState(false);
+  const [speechSupported, setSpeechSupported] = useState(false);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
+
+  // Initialize speech recognition
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const SpeechRecognition =
+        window.SpeechRecognition || (window as any).webkitSpeechRecognition;
+
+      if (SpeechRecognition) {
+        setSpeechSupported(true);
+        const recognition = new SpeechRecognition();
+
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = "en-US";
+
+        recognition.onstart = () => {
+          setIsListening(true);
+        };
+
+        recognition.onresult = (event: SpeechRecognitionEvent) => {
+          let finalTranscript = "";
+          let interimTranscript = "";
+
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            const transcript = event.results[i][0].transcript;
+            if (event.results[i].isFinal) {
+              finalTranscript += transcript;
+            } else {
+              interimTranscript += transcript;
+            }
+          }
+
+          if (finalTranscript) {
+            setInputMessage((prev) => {
+              const trimmedPrev = prev.trim();
+              const trimmedFinal = finalTranscript.trim();
+              return trimmedPrev
+                ? `${trimmedPrev} ${trimmedFinal}`
+                : trimmedFinal;
+            });
+          }
+        };
+
+        recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+          console.error("Speech recognition error:", event.error);
+          setIsListening(false);
+
+          switch (event.error) {
+            case "no-speech":
+              toast.error("Couldn't hear anything. Please try again.");
+              break;
+            case "network":
+              toast.error("Network error. Please check your connection.");
+              break;
+            case "not-allowed":
+              toast.error(
+                "Microphone access denied. Please allow microphone access."
+              );
+              break;
+            default:
+              toast.error("Speech recognition error. Please try again.");
+          }
+        };
+
+        recognition.onend = () => {
+          setIsListening(false);
+        };
+
+        recognitionRef.current = recognition;
+      }
+    }
+
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+    };
+  }, []);
+
+  const toggleListening = () => {
+    if (!speechSupported) {
+      toast.error("Speech recognition is not supported in this browser.");
+      return;
+    }
+
+    if (!recognitionRef.current) return;
+
+    if (isListening) {
+      recognitionRef.current.stop();
+    } else {
+      try {
+        // Don't clear existing text, just add to it
+        recognitionRef.current.start();
+        toast.success("Listening... Speak now!");
+      } catch (error) {
+        console.error("Error starting speech recognition:", error);
+        toast.error("Failed to start voice recognition.");
+      }
+    }
+  };
 
   const handleSendMessage = () => {
     if (!inputMessage.trim() || loading) return;
@@ -39,7 +188,11 @@ const ChatInput: React.FC<ChatInputProps> = ({ loading, onSendMessage }) => {
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Type your message... (Shift + Enter for new line)"
+                placeholder={
+                  speechSupported
+                    ? "Type your message or click the mic to speak... (Shift + Enter for new line)"
+                    : "Type your message... (Shift + Enter for new line)"
+                }
                 className="w-full px-4 lg:px-6 py-3 lg:py-4 bg-transparent text-white placeholder-[#D0D0D0] rounded-xl lg:rounded-2xl border-none focus:outline-none resize-none scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent text-sm lg:text-base leading-relaxed"
                 disabled={loading}
                 rows={1}
@@ -71,6 +224,26 @@ const ChatInput: React.FC<ChatInputProps> = ({ loading, onSendMessage }) => {
               )}
             </div>
 
+            {/* Microphone Button */}
+            {speechSupported && (
+              <button
+                onClick={toggleListening}
+                disabled={loading}
+                className={`px-3 lg:px-4 py-3 lg:py-4 rounded-xl lg:rounded-2xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#00f5ff]/50 flex items-center justify-center min-w-[50px] lg:min-w-[60px] shadow-lg transform hover:scale-105 disabled:transform-none disabled:shadow-none ${
+                  isListening
+                    ? "bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 shadow-red-500/20 animate-pulse"
+                    : "bg-gradient-to-r from-white/10 to-white/15 hover:from-white/15 hover:to-white/20 shadow-white/10"
+                } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
+                title={isListening ? "Stop listening" : "Click to speak"}
+              >
+                {isListening ? (
+                  <MicOff className="h-4 w-4 lg:h-5 lg:w-5 text-white" />
+                ) : (
+                  <Mic className="h-4 w-4 lg:h-5 lg:w-5 text-white" />
+                )}
+              </button>
+            )}
+
             {/* Send Button */}
             <button
               onClick={handleSendMessage}
@@ -89,6 +262,11 @@ const ChatInput: React.FC<ChatInputProps> = ({ loading, onSendMessage }) => {
         <p className="text-xs text-[#D0D0D0]/70 mt-3 lg:mt-4 text-center leading-relaxed">
           AI responses are generated and may contain inaccuracies. Please verify
           important information.
+          {speechSupported && (
+            <span className="block mt-1">
+              💡 Tip: Use the microphone button for voice input
+            </span>
+          )}
         </p>
       </div>
     </div>
