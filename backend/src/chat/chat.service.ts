@@ -34,14 +34,14 @@ export class ChatService {
           'X-Title': 'Private GPT Chat',
         },
         body: JSON.stringify({
-          model: 'openai/gpt-3.5-turbo', // More stable and faster model
+          model: 'meta-llama/llama-3.1-8b-instruct:free', // Free model with better availability
           messages: [
             {
               role: 'user',
               content: message,
             },
           ],
-          max_tokens: message.length > 500 ? 400 : 600, // Further reduced for faster response
+          max_tokens: 150, // Smaller for free model
           temperature: 0.7,
         }),
         signal: controller.signal, // Add timeout signal

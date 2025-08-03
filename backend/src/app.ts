@@ -11,6 +11,7 @@ import { errorHandler, notFound } from './shared/middleware/errorHandler'
 import authRoutes from './auth/auth.routes'
 import chatRoutes from './chat/chat.routes'
 import userRoutes from './user/user.routes'
+import { TestController } from './chat/test.controller'
 
 const app = express()
 
@@ -122,6 +123,10 @@ app.all('/api/cors-test', (req, res) => {
     allowedOrigins: [envVars.FRONTEND_URL, envVars.CLIENT_URL]
   })
 })
+
+// OpenRouter API test endpoint
+const testController = new TestController()
+app.get('/api/test-openrouter', testController.testOpenRouter.bind(testController))
 
 // Routes
 app.use('/api/auth', authRoutes)
