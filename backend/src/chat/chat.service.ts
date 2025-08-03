@@ -11,7 +11,14 @@ export class ChatService {
     console.log('🤖 Starting OpenRouter API call...');
     console.log('📝 Message length:', message.length);
     console.log('🔑 API Key present:', !!apiKey);
+    console.log('🔑 API Key first 10 chars:', apiKey ? apiKey.substring(0, 10) + '...' : 'MISSING');
     console.log('🌐 Base URL:', baseURL);
+    console.log('🌍 Environment:', process.env.NODE_ENV);
+    console.log('🔧 All required env vars loaded:', {
+      OPENROUTER_API_KEY: !!process.env.OPENROUTER_API_KEY,
+      OPENAI_API_BASE_URL: !!process.env.OPENAI_API_BASE_URL,
+      FRONTEND_URL: !!process.env.FRONTEND_URL
+    });
 
     try {
       // Create AbortController for timeout
@@ -86,48 +93,59 @@ export class ChatService {
   }
 
   async createOrUpdateChat(userId: string, data: IChatCreate): Promise<IChatResponse> {
-    const { message, chatId } = data;
+    try {
+      console.log('🚀 Starting createOrUpdateChat method');
+      console.log('👤 User ID:', userId);
+      console.log('💬 Message length:', data.message?.length || 0);
+      console.log('🆔 Chat ID:', data.chatId || 'NEW CHAT');
 
-    let chat;
+      const { message, chatId } = data;
 
-    if (chatId) {
-      // Add to existing chat
-      chat = await Chat.findOne({ _id: chatId, userId });
-      if (!chat) {
-        throw createError('Chat not found', 404);
+      let chat;
+
+      if (chatId) {
+        // Add to existing chat
+        chat = await Chat.findOne({ _id: chatId, userId });
+        if (!chat) {
+          throw createError('Chat not found', 404);
+        }
+      } else {
+        // Create new chat
+        chat = new Chat({
+          userId,
+          title: message.substring(0, 50) + (message.length > 50 ? '...' : ''),
+          messages: [],
+        });
       }
-    } else {
-      // Create new chat
-      chat = new Chat({
-        userId,
-        title: message.substring(0, 50) + (message.length > 50 ? '...' : ''),
-        messages: [],
+
+      // Add user message
+      chat.messages.push({
+        role: 'user',
+        content: message,
+        timestamp: new Date(),
       });
+
+      // Get AI response
+      const aiResponse = await this.callOpenRouterAPI(message);
+
+      // Add AI response
+      chat.messages.push({
+        role: 'assistant',
+        content: aiResponse,
+        timestamp: new Date(),
+      });
+
+      await chat.save();
+
+      return {
+        chat,
+        response: aiResponse,
+      };
+    } catch (error: any) {
+      console.error('❌ Error in createOrUpdateChat:', error.message);
+      console.error('🔍 Error details:', error);
+      throw error;
     }
-
-    // Add user message
-    chat.messages.push({
-      role: 'user',
-      content: message,
-      timestamp: new Date(),
-    });
-
-    // Get AI response
-    const aiResponse = await this.callOpenRouterAPI(message);
-
-    // Add AI response
-    chat.messages.push({
-      role: 'assistant',
-      content: aiResponse,
-      timestamp: new Date(),
-    });
-
-    await chat.save();
-
-    return {
-      chat,
-      response: aiResponse,
-    };
   }
 
   async getUserChats(userId: string) {
