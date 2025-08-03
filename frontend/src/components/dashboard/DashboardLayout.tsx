@@ -7,6 +7,7 @@ import Sidebar from "./sidebar/Sidebar";
 
 const DashboardLayout: React.FC = () => {
   const [showSettings, setShowSettings] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   // Chat functionality
   const {
@@ -52,6 +53,8 @@ const DashboardLayout: React.FC = () => {
         newTitle={newTitle}
         showSettings={showSettings}
         setShowSettings={setShowSettings}
+        sidebarCollapsed={sidebarCollapsed}
+        setSidebarCollapsed={setSidebarCollapsed}
         setEditingTitle={setEditingTitle}
         setNewTitle={setNewTitle}
         startNewChat={startNewChat}
@@ -73,6 +76,8 @@ const DashboardLayout: React.FC = () => {
         messages={messages}
         loading={loading}
         showSettings={showSettings}
+        sidebarCollapsed={sidebarCollapsed}
+        setSidebarCollapsed={setSidebarCollapsed}
         playingMessageIndex={playingMessageIndex}
         streamingMessageIndex={streamingMessageIndex}
         playMessageAudio={playMessageAudio}

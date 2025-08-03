@@ -9,6 +9,8 @@ interface ChatAreaProps {
   messages: Message[];
   loading: boolean;
   showSettings: boolean;
+  sidebarCollapsed: boolean;
+  setSidebarCollapsed: (collapsed: boolean) => void;
   playingMessageIndex: number | null;
   streamingMessageIndex: number | null;
   playMessageAudio: (content: string, messageIndex: number) => void;
@@ -20,6 +22,8 @@ const ChatArea: React.FC<ChatAreaProps> = ({
   messages,
   loading,
   showSettings,
+  sidebarCollapsed,
+  setSidebarCollapsed,
   playingMessageIndex,
   streamingMessageIndex,
   playMessageAudio,
@@ -29,9 +33,14 @@ const ChatArea: React.FC<ChatAreaProps> = ({
     <div
       className={`flex-1 flex flex-col h-screen bg-gradient-to-br from-[#030637] via-[#1a1a2e] to-[#16213e] backdrop-blur-xl transition-all duration-300 ${
         showSettings ? "lg:mr-96" : "mr-0"
-      } ml-64 lg:ml-80`}
+      } ${sidebarCollapsed ? "ml-16" : "ml-64 lg:ml-80"}`}
     >
-      <ChatHeader currentChat={currentChat} messagesCount={messages.length} />
+      <ChatHeader
+        currentChat={currentChat}
+        messagesCount={messages.length}
+        sidebarCollapsed={sidebarCollapsed}
+        setSidebarCollapsed={setSidebarCollapsed}
+      />
 
       <ChatMessages
         messages={messages}
