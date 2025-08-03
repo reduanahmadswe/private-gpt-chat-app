@@ -1,4 +1,5 @@
 import {
+  Copy,
   Edit2,
   Lock,
   LogOut,
@@ -199,6 +200,38 @@ const Dashboard: React.FC = () => {
       toast.error(error.response?.data?.message || "Failed to change password");
     } finally {
       setSettingsLoading(false);
+    }
+  };
+
+  // Copy message content to clipboard
+  const copyMessageContent = async (content: string) => {
+    try {
+      await navigator.clipboard.writeText(content);
+      toast.success("Message copied to clipboard!");
+    } catch (error) {
+      toast.error("Failed to copy message");
+    }
+  };
+
+  // Share message content
+  const shareMessageContent = async (content: string) => {
+    try {
+      if (navigator.share) {
+        // Use Web Share API if available (mobile devices)
+        await navigator.share({
+          title: "AI Assistant Response",
+          text: content,
+        });
+      } else {
+        // Fallback: copy to clipboard
+        await navigator.clipboard.writeText(content);
+        toast.success("Message copied to clipboard for sharing!");
+      }
+    } catch (error) {
+      // If user cancels share dialog, don't show error
+      if (error instanceof Error && error.name !== "AbortError") {
+        toast.error("Failed to share message");
+      }
     }
   };
 
@@ -759,17 +792,41 @@ const Dashboard: React.FC = () => {
                         <MessageCircle className="h-4 w-4 lg:h-5 lg:w-5 text-[#00f5ff]" />
                       </div>
                     )}
-                    <div
-                      className={`p-4 lg:p-6 rounded-2xl lg:rounded-3xl backdrop-blur-xl shadow-lg ${
-                        message.role === "user"
-                          ? "bg-gradient-to-r from-[#9d4edd]/20 to-[#40e0d0]/20 border border-[#9d4edd]/30 text-white ml-auto"
-                          : "bg-gradient-to-r from-white/5 to-white/10 border border-white/10 text-white"
-                      }`}
-                    >
-                      <div className="prose prose-invert max-w-none">
-                        <p className="whitespace-pre-wrap leading-relaxed text-sm lg:text-base">
-                          {message.content}
-                        </p>
+                    <div className="flex-1">
+                      <div
+                        className={`p-4 lg:p-6 rounded-2xl lg:rounded-3xl backdrop-blur-xl shadow-lg ${
+                          message.role === "user"
+                            ? "bg-gradient-to-r from-[#9d4edd]/20 to-[#40e0d0]/20 border border-[#9d4edd]/30 text-white ml-auto"
+                            : "bg-gradient-to-r from-white/5 to-white/10 border border-white/10 text-white"
+                        }`}
+                      >
+                        <div className="prose prose-invert max-w-none">
+                          <p className="whitespace-pre-wrap leading-relaxed text-sm lg:text-base">
+                            {message.content}
+                          </p>
+                        </div>
+                        
+                        {/* Copy and Share buttons for AI responses */}
+                        {message.role === "assistant" && (
+                          <div className="flex items-center justify-end space-x-2 mt-3 pt-3 border-t border-white/10">
+                            <button
+                              onClick={() => copyMessageContent(message.content)}
+                              className="flex items-center space-x-1 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-[#D0D0D0] hover:text-white transition-all duration-200 text-xs"
+                              title="Copy message"
+                            >
+                              <Copy className="h-3 w-3" />
+                              <span>Copy</span>
+                            </button>
+                            <button
+                              onClick={() => shareMessageContent(message.content)}
+                              className="flex items-center space-x-1 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-[#D0D0D0] hover:text-white transition-all duration-200 text-xs"
+                              title="Share message"
+                            >
+                              <Share2 className="h-3 w-3" />
+                              <span>Share</span>
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </div>
                     {message.role === "user" && (
