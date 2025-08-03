@@ -100,6 +100,8 @@ export class AuthController {
 
       console.log('🎉 Google OAuth successful for:', user.email);
       console.log('🔑 Handling Google OAuth for user:', user.email);
+      console.log('🌍 CLIENT_URL:', envVars.CLIENT_URL);
+      console.log('🌍 NODE_ENV:', envVars.NODE_ENV);
 
       // Generate tokens for the authenticated user
       const result = await authService.handleGoogleOAuth(user);
@@ -130,20 +132,23 @@ export class AuthController {
       let redirectUrl: string;
 
       if (isProduction) {
-        // Production: Use secure cookies only
-        redirectUrl = `${envVars.CLIENT_URL}/dashboard?auth=success&provider=google`;
+        // Production: Use secure cookies AND pass token for compatibility
+        redirectUrl = `${envVars.CLIENT_URL}/dashboard?auth=success&provider=google&token=${result.token}`;
       } else {
         // Development: Also pass token in query for easier testing
         redirectUrl = `${envVars.CLIENT_URL}/dashboard?auth=success&provider=google&token=${result.token}`;
       }
 
       console.log('🚀 Redirecting to:', redirectUrl);
+      console.log(process.env.GOOGLE_CALLBACK_URL)
       res.redirect(redirectUrl);
 
     } catch (error) {
       console.error('❌ Google OAuth callback error:', error);
+      console.log('🌍 CLIENT_URL when error:', envVars.CLIENT_URL);
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       const errorUrl = `${envVars.CLIENT_URL}/auth/signin?error=oauth_failed&message=${encodeURIComponent(errorMessage)}`;
+      console.log('🚀 Error redirect URL:', errorUrl);
       res.redirect(errorUrl);
     }
   }
