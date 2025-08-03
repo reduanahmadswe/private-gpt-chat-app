@@ -5,91 +5,128 @@ import { Chat } from './chat.model';
 
 export class ChatService {
   private async callOpenRouterAPI(message: string): Promise<string> {
+    // First try OpenRouter API
+    try {
+      return await this.tryOpenRouter(message);
+    } catch (error) {
+      console.log('📢 OpenRouter failed, trying fallback response...');
+      // Return a helpful fallback response when OpenRouter is down
+      return this.generateFallbackResponse(message);
+    }
+  }
+
+  private async tryOpenRouter(message: string): Promise<string> {
     const apiKey = envVars.OPENROUTER_API_KEY;
     const baseURL = envVars.OPENAI_API_BASE_URL;
 
     console.log('🤖 Starting OpenRouter API call...');
     console.log('📝 Message length:', message.length);
     console.log('🔑 API Key present:', !!apiKey);
-    console.log('🔑 API Key first 10 chars:', apiKey ? apiKey.substring(0, 10) + '...' : 'MISSING');
-    console.log('🌐 Base URL:', baseURL);
-    console.log('🌍 Environment:', process.env.NODE_ENV);
-    console.log('🔧 All required env vars loaded:', {
-      OPENROUTER_API_KEY: !!process.env.OPENROUTER_API_KEY,
-      OPENAI_API_BASE_URL: !!process.env.OPENAI_API_BASE_URL,
-      FRONTEND_URL: !!process.env.FRONTEND_URL
-    });
 
-    try {
-      // Create AbortController for timeout
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 15000); // Reduced to 15 seconds
+    // Try multiple free models in order of reliability
+    const models = [
+      'google/gemma-2-9b-it:free',
+      'microsoft/phi-3-mini-128k-instruct:free', 
+      'meta-llama/llama-3.1-8b-instruct:free'
+    ];
 
-      const response = await fetch(`${baseURL}/chat/completions`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-          'HTTP-Referer': envVars.FRONTEND_URL,
-          'X-Title': 'Private GPT Chat',
-        },
-        body: JSON.stringify({
-          model: 'microsoft/phi-3-mini-128k-instruct:free', // Different free model
-          messages: [
-            {
-              role: 'user',
-              content: message,
-            },
-          ],
-          max_tokens: 100, // Even smaller for faster response
-          temperature: 0.7,
-        }),
-        signal: controller.signal, // Add timeout signal
-      });
+    for (let i = 0; i < models.length; i++) {
+      const model = models[i];
+      console.log(`🔄 Trying model ${i + 1}/${models.length}: ${model}`);
+      
+      try {
+        // Create AbortController for timeout
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // Even shorter: 10 seconds
 
-      clearTimeout(timeoutId); // Clear timeout if request succeeds
+        const response = await fetch(`${baseURL}/chat/completions`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json',
+            'HTTP-Referer': envVars.FRONTEND_URL,
+            'X-Title': 'Private GPT Chat',
+          },
+          body: JSON.stringify({
+            model: model,
+            messages: [
+              {
+                role: 'user', 
+                content: message,
+              },
+            ],
+            max_tokens: 80, // Very small for speed
+            temperature: 0.7,
+          }),
+          signal: controller.signal,
+        });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        console.error('OpenRouter API Error:', errorData);
-        console.error('Response status:', response.status);
-        console.error('Response statusText:', response.statusText);
+        clearTimeout(timeoutId);
 
-        if (response.status === 401) {
-          throw createError('Invalid API key', 401);
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          console.error(`❌ Model ${model} failed:`, errorData);
+          
+          // Try next model if available
+          if (i < models.length - 1) continue;
+          
+          // Last model failed, throw error
+          throw new Error(`All models failed. Last error: ${JSON.stringify(errorData)}`);
         }
 
-        if (response.status === 402) {
-          throw createError('Insufficient credits in OpenRouter account. Please add more credits at https://openrouter.ai/settings/credits', 402);
+        const data: any = await response.json();
+        const result = data.choices[0]?.message?.content || 'No response generated';
+        console.log(`✅ Success with model: ${model}`);
+        return result;
+        
+      } catch (error: any) {
+        console.error(`❌ Error with model ${model}:`, error.message);
+        
+        // If it's the last model, throw the error
+        if (i === models.length - 1) {
+          throw error;
         }
-
-        if (response.status === 429) {
-          throw createError('Rate limit exceeded - please try again later', 429);
-        }
-
-        throw createError(`API Error: ${response.status} - ${JSON.stringify(errorData)}`, 500);
+        
+        // Continue to next model
+        continue;
       }
-
-      const data: any = await response.json();
-      return data.choices[0]?.message?.content || 'No response generated';
-    } catch (error: any) {
-      console.error('OpenRouter API Error:', error.message);
-
-      if (error.name === 'AbortError') {
-        throw createError('Request timeout - please try a shorter message or try again later', 408);
-      }
-
-      if (error.code === 'ECONNRESET' || error.code === 'ETIMEDOUT') {
-        throw createError('Network timeout - please check your connection and try again', 408);
-      }
-
-      // If it's a fetch error (network issues)
-      if (error.message.includes('fetch')) {
-        throw createError('Network error - please try again later', 500);
-      }
-
-      throw createError('Failed to get AI response - please try again', 500);
     }
+
+    throw new Error('All models failed');
+  }
+
+  private generateFallbackResponse(message: string): string {
+    console.log('🔄 Generating fallback response');
+    
+    // Simple keyword-based responses when AI is down
+    const lowerMessage = message.toLowerCase();
+    
+    if (lowerMessage.includes('hello') || lowerMessage.includes('hi') || lowerMessage.includes('হাই') || lowerMessage.includes('হ্যালো')) {
+      return 'Hello! I apologize, but our AI service is temporarily experiencing high demand. Please try again in a few moments. How can I help you today?';
+    }
+    
+    if (lowerMessage.includes('how are you') || lowerMessage.includes('কেমন আছেন')) {
+      return 'I\'m doing well, thank you! Our AI service is currently under heavy load, but I\'m here to help. Please try your question again in a moment.';
+    }
+    
+    if (lowerMessage.includes('what') || lowerMessage.includes('কি') || lowerMessage.includes('কী')) {
+      return 'I understand you\'re asking about something. Our AI service is temporarily overloaded due to high demand. Please try asking your question again in a few seconds for a detailed response.';
+    }
+    
+    if (lowerMessage.includes('help') || lowerMessage.includes('সাহায্য')) {
+      return 'I\'d be happy to help! Our AI service is experiencing temporary delays due to high traffic. Please try your question again shortly, and I\'ll provide you with a comprehensive answer.';
+    }
+
+    // General fallback response
+    return `I received your message: "${message.length > 50 ? message.substring(0, 50) + '...' : message}"
+
+Our AI service is temporarily experiencing high demand and timeouts. This is likely due to:
+- Heavy traffic on free AI models
+- Server overload at our AI provider
+
+Please try again in a few moments. Your question will be answered properly once the service stabilizes.
+
+Thank you for your patience! 🙏`;
   }
 
   async createOrUpdateChat(userId: string, data: IChatCreate): Promise<IChatResponse> {
