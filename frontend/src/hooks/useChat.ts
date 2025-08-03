@@ -26,6 +26,7 @@ export const useChat = () => {
     const [loading, setLoading] = useState(false);
     const [editingTitle, setEditingTitle] = useState<string | null>(null);
     const [newTitle, setNewTitle] = useState("");
+    const [streamingMessageIndex, setStreamingMessageIndex] = useState<number | null>(null);
 
     useEffect(() => {
         // Fetch chats when component mounts
@@ -65,12 +66,40 @@ export const useChat = () => {
                 chatId: currentChat?._id,
             });
 
+            // Add assistant message with streaming effect
             const assistantMessage: Message = {
                 role: "assistant",
-                content: response.data.response,
+                content: "",
             };
 
-            setMessages([...newMessages, assistantMessage]);
+            const messagesWithEmptyAssistant = [...newMessages, assistantMessage];
+            setMessages(messagesWithEmptyAssistant);
+
+            const assistantMessageIndex = messagesWithEmptyAssistant.length - 1;
+            setStreamingMessageIndex(assistantMessageIndex);
+
+            // Simulate typing effect with word-by-word streaming
+            const fullResponse = response.data.response;
+            const words = fullResponse.split(' ');
+            let currentContent = "";
+
+            for (let i = 0; i < words.length; i++) {
+                currentContent += (i > 0 ? ' ' : '') + words[i];
+
+                setMessages(prevMessages =>
+                    prevMessages.map((msg, index) =>
+                        index === assistantMessageIndex
+                            ? { ...msg, content: currentContent }
+                            : msg
+                    )
+                );
+
+                // Wait between words for smooth streaming
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+
+            // Streaming complete
+            setStreamingMessageIndex(null);
 
             if (!currentChat) {
                 // New chat created
@@ -79,12 +108,11 @@ export const useChat = () => {
             }
         } catch (error: any) {
             toast.error(error.response?.data?.message || "Failed to send message");
+            setStreamingMessageIndex(null);
         } finally {
             setLoading(false);
         }
-    };
-
-    const deleteChat = async (chatId: string) => {
+    }; const deleteChat = async (chatId: string) => {
         if (!confirm("Are you sure you want to delete this chat?")) return;
 
         try {
@@ -134,6 +162,7 @@ export const useChat = () => {
         loading,
         editingTitle,
         newTitle,
+        streamingMessageIndex,
         setEditingTitle,
         setNewTitle,
         startNewChat,

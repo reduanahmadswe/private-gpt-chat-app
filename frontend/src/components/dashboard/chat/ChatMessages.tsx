@@ -10,6 +10,7 @@ interface ChatMessagesProps {
   loading: boolean;
   playingMessageIndex: number | null;
   playMessageAudio: (content: string, messageIndex: number) => void;
+  streamingMessageIndex?: number | null;
 }
 
 const ChatMessages: React.FC<ChatMessagesProps> = ({
@@ -17,6 +18,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
   loading,
   playingMessageIndex,
   playMessageAudio,
+  streamingMessageIndex = null,
 }) => {
   const { user } = useAuth();
 
@@ -111,6 +113,27 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
                     }`}
                   >
                     <MarkdownMessage message={message.content} />
+
+                    {/* Streaming indicator */}
+                    {message.role === "assistant" &&
+                      streamingMessageIndex === index && (
+                        <div className="flex items-center mt-2">
+                          <div className="flex space-x-1">
+                            <div className="w-2 h-2 bg-[#00f5ff] rounded-full animate-bounce"></div>
+                            <div
+                              className="w-2 h-2 bg-[#9d4edd] rounded-full animate-bounce"
+                              style={{ animationDelay: "0.1s" }}
+                            ></div>
+                            <div
+                              className="w-2 h-2 bg-[#40e0d0] rounded-full animate-bounce"
+                              style={{ animationDelay: "0.2s" }}
+                            ></div>
+                          </div>
+                          <span className="ml-2 text-xs text-gray-400">
+                            AI is typing...
+                          </span>
+                        </div>
+                      )}
 
                     {/* Copy, Share and Audio buttons for AI responses */}
                     {message.role === "assistant" && (

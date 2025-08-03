@@ -16,6 +16,7 @@ const DashboardLayout: React.FC = () => {
     loading,
     editingTitle,
     newTitle,
+    streamingMessageIndex,
     setEditingTitle,
     setNewTitle,
     startNewChat,
@@ -73,6 +74,7 @@ const DashboardLayout: React.FC = () => {
         loading={loading}
         showSettings={showSettings}
         playingMessageIndex={playingMessageIndex}
+        streamingMessageIndex={streamingMessageIndex}
         playMessageAudio={playMessageAudio}
         onSendMessage={handleSendMessage}
       />
