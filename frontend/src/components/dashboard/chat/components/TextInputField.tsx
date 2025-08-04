@@ -40,18 +40,20 @@ const TextInputField: React.FC<TextInputFieldProps> = ({
   return (
     <div className="flex-1 relative">
       <div className="relative flex items-center min-h-[44px] sm:min-h-[48px] md:min-h-[52px]">
-        <VoiceToTextButton
-          isListening={isListening}
-          isSupported={isVoiceToTextSupported}
-          loading={loading}
-          onClick={onVoiceToTextToggle}
-        />
+        {isVoiceToTextSupported && (
+          <VoiceToTextButton
+            isListening={isListening}
+            isSupported={isVoiceToTextSupported}
+            loading={loading}
+            onClick={onVoiceToTextToggle}
+          />
+        )}
 
         <textarea
           value={value + (interimTranscript ? ` ${interimTranscript}` : "")}
           onChange={handleChange}
           onKeyPress={onKeyPress}
-          placeholder=""
+          placeholder="Type your message... (Shift + Enter for new line)"
           className={`w-full py-3 sm:py-3.5 md:py-4 ${
             isVoiceToTextSupported
               ? "pl-10 sm:pl-11 md:pl-12 lg:pl-14"

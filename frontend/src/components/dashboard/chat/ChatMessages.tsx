@@ -44,7 +44,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
   };
 
   return (
-    <div className="flex-1 overflow-y-auto scrollbar-thin">
+    <div className="flex-1 overflow-y-auto scrollbar-thin pb-32">
       <div className="min-h-full flex flex-col justify-end">
         <div className="space-y-1 p-4 md:p-6 pb-4">
           {/* Welcome message if no messages */}

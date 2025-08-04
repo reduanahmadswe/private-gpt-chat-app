@@ -35,17 +35,17 @@ const VoiceToTextButton: React.FC<VoiceToTextButtonProps> = ({
         }`}
       />
 
+      {/* Hover glow effect */}
+      {!isListening && !loading && (
+        <div className="absolute inset-0 rounded-lg bg-[#00f5ff]/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      )}
+
       {/* Listening indicator rings */}
       {isListening && (
         <>
           <div className="absolute inset-0 rounded-lg border-2 border-red-400/50 animate-ping" />
           <div className="absolute inset-0 rounded-lg border border-red-300/30 animate-pulse" />
         </>
-      )}
-
-      {/* Hover glow effect */}
-      {!isListening && !loading && (
-        <div className="absolute inset-0 rounded-lg bg-[#00f5ff]/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       )}
     </button>
   );

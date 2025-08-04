@@ -52,7 +52,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
           </div>
         </div>
         <div className="flex items-center space-x-2">
-          <div className="px-3 lg:px-4 py-1.5 lg:py-2 bg-gradient-to-r from-[#00f5ff]/10 to-[#9d4edd]/10 rounded-lg lg:rounded-xl border border-[#00f5ff]/20">
+          <div className="hidden sm:flex px-3 lg:px-4 py-1.5 lg:py-2 bg-gradient-to-r from-[#00f5ff]/10 to-[#9d4edd]/10 rounded-lg lg:rounded-xl border border-[#00f5ff]/20">
             <span className="text-[#00f5ff] text-xs lg:text-sm font-medium">
               Claude 3.5 Sonnet
             </span>
