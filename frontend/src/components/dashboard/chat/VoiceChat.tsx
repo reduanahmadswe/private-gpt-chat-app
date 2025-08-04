@@ -23,51 +23,55 @@ const VoiceChat: React.FC<VoiceChatProps> = ({ onBack }) => {
   const currentResponseIdRef = useRef<string>("");
   const isPlaybackActiveRef = useRef<boolean>(false);
   const lastProcessedMessageRef = useRef<string>(""); // Track last processed message
-  const { sendMessage, messages } = useChat();
+  const streamingContentRef = useRef<string>(""); // Track streaming content
+  const lastPlayedContentRef = useRef<string>(""); // Track last played content
+  const streamingUtteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
+  const streamingTimeoutIdRef = useRef<number | null>(null);
+  const { sendMessage, messages, streamingMessageIndex } = useChat();
 
-  // Improved audio playback system - plays complete responses immediately
-  const speakCompleteResponse = async (
-    responseContent: string,
-    responseId: string
-  ) => {
+  // Streaming audio playback system - plays audio as content comes (no interruptions)
+  const speakStreamingContent = async (content: string) => {
     if (!("speechSynthesis" in window)) {
       console.log("Speech synthesis not supported");
       return;
     }
 
-    // CRITICAL: Block if any audio is currently playing
-    if (isPlaybackActiveRef.current || window.speechSynthesis.speaking) {
-      console.log("🚫 BLOCKED: Audio already playing, ignoring new request");
+    // Only update if there's new content to speak
+    const newContent = content
+      .substring(lastPlayedContentRef.current.length)
+      .trim();
+    if (!newContent) {
+      return; // No new content to speak
+    }
+
+    // If we already have audio playing, don't interrupt - queue the new content
+    if (streamingUtteranceRef.current && window.speechSynthesis.speaking) {
+      console.log("🎵 Audio already playing, queuing new content...");
+
+      // Clear existing timeout and set new one for delayed playback
+      if (streamingTimeoutIdRef.current) {
+        clearTimeout(streamingTimeoutIdRef.current);
+      }
+
+      streamingTimeoutIdRef.current = window.setTimeout(() => {
+        speakStreamingContent(content);
+      }, 500); // Wait 500ms and try again
+
       return;
     }
 
-    // Prevent duplicate playback of the same response
-    if (currentResponseIdRef.current === responseId) {
-      console.log("🚫 BLOCKED: Same response already played/playing");
-      return;
-    }
+    console.log(`🎯 Speaking new streaming content: "${newContent}"`);
 
-    // Clean the content for speech
-    const cleanContent = responseContent.trim();
-    if (!cleanContent) {
-      console.log("🔇 No content to speak");
-      return;
-    }
+    // Update tracking
+    lastPlayedContentRef.current = content;
+    streamingContentRef.current = content;
 
-    console.log("🎯 Starting complete response playback");
-    console.log("📝 Content length:", cleanContent.length);
-    console.log("📝 Preview:", cleanContent.substring(0, 100) + "...");
+    // Create utterance for new content
+    const utterance = new SpeechSynthesisUtterance(newContent);
+    streamingUtteranceRef.current = utterance;
 
-    // Lock the entire system
-    isPlaybackActiveRef.current = true;
-    isStreamingSpeechRef.current = true;
-    currentResponseIdRef.current = responseId;
-    setVoiceState(VoiceState.SPEAKING);
-
-    const utterance = new SpeechSynthesisUtterance(cleanContent);
-
-    // Configure speech settings for better quality
-    utterance.rate = 0.9; // Slightly slower for better clarity
+    // Configure speech settings
+    utterance.rate = 0.9;
     utterance.pitch = 1.0;
     utterance.volume = 1.0;
     utterance.lang = "en-US";
@@ -89,51 +93,78 @@ const VoiceChat: React.FC<VoiceChatProps> = ({ onBack }) => {
         voices[0];
 
       utterance.voice = preferredVoice;
-      console.log("🎙️ Using voice:", preferredVoice.name);
     }
 
     utterance.onstart = () => {
-      console.log("✅ Audio playback started - system fully locked");
-      // Ensure UI reflects speaking state
+      console.log("✅ Streaming audio started (no interruption)");
       setVoiceState(VoiceState.SPEAKING);
+      isPlaybackActiveRef.current = true;
     };
 
     utterance.onend = () => {
-      console.log("✅ Audio playback completed naturally");
+      console.log("✅ Streaming audio chunk completed");
+      streamingUtteranceRef.current = null;
 
-      // Release all locks immediately
-      isPlaybackActiveRef.current = false;
-      isStreamingSpeechRef.current = false;
-      currentResponseIdRef.current = ""; // Clear response ID to allow new responses
+      // Check if there's more content to speak after a brief delay
+      setTimeout(() => {
+        const currentMessage = messages[messages.length - 1];
+        if (currentMessage && currentMessage.role === "assistant") {
+          const remainingContent = currentMessage.content
+            .substring(lastPlayedContentRef.current.length)
+            .trim();
 
-      // Reset to IDLE state immediately
-      setVoiceState(VoiceState.IDLE);
-      console.log("🔓 System unlocked and ready for new input");
+          if (remainingContent && streamingMessageIndex !== null) {
+            // More content is coming, continue streaming
+            speakStreamingContent(currentMessage.content);
+          } else if (streamingMessageIndex === null) {
+            // Streaming is complete
+            isPlaybackActiveRef.current = false;
+            setVoiceState(VoiceState.IDLE);
+            console.log("🔓 Streaming fully completed - ready for new input");
+          }
+        }
+      }, 100);
     };
 
     utterance.onerror = (error) => {
-      console.error("❌ Audio playback error:", error.error);
+      console.error("❌ Streaming audio error:", error.error);
+      streamingUtteranceRef.current = null;
 
-      // Release all locks immediately on error
-      isPlaybackActiveRef.current = false;
-      isStreamingSpeechRef.current = false;
-      currentResponseIdRef.current = ""; // Clear response ID
-
-      // Reset to IDLE immediately
-      setVoiceState(VoiceState.IDLE);
-      console.log("🔓 System reset after audio error");
-    };
-
-    utterance.onpause = () => {
-      console.log("⏸️ Audio playback paused");
-    };
-
-    utterance.onresume = () => {
-      console.log("▶️ Audio playback resumed");
+      // Don't reset state on error, try to continue
+      if (error.error !== "interrupted") {
+        isPlaybackActiveRef.current = false;
+        setVoiceState(VoiceState.IDLE);
+      }
     };
 
     // Start the audio playback
     window.speechSynthesis.speak(utterance);
+  };
+
+  // Stop streaming audio
+  const stopStreamingAudio = () => {
+    console.log("🛑 Stopping streaming audio");
+
+    // Clear any pending timeouts
+    if (streamingTimeoutIdRef.current) {
+      clearTimeout(streamingTimeoutIdRef.current);
+      streamingTimeoutIdRef.current = null;
+    }
+
+    // Cancel current audio
+    if (streamingUtteranceRef.current) {
+      window.speechSynthesis.cancel();
+      streamingUtteranceRef.current = null;
+    }
+
+    // Reset all streaming state
+    isPlaybackActiveRef.current = false;
+    isStreamingSpeechRef.current = false;
+    streamingContentRef.current = "";
+    lastPlayedContentRef.current = "";
+    setVoiceState(VoiceState.IDLE);
+
+    console.log("🔓 Streaming audio stopped - ready for new input");
   };
 
   // Initialize speech recognition
@@ -297,21 +328,15 @@ const VoiceChat: React.FC<VoiceChatProps> = ({ onBack }) => {
     if (voiceState === VoiceState.LISTENING) {
       recognitionRef.current?.stop();
     } else if (voiceState === VoiceState.SPEAKING) {
-      // Stop current audio playback
-      if ("speechSynthesis" in window) {
-        window.speechSynthesis.cancel();
-      }
-      // Reset all locks
-      isPlaybackActiveRef.current = false;
-      isStreamingSpeechRef.current = false;
-      setVoiceState(VoiceState.IDLE);
+      // Stop streaming audio
+      stopStreamingAudio();
     } else if (voiceState === VoiceState.IDLE && !isPlaybackActiveRef.current) {
       // Only allow new input if no audio is playing
       recognitionRef.current?.start();
     }
   };
 
-  // Monitor messages for new AI responses - immediate playback
+  // Monitor messages for streaming audio playback
   useEffect(() => {
     if (messages.length === 0) return;
 
@@ -322,34 +347,29 @@ const VoiceChat: React.FC<VoiceChatProps> = ({ onBack }) => {
       return;
     }
 
-    // Prevent processing the same message multiple times
+    // If streaming is active, play new content as it comes
+    if (streamingMessageIndex !== null) {
+      console.log("⏳ Streaming in progress, playing new content...");
+      speakStreamingContent(lastMessage.content);
+      return;
+    }
+
+    // If streaming just completed, ensure final content is played
     const messageHash = `${lastMessage.content}-${messages.length}`;
-    if (lastProcessedMessageRef.current === messageHash) {
-      console.log("🔇 Same message already processed, skipping");
-      return;
+    if (lastProcessedMessageRef.current !== messageHash) {
+      console.log("🎯 Streaming completed! Ensuring full content is played");
+
+      // Reset streaming tracking for new response
+      lastPlayedContentRef.current = "";
+      streamingContentRef.current = "";
+
+      // Mark as processed
+      lastProcessedMessageRef.current = messageHash;
+
+      // Speak any remaining content
+      speakStreamingContent(lastMessage.content);
     }
-
-    // Skip if we're already playing audio
-    if (isPlaybackActiveRef.current || window.speechSynthesis.speaking) {
-      console.log("🚫 BLOCKED: Audio already playing, skipping new response");
-      return;
-    }
-
-    // Mark this message as processed
-    lastProcessedMessageRef.current = messageHash;
-
-    // Generate unique ID for this response
-    const responseId = `${lastMessage.content.substring(0, 50)}-${Date.now()}`;
-
-    console.log(
-      "🎯 New assistant response detected, starting immediate playback"
-    );
-
-    // Add a small delay to ensure the message is fully processed
-    setTimeout(() => {
-      speakCompleteResponse(lastMessage.content, responseId);
-    }, 100);
-  }, [messages]);
+  }, [messages, streamingMessageIndex]);
 
   // Reset state when changing to IDLE
   useEffect(() => {
@@ -359,11 +379,18 @@ const VoiceChat: React.FC<VoiceChatProps> = ({ onBack }) => {
         lastSpokenContentRef.current = "";
         currentResponseIdRef.current = "";
         lastProcessedMessageRef.current = ""; // Reset message tracking
+        streamingContentRef.current = ""; // Reset streaming content
+        lastPlayedContentRef.current = ""; // Reset content tracking
 
         // Clear any pending timeouts
         if (streamingTimeoutRef.current) {
           clearTimeout(streamingTimeoutRef.current);
           streamingTimeoutRef.current = null;
+        }
+
+        if (streamingTimeoutIdRef.current) {
+          clearTimeout(streamingTimeoutIdRef.current);
+          streamingTimeoutIdRef.current = null;
         }
 
         console.log("🔄 State reset to IDLE - ready for new interactions");
@@ -400,11 +427,24 @@ const VoiceChat: React.FC<VoiceChatProps> = ({ onBack }) => {
           />
         </div>
 
-        {/* Speaking indicator */}
+        {/* Speaking indicator with Stop button */}
         {voiceState === VoiceState.SPEAKING && (
           <div className="text-center">
-            <p className="text-white/80 text-sm">Speaking...</p>
-            <div className="mt-2 flex justify-center space-x-1">
+            <p className="text-white/80 text-sm mb-3">Speaking...</p>
+
+            {/* Stop Audio Button */}
+            <button
+              onClick={stopStreamingAudio}
+              className="mb-4 px-6 py-2 bg-red-500/20 hover:bg-red-500/30 
+                         border border-red-400/50 rounded-full text-red-300 
+                         transition-all duration-200 text-sm font-medium
+                         hover:scale-105 active:scale-95"
+            >
+              🛑 Stop Audio
+            </button>
+
+            {/* Animation dots */}
+            <div className="flex justify-center space-x-1">
               <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce"></div>
               <div
                 className="w-2 h-2 bg-purple-400 rounded-full animate-bounce"
