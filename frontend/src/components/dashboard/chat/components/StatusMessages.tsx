@@ -37,11 +37,11 @@ const StatusMessages: React.FC<StatusMessagesProps> = ({
         </div>
       )}
 
-      {isVoiceToTextSupported && !isVoiceMode && !isListening && (
+      {!isVoiceToTextSupported && (
         <div className="animate-fadeIn">
-          <span className="inline-flex items-center px-3 py-1 rounded-full bg-gradient-to-r from-white/5 to-white/10 border border-white/20 text-[#D0D0D0]/70 hover:text-[#D0D0D0] transition-colors duration-300">
-            💡 <em className="mx-1">Tip:</em> Click the microphone icon in the
-            input field to convert speech to text
+          <span className="inline-flex items-center px-3 py-1 rounded-full bg-gradient-to-r from-red-500/20 to-red-400/10 border border-red-500/30 text-red-400 shadow-lg shadow-red-500/20">
+            ⚠️ <strong className="mx-1">Voice input not supported</strong> -
+            Your browser doesn't support speech recognition
           </span>
         </div>
       )}

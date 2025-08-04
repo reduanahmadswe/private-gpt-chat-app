@@ -30,6 +30,45 @@
   .scrollbar-thin::-webkit-scrollbar-thumb:hover {
     background-color: rgba(255, 255, 255, 0.3);
   }
+
+  /* Chat animations */
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes typing {
+    0%,
+    60%,
+    100% {
+      transform: translateY(0);
+    }
+    30% {
+      transform: translateY(-10px);
+    }
+  }
+
+  /* Mobile optimizations */
+  @media (max-width: 768px) {
+    .mobile-chat-message {
+      max-width: 85%;
+    }
+
+    .mobile-input-area {
+      padding: 1rem;
+    }
+
+    .mobile-avatar {
+      width: 32px;
+      height: 32px;
+    }
+  }
 }
 
 @layer components {

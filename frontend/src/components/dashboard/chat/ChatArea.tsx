@@ -121,7 +121,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
           ? "ml-0" // Full screen in voice mode
           : sidebarCollapsed
           ? "ml-16"
-          : "ml-64 lg:ml-80"
+          : "ml-0 sm:ml-72 md:ml-80 lg:ml-80 xl:ml-96"
       }`}
     >
       {!isVoiceMode && (
@@ -134,29 +134,33 @@ const ChatArea: React.FC<ChatAreaProps> = ({
         />
       )}
 
-      <div
-        ref={scrollContainerRef}
-        className={`flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent hover:scrollbar-thumb-white/30 transition-all duration-300 ${
-          isHeaderVisible && !isVoiceMode ? "pt-20 lg:pt-24" : "pt-0"
-        }`}
-      >
-        {!isVoiceMode && (
-          <ChatMessages
-            messages={messages}
-            loading={loading}
-            playingMessageIndex={playingMessageIndex}
-            streamingMessageIndex={streamingMessageIndex}
-            playMessageAudio={playMessageAudio}
-            downloadMessage={downloadMessage}
-          />
-        )}
-      </div>
+      {/* Main Chat Area */}
+      <div className="flex-1 flex flex-col min-h-0">
+        <div
+          ref={scrollContainerRef}
+          className={`flex-1 transition-all duration-300 ${
+            isHeaderVisible && !isVoiceMode ? "pt-20 lg:pt-24" : "pt-0"
+          }`}
+        >
+          {!isVoiceMode && (
+            <ChatMessages
+              messages={messages}
+              loading={loading}
+              playingMessageIndex={playingMessageIndex}
+              streamingMessageIndex={streamingMessageIndex}
+              playMessageAudio={playMessageAudio}
+              downloadMessage={downloadMessage}
+            />
+          )}
+        </div>
 
-      <ChatInput
-        loading={loading}
-        onSendMessage={onSendMessage}
-        onVoiceModeChange={handleVoiceModeChange}
-      />
+        {/* Fixed Input Area */}
+        <ChatInput
+          loading={loading}
+          onSendMessage={onSendMessage}
+          onVoiceModeChange={handleVoiceModeChange}
+        />
+      </div>
     </div>
   );
 };

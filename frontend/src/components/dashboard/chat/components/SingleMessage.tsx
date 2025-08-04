@@ -1,4 +1,4 @@
-import { MessageCircle } from "lucide-react";
+import { Clock, MessageCircle } from "lucide-react";
 import React from "react";
 import { Message } from "../../../../hooks/useChat";
 import MarkdownMessage from "../../../MarkdownMessage";
@@ -26,67 +26,94 @@ const SingleMessage: React.FC<SingleMessageProps> = ({
   onPlayAudio,
   onDownload,
 }) => {
+  const isUser = message.role === "user";
+
+  // Format timestamp
+  const timestamp = new Date().toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
   return (
     <div
-      className={`flex ${
-        message.role === "user" ? "justify-end" : "justify-start"
-      } group`}
+      className={`flex w-full mb-3 animate-slideUp ${
+        isUser ? "justify-end" : "justify-start"
+      }`}
     >
       <div
-        className={`flex items-start space-x-2 lg:space-x-4 max-w-3xl lg:max-w-4xl ${
-          message.role === "user" ? "flex-row-reverse space-x-reverse" : ""
-        }`}
+        className={`flex items-start max-w-[85%] md:max-w-[75%] lg:max-w-[60%] ${
+          isUser ? "flex-row-reverse" : "flex-row"
+        } gap-2`}
       >
-        {/* Avatar */}
-        {message.role === "assistant" && (
-          <div className="bg-gradient-to-br from-[#00f5ff]/20 to-[#9d4edd]/20 rounded-xl lg:rounded-2xl p-2 lg:p-3 border border-[#00f5ff]/30 flex-shrink-0">
-            <MessageCircle className="h-4 w-4 lg:h-5 lg:w-5 text-[#00f5ff]" />
+        {/* Assistant Avatar */}
+        {!isUser && (
+          <div className="bg-gradient-to-br from-slate-100/10 to-slate-200/10 rounded-full p-2 border border-white/10 flex-shrink-0 shadow-lg">
+            <MessageCircle className="h-4 w-4 text-cyan-400" />
           </div>
         )}
 
-        {/* Message Content */}
-        <div
-          className={`relative backdrop-blur-xl border shadow-lg ${
-            message.role === "user"
-              ? "bg-gradient-to-r from-[#9d4edd]/10 to-[#40e0d0]/10 border-[#9d4edd]/20 text-white"
-              : "bg-gradient-to-r from-white/5 to-white/10 border-white/10 text-white"
-          } p-4 lg:p-6 rounded-2xl lg:rounded-3xl transition-all duration-300 hover:shadow-xl`}
-        >
-          {/* Message Text */}
-          <div className="prose prose-sm lg:prose-base max-w-none text-white">
-            {message.role === "assistant" ? (
-              <MarkdownMessage message={message.content} />
-            ) : (
-              <p className="mb-0 text-sm lg:text-base leading-relaxed whitespace-pre-wrap">
-                {message.content}
-              </p>
-            )}
-          </div>
-
-          {/* Message Actions for Assistant Messages */}
-          {message.role === "assistant" && (
-            <MessageActions
-              content={message.content}
-              messageIndex={messageIndex}
-              playingMessageIndex={playingMessageIndex}
-              onCopy={onCopy}
-              onShare={onShare}
-              onPlayAudio={onPlayAudio}
-              onDownload={onDownload}
-            />
-          )}
-        </div>
-
         {/* User Avatar */}
-        {message.role === "user" && (
-          <div className="bg-gradient-to-br from-[#9d4edd]/20 to-[#40e0d0]/20 rounded-xl lg:rounded-2xl p-2 lg:p-3 border border-[#9d4edd]/30 flex-shrink-0">
-            <div className="w-4 h-4 lg:w-5 lg:h-5 bg-gradient-to-br from-[#9d4edd] to-[#40e0d0] rounded-full flex items-center justify-center">
+        {isUser && (
+          <div className="bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-full p-2 border border-blue-400/30 flex-shrink-0 shadow-lg">
+            <div className="w-4 h-4 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
               <span className="text-white font-bold text-xs">
                 {user?.name?.charAt(0).toUpperCase() || "U"}
               </span>
             </div>
           </div>
         )}
+
+        {/* Message Bubble */}
+        <div className="flex flex-col">
+          <div
+            className={`relative backdrop-blur-sm border shadow-lg px-4 py-3 rounded-2xl transition-all duration-300 hover:shadow-xl group ${
+              isUser
+                ? "bg-gradient-to-r from-blue-600/90 to-cyan-600/90 border-blue-500/50 text-white rounded-br-md"
+                : "bg-gradient-to-r from-slate-800/80 to-slate-700/80 border-slate-600/30 text-gray-100 rounded-bl-md"
+            }`}
+          >
+            {/* Message Content */}
+            <div className="relative">
+              {!isUser ? (
+                <div className="prose prose-sm max-w-none prose-invert">
+                  <MarkdownMessage message={message.content} />
+                </div>
+              ) : (
+                <p className="mb-0 text-sm leading-relaxed whitespace-pre-wrap">
+                  {message.content}
+                </p>
+              )}
+            </div>
+
+            {/* Timestamp and Actions Row */}
+            <div
+              className={`flex items-center justify-between gap-2 mt-2 ${
+                isUser ? "flex-row-reverse" : "flex-row"
+              }`}
+            >
+              {/* Timestamp */}
+              <div className="flex items-center gap-1">
+                <Clock className="h-3 w-3 opacity-60" />
+                <span className="text-xs opacity-60">{timestamp}</span>
+              </div>
+
+              {/* Message Actions (for assistant messages) */}
+              {!isUser && (
+                <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  <MessageActions
+                    content={message.content}
+                    messageIndex={messageIndex}
+                    playingMessageIndex={playingMessageIndex}
+                    onCopy={onCopy}
+                    onShare={onShare}
+                    onPlayAudio={onPlayAudio}
+                    onDownload={onDownload}
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

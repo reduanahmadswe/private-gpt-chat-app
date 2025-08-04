@@ -70,7 +70,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
   };
 
   return (
-    <div className="absolute bottom-0 left-0 right-0 p-4 lg:p-6">
+    <div className="sticky bottom-0 left-0 right-0 bg-gradient-to-t from-slate-900 via-slate-900/95 to-transparent p-3 md:p-4 lg:p-6 backdrop-blur-xl border-t border-white/10">
       <div className="w-full max-w-4xl mx-auto">
         {isVoiceMode ? (
           <VoiceChat
@@ -78,36 +78,53 @@ const ChatInput: React.FC<ChatInputProps> = ({
             onBack={() => handleVoiceModeToggle(false)}
           />
         ) : (
-          <div className="bg-gradient-to-r from-white/5 to-white/10 backdrop-blur-xl rounded-2xl lg:rounded-3xl border border-white/20 shadow-2xl shadow-black/20 p-2">
-            <div className="flex items-end space-x-2 lg:space-x-4">
-              {/* Input field with voice-to-text */}
-              <TextInputField
-                value={inputMessage}
-                interimTranscript={interimTranscript}
-                loading={loading}
-                isVoiceToTextSupported={isVoiceToTextSupported}
-                isListening={isListening}
-                onChange={setInputMessage}
-                onKeyPress={handleKeyPress}
-                onInput={handleInput}
-                onClear={() => setInputMessage("")}
-                onVoiceToTextToggle={toggleListening}
-              />
+          <div className="relative">
+            {/* Input Container */}
+            <div className="bg-gradient-to-r from-slate-800/90 to-slate-700/90 backdrop-blur-xl rounded-xl md:rounded-2xl lg:rounded-3xl border border-slate-600/50 shadow-2xl shadow-black/20 overflow-hidden">
+              <div className="flex items-end">
+                {/* Text Input Area */}
+                <div className="flex-1 relative">
+                  <TextInputField
+                    value={inputMessage}
+                    interimTranscript={interimTranscript}
+                    loading={loading}
+                    isVoiceToTextSupported={isVoiceToTextSupported}
+                    isListening={isListening}
+                    onChange={setInputMessage}
+                    onKeyPress={handleKeyPress}
+                    onInput={handleInput}
+                    onClear={() => setInputMessage("")}
+                    onVoiceToTextToggle={toggleListening}
+                  />
+                </div>
 
-              {/* Voice Mode Toggle Button */}
-              <VoiceModeToggleButton
-                loading={loading}
-                onClick={() => handleVoiceModeToggle(true)}
-              />
+                {/* Action Buttons */}
+                <div className="flex items-center space-x-1 p-2">
+                  {/* Voice Mode Toggle Button */}
+                  <VoiceModeToggleButton
+                    loading={loading}
+                    onClick={() => handleVoiceModeToggle(true)}
+                  />
 
-              {/* Send Button */}
-              <SendButton
-                loading={loading}
-                disabled={loading || !inputMessage.trim()}
-                onClick={handleSendMessage}
-                hasMessage={!!inputMessage.trim()}
-              />
+                  {/* Send Button */}
+                  <SendButton
+                    loading={loading}
+                    disabled={loading || !inputMessage.trim()}
+                    onClick={handleSendMessage}
+                    hasMessage={!!inputMessage.trim()}
+                  />
+                </div>
+              </div>
             </div>
+
+            {/* Placeholder text when empty */}
+            {!inputMessage && !isListening && (
+              <div className="absolute left-12 top-1/2 -translate-y-1/2 pointer-events-none">
+                <span className="text-white/50 text-sm md:text-base">
+                  Type your message... (Shift + Enter for new line)
+                </span>
+              </div>
+            )}
           </div>
         )}
 
