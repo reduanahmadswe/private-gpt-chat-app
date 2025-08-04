@@ -27,6 +27,7 @@ const VoiceChat: React.FC<VoiceChatProps> = ({ onBack }) => {
   const lastPlayedContentRef = useRef<string>(""); // Track last played content
   const streamingUtteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   const streamingTimeoutIdRef = useRef<number | null>(null);
+  const isStoppedManuallyRef = useRef<boolean>(false); // Track manual stop
   const { sendMessage, messages, streamingMessageIndex } = useChat();
 
   // Streaming audio playback system - plays audio as content comes (no interruptions)
@@ -105,8 +106,19 @@ const VoiceChat: React.FC<VoiceChatProps> = ({ onBack }) => {
       console.log("✅ Streaming audio chunk completed");
       streamingUtteranceRef.current = null;
 
+      // Check if audio was stopped manually - if so, don't continue
+      if (isStoppedManuallyRef.current) {
+        console.log("🛑 Audio was stopped manually - not continuing");
+        return;
+      }
+
       // Check if there's more content to speak after a brief delay
       setTimeout(() => {
+        // Double check if still not manually stopped
+        if (isStoppedManuallyRef.current) {
+          return;
+        }
+
         const currentMessage = messages[messages.length - 1];
         if (currentMessage && currentMessage.role === "assistant") {
           const remainingContent = currentMessage.content
@@ -143,28 +155,41 @@ const VoiceChat: React.FC<VoiceChatProps> = ({ onBack }) => {
 
   // Stop streaming audio
   const stopStreamingAudio = () => {
-    console.log("🛑 Stopping streaming audio");
+    console.log("🛑 Stopping streaming audio immediately");
 
-    // Clear any pending timeouts
+    // Set manual stop flag to prevent restart
+    isStoppedManuallyRef.current = true;
+
+    // Clear any pending timeouts first
     if (streamingTimeoutIdRef.current) {
       clearTimeout(streamingTimeoutIdRef.current);
       streamingTimeoutIdRef.current = null;
     }
 
-    // Cancel current audio
-    if (streamingUtteranceRef.current) {
+    // Force cancel all speech synthesis immediately
+    if (window.speechSynthesis) {
       window.speechSynthesis.cancel();
+
+      // Force pause and cancel again for better browser compatibility
+      window.speechSynthesis.pause();
+      window.speechSynthesis.cancel();
+    }
+
+    // Clear utterance reference
+    if (streamingUtteranceRef.current) {
       streamingUtteranceRef.current = null;
     }
 
-    // Reset all streaming state
+    // Immediately reset all streaming state
     isPlaybackActiveRef.current = false;
     isStreamingSpeechRef.current = false;
     streamingContentRef.current = "";
     lastPlayedContentRef.current = "";
+
+    // Force set state to IDLE immediately
     setVoiceState(VoiceState.IDLE);
 
-    console.log("🔓 Streaming audio stopped - ready for new input");
+    console.log("🔓 Streaming audio stopped immediately - ready for new input");
   };
 
   // Initialize speech recognition
@@ -328,7 +353,7 @@ const VoiceChat: React.FC<VoiceChatProps> = ({ onBack }) => {
     if (voiceState === VoiceState.LISTENING) {
       recognitionRef.current?.stop();
     } else if (voiceState === VoiceState.SPEAKING) {
-      // Stop streaming audio
+      // Stop streaming audio immediately
       stopStreamingAudio();
     } else if (voiceState === VoiceState.IDLE && !isPlaybackActiveRef.current) {
       // Only allow new input if no audio is playing
@@ -362,6 +387,7 @@ const VoiceChat: React.FC<VoiceChatProps> = ({ onBack }) => {
       // Reset streaming tracking for new response
       lastPlayedContentRef.current = "";
       streamingContentRef.current = "";
+      isStoppedManuallyRef.current = false; // Reset manual stop flag for new message
 
       // Mark as processed
       lastProcessedMessageRef.current = messageHash;
@@ -381,6 +407,7 @@ const VoiceChat: React.FC<VoiceChatProps> = ({ onBack }) => {
         lastProcessedMessageRef.current = ""; // Reset message tracking
         streamingContentRef.current = ""; // Reset streaming content
         lastPlayedContentRef.current = ""; // Reset content tracking
+        isStoppedManuallyRef.current = false; // Reset manual stop flag
 
         // Clear any pending timeouts
         if (streamingTimeoutRef.current) {
@@ -434,11 +461,15 @@ const VoiceChat: React.FC<VoiceChatProps> = ({ onBack }) => {
 
             {/* Stop Audio Button */}
             <button
-              onClick={stopStreamingAudio}
+              onClick={() => {
+                console.log("🔴 Stop button clicked");
+                stopStreamingAudio();
+              }}
               className="mb-4 px-6 py-2 bg-red-500/20 hover:bg-red-500/30 
                          border border-red-400/50 rounded-full text-red-300 
                          transition-all duration-200 text-sm font-medium
-                         hover:scale-105 active:scale-95"
+                         hover:scale-105 active:scale-95 active:bg-red-500/50
+                         focus:outline-none focus:ring-2 focus:ring-red-400/50"
             >
               🛑 Stop Audio
             </button>
