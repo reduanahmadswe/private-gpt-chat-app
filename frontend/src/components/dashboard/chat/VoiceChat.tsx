@@ -16,11 +16,6 @@ interface VoiceChatProps {
 const VoiceChat: React.FC<VoiceChatProps> = ({ onBack }) => {
   const [voiceState, setVoiceState] = useState<VoiceState>(VoiceState.IDLE);
   const recognitionRef = useRef<any>(null);
-  const speechTimeoutRef = useRef<number | null>(null);
-  const lastSpokenContentRef = useRef<string>("");
-  const isStreamingSpeechRef = useRef<boolean>(false);
-  const streamingTimeoutRef = useRef<number | null>(null);
-  const currentResponseIdRef = useRef<string>("");
   const isPlaybackActiveRef = useRef<boolean>(false);
   const lastProcessedMessageRef = useRef<string>(""); // Track last processed message
   const streamingContentRef = useRef<string>(""); // Track streaming content
@@ -182,7 +177,6 @@ const VoiceChat: React.FC<VoiceChatProps> = ({ onBack }) => {
 
     // Immediately reset all streaming state
     isPlaybackActiveRef.current = false;
-    isStreamingSpeechRef.current = false;
     streamingContentRef.current = "";
     lastPlayedContentRef.current = "";
 
@@ -320,11 +314,8 @@ const VoiceChat: React.FC<VoiceChatProps> = ({ onBack }) => {
       if (silenceTimer) {
         window.clearTimeout(silenceTimer);
       }
-      if (speechTimeoutRef.current) {
-        window.clearTimeout(speechTimeoutRef.current);
-      }
-      if (streamingTimeoutRef.current) {
-        clearTimeout(streamingTimeoutRef.current);
+      if (streamingTimeoutIdRef.current) {
+        clearTimeout(streamingTimeoutIdRef.current);
       }
     };
   }, []); // Remove voiceState dependency to prevent infinite recreation
@@ -402,19 +393,12 @@ const VoiceChat: React.FC<VoiceChatProps> = ({ onBack }) => {
     if (voiceState === VoiceState.IDLE) {
       // Only reset if we're not actively playing audio
       if (!isPlaybackActiveRef.current && !window.speechSynthesis.speaking) {
-        lastSpokenContentRef.current = "";
-        currentResponseIdRef.current = "";
         lastProcessedMessageRef.current = ""; // Reset message tracking
         streamingContentRef.current = ""; // Reset streaming content
         lastPlayedContentRef.current = ""; // Reset content tracking
         isStoppedManuallyRef.current = false; // Reset manual stop flag
 
         // Clear any pending timeouts
-        if (streamingTimeoutRef.current) {
-          clearTimeout(streamingTimeoutRef.current);
-          streamingTimeoutRef.current = null;
-        }
-
         if (streamingTimeoutIdRef.current) {
           clearTimeout(streamingTimeoutIdRef.current);
           streamingTimeoutIdRef.current = null;
