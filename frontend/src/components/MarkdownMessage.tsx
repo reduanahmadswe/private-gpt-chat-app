@@ -2,6 +2,7 @@ import { Copy } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/cjs/styles/prism";
+import { copyToClipboard } from "../utils/clipboard";
 
 type MarkdownMessageProps = {
   message: string;
@@ -122,7 +123,9 @@ export default function MarkdownMessage({ message }: MarkdownMessageProps) {
                   {/* Enhanced copy button */}
                   <button
                     type="button"
-                    onClick={() => navigator.clipboard.writeText(code)}
+                    onClick={() =>
+                      copyToClipboard(code, "Code copied to clipboard!")
+                    }
                     className="absolute top-3 right-3 flex items-center space-x-1 px-3 py-1.5 text-xs bg-gradient-to-r from-[#00f5ff]/10 to-[#9d4edd]/10 hover:from-[#00f5ff]/20 hover:to-[#9d4edd]/20 text-white border border-[#00f5ff]/30 hover:border-[#00f5ff]/50 rounded-md opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-sm"
                     title="Copy code to clipboard"
                   >

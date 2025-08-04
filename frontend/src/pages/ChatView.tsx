@@ -2,11 +2,11 @@ import { ArrowLeft, Copy, Share2 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Link, useParams } from "react-router-dom";
+import { Message as BaseMessage } from "../hooks/useChat";
 import api from "../utils/api";
+import { copyToClipboard } from "../utils/clipboard";
 
-interface Message {
-  role: "user" | "assistant";
-  content: string;
+interface Message extends BaseMessage {
   timestamp: Date;
 }
 
@@ -40,10 +40,9 @@ const ChatView: React.FC = () => {
     }
   };
 
-  const copyToClipboard = () => {
+  const copyLinkToClipboard = () => {
     const url = window.location.href;
-    navigator.clipboard.writeText(url);
-    toast.success("Link copied to clipboard!");
+    copyToClipboard(url, "Link copied to clipboard!");
   };
 
   const copyChat = () => {
@@ -53,8 +52,7 @@ const ChatView: React.FC = () => {
       .map((msg) => `${msg.role === "user" ? "You" : "AI"}: ${msg.content}`)
       .join("\n\n");
 
-    navigator.clipboard.writeText(chatText);
-    toast.success("Chat copied to clipboard!");
+    copyToClipboard(chatText, "Chat copied to clipboard!");
   };
 
   if (loading) {
@@ -106,7 +104,7 @@ const ChatView: React.FC = () => {
 
           <div className="flex items-center space-x-2">
             <button
-              onClick={copyToClipboard}
+              onClick={copyLinkToClipboard}
               className="btn-secondary p-2"
               title="Copy link"
             >

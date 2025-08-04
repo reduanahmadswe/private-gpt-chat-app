@@ -111,17 +111,17 @@ const ChatArea: React.FC<ChatAreaProps> = ({
   return (
     <div
       className={`flex-1 flex flex-col h-screen bg-gradient-to-br from-[#030637] via-[#1a1a2e] to-[#16213e] backdrop-blur-xl transition-all duration-300 relative ${
-        isVoiceMode 
+        isVoiceMode
           ? "ml-0" // Full screen in voice mode
-          : showSettings 
-            ? "lg:mr-96" 
-            : "mr-0"
+          : showSettings
+          ? "lg:mr-96"
+          : "mr-0"
       } ${
-        isVoiceMode 
+        isVoiceMode
           ? "ml-0" // Full screen in voice mode
-          : sidebarCollapsed 
-            ? "ml-16" 
-            : "ml-64 lg:ml-80"
+          : sidebarCollapsed
+          ? "ml-16"
+          : "ml-64 lg:ml-80"
       }`}
     >
       {!isVoiceMode && (
@@ -152,8 +152,8 @@ const ChatArea: React.FC<ChatAreaProps> = ({
         )}
       </div>
 
-      <ChatInput 
-        loading={loading} 
+      <ChatInput
+        loading={loading}
         onSendMessage={onSendMessage}
         onVoiceModeChange={handleVoiceModeChange}
       />

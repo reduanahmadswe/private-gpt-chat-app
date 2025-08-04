@@ -1,457 +1,197 @@
-import { ArrowLeft, Mic, MicOff, Square, Volume2, VolumeX } from "lucide-react";
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import toast from "react-hot-toast";
-
-// Extend Window interface for Speech Recognition
-declare global {
-  interface Window {
-    SpeechRecognition?: new () => VoiceSpeechRecognition;
-    webkitSpeechRecognition?: new () => VoiceSpeechRecognition;
-  }
-}
-
-// Speech Recognition types
-interface VoiceSpeechRecognition extends EventTarget {
-  continuous: boolean;
-  interimResults: boolean;
-  lang: string;
-  start(): void;
-  stop(): void;
-  abort(): void;
-  onstart: (() => void) | null;
-  onresult: ((event: VoiceSpeechRecognitionEvent) => void) | null;
-  onerror: ((event: VoiceSpeechRecognitionErrorEvent) => void) | null;
-  onend: (() => void) | null;
-}
-
-interface VoiceSpeechRecognitionEvent {
-  resultIndex: number;
-  results: VoiceSpeechRecognitionResultList;
-}
-
-interface VoiceSpeechRecognitionResultList {
-  length: number;
-  [index: number]: VoiceSpeechRecognitionResult;
-}
-
-interface VoiceSpeechRecognitionResult {
-  length: number;
-  isFinal: boolean;
-  [index: number]: VoiceSpeechRecognitionAlternative;
-}
-
-interface VoiceSpeechRecognitionAlternative {
-  transcript: string;
-  confidence: number;
-}
-
-interface VoiceSpeechRecognitionErrorEvent {
-  error: string;
-}
+import React, { useEffect, useRef, useState } from "react";
+import { useChat } from "../../../hooks/useChat";
+import {
+  VoiceActivityIndicator,
+  VoiceBackButton,
+  VoiceControlButton,
+  VoiceState,
+  VoiceStatusDisplay,
+} from "./voice";
 
 interface VoiceChatProps {
   loading: boolean;
-  onBack?: () => void;
+  onBack: () => void;
 }
 
-enum VoiceState {
-  IDLE = "idle",
-  LISTENING = "listening",
-  PROCESSING = "processing",
-  SPEAKING = "speaking",
-}
-
-const VoiceChat: React.FC<VoiceChatProps> = ({ loading, onBack }) => {
+const VoiceChat: React.FC<VoiceChatProps> = ({ onBack }) => {
   const [voiceState, setVoiceState] = useState<VoiceState>(VoiceState.IDLE);
-  const [speechSupported, setSpeechSupported] = useState(false);
-  const [currentTranscript, setCurrentTranscript] = useState("");
+  const [transcript, setTranscript] = useState("");
+  const recognitionRef = useRef<any>(null);
+  const { sendMessage, messages } = useChat();
 
-  const recognitionRef = useRef<VoiceSpeechRecognition | null>(null);
-  const synthRef = useRef<SpeechSynthesis | null>(null);
-  const currentUtteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
+  // Speech synthesis for AI responses
+  const speakMessage = async (text: string) => {
+    return new Promise<void>((resolve) => {
+      if ("speechSynthesis" in window) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.onend = () => resolve();
+        utterance.onerror = () => resolve();
+        window.speechSynthesis.speak(utterance);
+      } else {
+        resolve();
+      }
+    });
+  };
 
   // Initialize speech recognition
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const SpeechRecognition =
-        window.SpeechRecognition || (window as any).webkitSpeechRecognition;
-
-      if (SpeechRecognition) {
-        setSpeechSupported(true);
-        const recognition = new SpeechRecognition();
-
-        recognition.continuous = false;
-        recognition.interimResults = true;
-        recognition.lang = "en-US";
-
-        recognition.onstart = () => {
-          setVoiceState(VoiceState.LISTENING);
-          setCurrentTranscript("");
-        };
-
-        recognition.onresult = (event: VoiceSpeechRecognitionEvent) => {
-          let finalTranscript = "";
-          let interimTranscript = "";
-
-          for (let i = event.resultIndex; i < event.results.length; i++) {
-            const transcript = event.results[i][0].transcript;
-            if (event.results[i].isFinal) {
-              finalTranscript += transcript;
-            } else {
-              interimTranscript += transcript;
-            }
-          }
-
-          if (finalTranscript) {
-            setCurrentTranscript(finalTranscript);
-            processVoiceInput(finalTranscript);
-          } else {
-            setCurrentTranscript(interimTranscript);
-          }
-        };
-
-        recognition.onerror = (event: VoiceSpeechRecognitionErrorEvent) => {
-          console.error("Speech recognition error:", event.error);
-          setVoiceState(VoiceState.IDLE);
-          setCurrentTranscript("");
-
-          switch (event.error) {
-            case "no-speech":
-              toast.error("No speech detected. Please try again.");
-              break;
-            case "network":
-              toast.error("Network error. Please check your connection.");
-              break;
-            case "not-allowed":
-              toast.error(
-                "Microphone access denied. Please allow microphone access."
-              );
-              break;
-            case "aborted":
-              // Don't show error for intentional stops
-              break;
-            default:
-              toast.error("Speech recognition error. Please try again.");
-          }
-        };
-
-        recognition.onend = () => {
-          if (voiceState === VoiceState.LISTENING) {
-            setVoiceState(VoiceState.IDLE);
-            setCurrentTranscript("");
-          }
-        };
-
-        recognitionRef.current = recognition;
-      }
-
-      // Initialize speech synthesis
-      if ("speechSynthesis" in window) {
-        synthRef.current = window.speechSynthesis;
-      }
+    if (
+      !("webkitSpeechRecognition" in window) &&
+      !("SpeechRecognition" in window)
+    ) {
+      console.error("Speech recognition not supported");
+      return;
     }
+
+    const SpeechRecognition =
+      (window as any).SpeechRecognition ||
+      (window as any).webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+
+    recognition.continuous = false;
+    recognition.interimResults = true;
+    recognition.lang = "en-US";
+
+    recognition.onstart = () => {
+      console.log("Speech recognition started");
+      setVoiceState(VoiceState.LISTENING);
+    };
+
+    recognition.onresult = (event: any) => {
+      const current = event.resultIndex;
+      const transcript = event.results[current][0].transcript;
+      setTranscript(transcript);
+    };
+
+    recognition.onend = () => {
+      console.log("Speech recognition ended");
+      if (transcript.trim()) {
+        handleSendMessage(transcript);
+        setTranscript("");
+      } else {
+        setVoiceState(VoiceState.IDLE);
+      }
+    };
+
+    recognition.onerror = (event: any) => {
+      console.error("Speech recognition error:", event.error);
+      setVoiceState(VoiceState.IDLE);
+    };
+
+    recognitionRef.current = recognition;
 
     return () => {
-      stopListening();
-      stopSpeaking();
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
     };
-  }, []);
+  }, [transcript]);
 
-  const processVoiceInput = useCallback(async (transcript: string) => {
-    if (!transcript.trim()) return;
-
+  // Handle sending message and getting response
+  const handleSendMessage = async (message: string) => {
     try {
       setVoiceState(VoiceState.PROCESSING);
+      await sendMessage(message);
 
-      // Call the voice chat API
-      const API_BASE_URL =
-        import.meta.env.VITE_API_BASE_URL || "http://localhost:5001";
-      const cleanUrl = API_BASE_URL.endsWith("/")
-        ? API_BASE_URL.slice(0, -1)
-        : API_BASE_URL;
-
-      const response = await fetch(`${cleanUrl}/api/chat/voice`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify({ message: transcript.trim() }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Voice chat API failed");
-      }
-
-      const data = await response.json();
-
-      if (data.response) {
-        await speakResponse(data.response);
-      } else {
-        throw new Error("No response from API");
+      // Get the latest message after sending
+      if (messages.length > 0) {
+        const latestMessage = messages[messages.length - 1];
+        if (latestMessage.role === "assistant") {
+          setVoiceState(VoiceState.SPEAKING);
+          await speakMessage(latestMessage.content);
+          setVoiceState(VoiceState.IDLE);
+        }
       }
     } catch (error) {
-      console.error("Error processing voice input:", error);
-      toast.error("Failed to process your message.");
+      console.error("Error sending message:", error);
       setVoiceState(VoiceState.IDLE);
-    }
-  }, []);
-  const speakResponse = useCallback(async (text: string) => {
-    if (!synthRef.current || !text) {
-      setVoiceState(VoiceState.IDLE);
-      return;
-    }
-
-    try {
-      // Cancel any ongoing speech
-      synthRef.current.cancel();
-
-      const utterance = new SpeechSynthesisUtterance(text);
-
-      // Configure voice settings
-      utterance.rate = 0.9;
-      utterance.pitch = 1.0;
-      utterance.volume = 1.0;
-
-      // Try to use a good quality voice
-      const voices = synthRef.current.getVoices();
-      const preferredVoice = voices.find(
-        (voice) =>
-          voice.name.includes("Google") ||
-          voice.name.includes("Microsoft") ||
-          voice.lang.startsWith("en")
-      );
-      if (preferredVoice) {
-        utterance.voice = preferredVoice;
-      }
-
-      utterance.onstart = () => {
-        setVoiceState(VoiceState.SPEAKING);
-      };
-
-      utterance.onend = () => {
-        setVoiceState(VoiceState.IDLE);
-        currentUtteranceRef.current = null;
-      };
-
-      utterance.onerror = (event) => {
-        console.error("Speech synthesis error:", event);
-        setVoiceState(VoiceState.IDLE);
-        toast.error("Failed to play audio response.");
-      };
-
-      currentUtteranceRef.current = utterance;
-      synthRef.current.speak(utterance);
-    } catch (error) {
-      console.error("Error in text-to-speech:", error);
-      setVoiceState(VoiceState.IDLE);
-      toast.error("Failed to speak response.");
-    }
-  }, []);
-
-  const startListening = useCallback(() => {
-    if (!speechSupported || !recognitionRef.current) {
-      toast.error("Speech recognition is not supported in this browser.");
-      return;
-    }
-
-    if (voiceState !== VoiceState.IDLE) return;
-
-    try {
-      // Stop any ongoing speech first
-      stopSpeaking();
-
-      recognitionRef.current.start();
-      toast.success("Listening... Speak now!");
-    } catch (error) {
-      console.error("Error starting speech recognition:", error);
-      toast.error("Failed to start listening.");
-    }
-  }, [speechSupported, voiceState]);
-
-  const stopListening = useCallback(() => {
-    if (recognitionRef.current && voiceState === VoiceState.LISTENING) {
-      recognitionRef.current.stop();
-      setVoiceState(VoiceState.IDLE);
-      setCurrentTranscript("");
-    }
-  }, [voiceState]);
-
-  const stopSpeaking = useCallback(() => {
-    if (synthRef.current) {
-      synthRef.current.cancel();
-    }
-    if (currentUtteranceRef.current) {
-      currentUtteranceRef.current = null;
-    }
-    if (voiceState === VoiceState.SPEAKING) {
-      setVoiceState(VoiceState.IDLE);
-    }
-  }, [voiceState]);
-
-  const handleMainAction = useCallback(() => {
-    switch (voiceState) {
-      case VoiceState.IDLE:
-        startListening();
-        break;
-      case VoiceState.LISTENING:
-        stopListening();
-        break;
-      case VoiceState.PROCESSING:
-        // Can't stop processing
-        break;
-      case VoiceState.SPEAKING:
-        stopSpeaking();
-        break;
-    }
-  }, [voiceState, startListening, stopListening, stopSpeaking]);
-
-  const getMainButtonContent = () => {
-    switch (voiceState) {
-      case VoiceState.IDLE:
-        return {
-          icon: <Mic className="h-12 w-12 lg:h-16 lg:w-16" />,
-          text: "Click to speak",
-          className:
-            "bg-gradient-to-r from-[#00f5ff] to-[#9d4edd] hover:from-[#9d4edd] hover:to-[#00f5ff] shadow-[#00f5ff]/30",
-        };
-      case VoiceState.LISTENING:
-        return {
-          icon: <MicOff className="h-12 w-12 lg:h-16 lg:w-16" />,
-          text: "Listening... Click to stop",
-          className:
-            "bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 shadow-red-500/30 animate-pulse",
-        };
-      case VoiceState.PROCESSING:
-        return {
-          icon: (
-            <div className="w-12 h-12 lg:w-16 lg:h-16 border-4 border-white/30 border-t-white rounded-full animate-spin" />
-          ),
-          text: "Processing...",
-          className:
-            "bg-gradient-to-r from-yellow-500 to-orange-500 shadow-yellow-500/30",
-        };
-      case VoiceState.SPEAKING:
-        return {
-          icon: <Volume2 className="h-12 w-12 lg:h-16 lg:w-16 animate-pulse" />,
-          text: "Speaking... Click to stop",
-          className:
-            "bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 shadow-green-500/30",
-        };
     }
   };
 
-  const buttonContent = getMainButtonContent();
+  // Handle voice control actions
+  const handleVoiceControl = () => {
+    if (voiceState === VoiceState.LISTENING) {
+      recognitionRef.current?.stop();
+    } else if (voiceState === VoiceState.SPEAKING) {
+      if ("speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+      setVoiceState(VoiceState.IDLE);
+    } else if (voiceState === VoiceState.IDLE) {
+      recognitionRef.current?.start();
+    }
+  };
 
-  if (!speechSupported) {
-    return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-[#030637] via-[#1a1a2e] to-[#16213e]">
-        <div className="w-full max-w-4xl mx-auto text-center p-6">
-          <div className="bg-gradient-to-r from-red-500/20 to-red-600/20 backdrop-blur-xl rounded-2xl lg:rounded-3xl border border-red-500/30 p-6">
-            <VolumeX className="h-12 w-12 text-red-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-white mb-2">
-              Voice Chat Not Available
-            </h3>
-            <p className="text-red-200 text-sm">
-              Your browser doesn't support speech recognition. Please use a
-              modern browser like Chrome, Edge, or Safari.
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // Update voice state when speech synthesis ends
+  useEffect(() => {
+    if ("speechSynthesis" in window) {
+      // This is a basic implementation - you might need to adjust based on your needs
+      const interval = setInterval(() => {
+        if (
+          !window.speechSynthesis.speaking &&
+          voiceState === VoiceState.SPEAKING
+        ) {
+          setVoiceState(VoiceState.IDLE);
+        }
+      }, 100);
+
+      return () => clearInterval(interval);
+    }
+  }, [voiceState]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-[#030637] via-[#1a1a2e] to-[#16213e]">
-      <div className="w-full h-full flex flex-col items-center justify-center p-4 lg:p-6">
-        {/* Back Button */}
-        {onBack && (
-          <div className="absolute top-6 left-6">
-            <button
-              onClick={onBack}
-              className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-white/10 to-white/15 hover:from-white/15 hover:to-white/20 border border-white/20 text-white rounded-xl transition-all duration-300 hover:scale-105"
-              title="Back to Text Mode"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              <span className="text-sm">Text Mode</span>
-            </button>
+    <div
+      className="fixed inset-0 z-50 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 
+                    flex flex-col items-center justify-center p-6"
+    >
+      {/* Background Effects */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-gradient-to-br from-purple-500/10 to-transparent rounded-full animate-pulse"></div>
+        <div className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-gradient-to-tl from-pink-500/10 to-transparent rounded-full animate-pulse"></div>
+      </div>
+
+      {/* Back Button */}
+      <VoiceBackButton onExitVoiceMode={onBack} />
+
+      {/* Main Content */}
+      <div className="relative z-10 flex flex-col items-center justify-center space-y-12 max-w-2xl mx-auto">
+        {/* Status Display */}
+        <VoiceStatusDisplay voiceState={voiceState} />
+
+        {/* Activity Indicator with Voice Control */}
+        <div className="relative">
+          <VoiceActivityIndicator voiceState={voiceState} />
+          <VoiceControlButton
+            voiceState={voiceState}
+            loading={false}
+            onAction={handleVoiceControl}
+          />
+        </div>
+
+        {/* Transcript Display */}
+        {transcript && (
+          <div
+            className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 
+                         shadow-xl max-w-md w-full text-center animate-fadeIn"
+          >
+            <p className="text-white/80 text-sm mb-2">You said:</p>
+            <p className="text-white font-medium text-lg">{transcript}</p>
           </div>
         )}
 
-        {/* Voice Activity Indicator */}
-        {voiceState === VoiceState.LISTENING && currentTranscript && (
-          <div className="absolute top-6 left-1/2 transform -translate-x-1/2">
-            <div className="bg-gradient-to-r from-white/10 to-white/15 backdrop-blur-xl rounded-xl border border-white/20 p-3">
-              <p className="text-white/80 text-sm">
-                <span className="text-[#00f5ff]">Hearing:</span> "
-                {currentTranscript}"
+        {/* Latest AI Response */}
+        {messages.length > 0 &&
+          messages[messages.length - 1].role === "assistant" && (
+            <div
+              className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 
+                         shadow-xl max-w-md w-full text-center animate-fadeIn"
+            >
+              <p className="text-white/80 text-sm mb-2">AI Response:</p>
+              <p className="text-white text-base leading-relaxed">
+                {messages[messages.length - 1].content}
               </p>
             </div>
-          </div>
-        )}
-
-        {/* Main Voice Control - Centered */}
-        <div className="flex flex-col items-center justify-center space-y-8">
-          <button
-            onClick={handleMainAction}
-            disabled={loading || voiceState === VoiceState.PROCESSING}
-            className={`relative p-8 lg:p-12 rounded-full transition-all duration-300 transform hover:scale-105 disabled:transform-none shadow-2xl ${
-              buttonContent.className
-            } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
-            title={buttonContent.text}
-          >
-            {/* Pulsing ring for listening state */}
-            {voiceState === VoiceState.LISTENING && (
-              <div className="absolute inset-0 rounded-full border-4 border-white/50 animate-ping" />
-            )}
-
-            {/* Button content */}
-            <div className="relative z-10 text-white">{buttonContent.icon}</div>
-          </button>
-
-          {/* Status Text */}
-          <div className="text-center">
-            <p className="text-white font-medium text-xl lg:text-2xl mb-2">
-              {voiceState === VoiceState.IDLE && "Ready to chat"}
-              {voiceState === VoiceState.LISTENING && "Listening..."}
-              {voiceState === VoiceState.PROCESSING && "Thinking..."}
-              {voiceState === VoiceState.SPEAKING && "Speaking..."}
-            </p>
-            <p className="text-white/60 text-base lg:text-lg">
-              {voiceState === VoiceState.IDLE &&
-                "Click the microphone to start voice conversation"}
-              {voiceState === VoiceState.LISTENING &&
-                "Speak clearly and wait for processing"}
-              {voiceState === VoiceState.PROCESSING &&
-                "AI is generating response..."}
-              {voiceState === VoiceState.SPEAKING && "Playing AI response"}
-            </p>
-          </div>
-
-          {/* Additional Controls */}
-          {voiceState === VoiceState.SPEAKING && (
-            <div className="flex justify-center space-x-3">
-              <button
-                onClick={stopSpeaking}
-                className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-red-500/20 to-red-600/20 hover:from-red-500/30 hover:to-red-600/30 border border-red-500/30 text-red-200 hover:text-white rounded-xl transition-all duration-300"
-                title="Stop speaking"
-              >
-                <Square className="h-4 w-4" />
-                <span className="text-sm">Stop</span>
-              </button>
-            </div>
           )}
-        </div>
-
-        {/* Footer Info */}
-        <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 text-center">
-          <p className="text-xs text-white/50 leading-relaxed">
-            🎤 Voice-only AI chat • No text display • Hands-free conversation
-            <br />
-            Speak naturally and wait for the AI to respond
-          </p>
-        </div>
       </div>
     </div>
   );
