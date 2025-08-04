@@ -39,7 +39,7 @@ const TextInputField: React.FC<TextInputFieldProps> = ({
 
   return (
     <div className="flex-1 relative">
-      <div className="relative flex items-center min-h-[52px]">
+      <div className="relative flex items-center min-h-[44px] sm:min-h-[48px] md:min-h-[52px]">
         <VoiceToTextButton
           isListening={isListening}
           isSupported={isVoiceToTextSupported}
@@ -52,13 +52,20 @@ const TextInputField: React.FC<TextInputFieldProps> = ({
           onChange={handleChange}
           onKeyPress={onKeyPress}
           placeholder=""
-          className={`w-full py-4 lg:py-4 ${
-            isVoiceToTextSupported ? "pl-12 lg:pl-14" : "pl-4 lg:pl-6"
-          } pr-12 lg:pr-14 bg-transparent text-white placeholder-white/40 border-none focus:outline-none resize-none scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent text-sm lg:text-base leading-relaxed font-medium`}
+          className={`w-full py-3 sm:py-3.5 md:py-4 ${
+            isVoiceToTextSupported
+              ? "pl-10 sm:pl-11 md:pl-12 lg:pl-14"
+              : "pl-3 sm:pl-4 md:pl-4 lg:pl-6"
+          } pr-10 sm:pr-11 md:pr-12 lg:pr-14 bg-transparent text-white placeholder-white/40 border-none focus:outline-none resize-none scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent text-sm sm:text-base lg:text-base leading-relaxed font-medium mobile-touch-target`}
           disabled={loading}
           rows={1}
           style={{
-            minHeight: "52px",
+            minHeight:
+              window.innerWidth < 640
+                ? "44px"
+                : window.innerWidth < 768
+                ? "48px"
+                : "52px",
             maxHeight: "120px",
             overflow: "auto",
           }}

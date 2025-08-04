@@ -410,10 +410,7 @@ const VoiceChat: React.FC<VoiceChatProps> = ({ onBack }) => {
   }, [voiceState]);
 
   return (
-    <div
-      className="fixed inset-0 z-50 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 
-                    flex flex-col items-center justify-center p-6"
-    >
+    <div className="fixed inset-0 z-50 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       {/* Background Effects */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-gradient-to-br from-purple-500/10 to-transparent rounded-full animate-pulse"></div>
@@ -423,55 +420,59 @@ const VoiceChat: React.FC<VoiceChatProps> = ({ onBack }) => {
       {/* Back Button */}
       <VoiceBackButton onExitVoiceMode={onBack} />
 
-      {/* Main Content */}
-      <div className="relative z-10 flex flex-col items-center justify-center space-y-12 max-w-2xl mx-auto">
-        {/* Status Display */}
-        <VoiceStatusDisplay voiceState={voiceState} />
-
-        {/* Activity Indicator with Voice Control */}
-        <div className="relative">
-          <VoiceActivityIndicator voiceState={voiceState} />
-          <VoiceControlButton
-            voiceState={voiceState}
-            loading={isPlaybackActiveRef.current}
-            onAction={handleVoiceControl}
-          />
-        </div>
-
-        {/* Speaking indicator with Stop button */}
-        {voiceState === VoiceState.SPEAKING && (
-          <div className="text-center">
-            <p className="text-white/80 text-sm mb-3">Speaking...</p>
-
-            {/* Stop Audio Button */}
-            <button
-              onClick={() => {
-                console.log("🔴 Stop button clicked");
-                stopStreamingAudio();
-              }}
-              className="mb-4 px-6 py-2 bg-red-500/20 hover:bg-red-500/30 
-                         border border-red-400/50 rounded-full text-red-300 
-                         transition-all duration-200 text-sm font-medium
-                         hover:scale-105 active:scale-95 active:bg-red-500/50
-                         focus:outline-none focus:ring-2 focus:ring-red-400/50"
-            >
-              🛑 Stop Audio
-            </button>
-
-            {/* Animation dots */}
-            <div className="flex justify-center space-x-1">
-              <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce"></div>
-              <div
-                className="w-2 h-2 bg-purple-400 rounded-full animate-bounce"
-                style={{ animationDelay: "0.1s" }}
-              ></div>
-              <div
-                className="w-2 h-2 bg-purple-400 rounded-full animate-bounce"
-                style={{ animationDelay: "0.2s" }}
-              ></div>
-            </div>
+      {/* Main Content - Perfect Center */}
+      <div className="absolute inset-0 flex items-center justify-center p-4 sm:p-6">
+        <div className="flex flex-col items-center justify-center text-center max-w-2xl w-full">
+          {/* Status Display */}
+          <div className="mb-4 sm:mb-6">
+            <VoiceStatusDisplay voiceState={voiceState} />
           </div>
-        )}
+
+          {/* Activity Indicator with Voice Control - Main Center Element */}
+          <div className="relative mb-4 sm:mb-6">
+            <VoiceActivityIndicator voiceState={voiceState} />
+            <VoiceControlButton
+              voiceState={voiceState}
+              loading={isPlaybackActiveRef.current}
+              onAction={handleVoiceControl}
+            />
+          </div>
+
+          {/* Speaking indicator with Stop button */}
+          {voiceState === VoiceState.SPEAKING && (
+            <div className="text-center">
+              <p className="text-white/80 text-sm mb-3">Speaking...</p>
+
+              {/* Stop Audio Button */}
+              <button
+                onClick={() => {
+                  console.log("🔴 Stop button clicked");
+                  stopStreamingAudio();
+                }}
+                className="mb-4 px-6 py-2 bg-red-500/20 hover:bg-red-500/30 
+                           border border-red-400/50 rounded-full text-red-300 
+                           transition-all duration-200 text-sm font-medium
+                           hover:scale-105 active:scale-95 active:bg-red-500/50
+                           focus:outline-none focus:ring-2 focus:ring-red-400/50"
+              >
+                🛑 Stop Audio
+              </button>
+
+              {/* Animation dots */}
+              <div className="flex justify-center space-x-1">
+                <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce"></div>
+                <div
+                  className="w-2 h-2 bg-purple-400 rounded-full animate-bounce"
+                  style={{ animationDelay: "0.1s" }}
+                ></div>
+                <div
+                  className="w-2 h-2 bg-purple-400 rounded-full animate-bounce"
+                  style={{ animationDelay: "0.2s" }}
+                ></div>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

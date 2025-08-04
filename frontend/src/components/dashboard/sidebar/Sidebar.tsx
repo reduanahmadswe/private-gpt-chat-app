@@ -8,6 +8,7 @@ import {
   Settings,
   Share2,
   Trash2,
+  X,
 } from "lucide-react";
 import React from "react";
 import { useAuth } from "../../../contexts/AuthContext";
@@ -65,16 +66,16 @@ const Sidebar: React.FC<SidebarProps> = ({
       <div
         className={`
           ${
-            sidebarCollapsed ? "w-16" : "w-full sm:w-72 md:w-80 lg:w-80 xl:w-96"
+            sidebarCollapsed
+              ? "w-16 sm:w-16 -translate-x-full sm:translate-x-0"
+              : "w-full sm:w-72 md:w-80 lg:w-80 xl:w-96 translate-x-0"
           }
           bg-gradient-to-b from-[#030637] to-[#2a1a3e] backdrop-blur-xl border-r border-white/10 
           flex flex-col fixed left-0 top-0 h-full z-20 shadow-2xl shadow-black/20 transition-all duration-300
           ${
-            sidebarCollapsed
-              ? "translate-x-0"
-              : showSettings
+            showSettings && !sidebarCollapsed
               ? "transform -translate-x-full md:translate-x-0"
-              : "transform translate-x-0"
+              : ""
           }
         `}
       >
@@ -109,7 +110,15 @@ const Sidebar: React.FC<SidebarProps> = ({
                   </div>
                 </div>
                 <div className="flex items-center space-x-1 sm:space-x-2 flex-shrink-0">
-                  {/* Hide collapse button on mobile, show hamburger instead */}
+                  {/* Close button for mobile */}
+                  <button
+                    onClick={() => setSidebarCollapsed(true)}
+                    className="text-[#D0D0D0] hover:text-white p-1.5 sm:p-2 rounded-xl hover:bg-white/10 transition-all duration-300 sm:hidden"
+                    title="Close Sidebar"
+                  >
+                    <X className="h-4 w-4 lg:h-5 lg:w-5" />
+                  </button>
+                  {/* Collapse button for desktop */}
                   <button
                     onClick={() => setSidebarCollapsed(true)}
                     className="text-[#D0D0D0] hover:text-white p-1.5 sm:p-2 rounded-xl hover:bg-white/10 transition-all duration-300 hidden sm:flex"

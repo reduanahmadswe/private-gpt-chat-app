@@ -1,5 +1,5 @@
 import jsPDF from "jspdf";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useChat } from "../../hooks/useChat";
 import { useSpeechSynthesis } from "../../hooks/useSpeechSynthesis";
 import ChatArea from "./chat/ChatArea";
@@ -167,6 +167,23 @@ const DashboardLayout: React.FC = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isVoiceMode, setIsVoiceMode] = useState(false);
+
+  // Check if mobile screen and collapse sidebar on mobile by default
+  useEffect(() => {
+    const checkScreenSize = () => {
+      const isMobile = window.innerWidth < 640; // sm breakpoint
+      setSidebarCollapsed(isMobile);
+    };
+
+    // Check on mount
+    checkScreenSize();
+
+    // Check on resize
+    window.addEventListener("resize", checkScreenSize);
+
+    // Cleanup
+    return () => window.removeEventListener("resize", checkScreenSize);
+  }, []);
 
   // Chat functionality
   const {

@@ -27,10 +27,11 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3 lg:space-x-4">
+          {/* Mobile hamburger menu - always show on mobile when sidebar is collapsed */}
           {sidebarCollapsed && (
             <button
               onClick={() => setSidebarCollapsed(false)}
-              className="text-[#D0D0D0] hover:text-white p-2 rounded-xl hover:bg-white/10 transition-all duration-300 lg:hidden"
+              className="text-[#D0D0D0] hover:text-white p-2 rounded-xl hover:bg-white/10 transition-all duration-300 sm:hidden"
               title="Open Sidebar"
             >
               <Menu className="h-5 w-5" />

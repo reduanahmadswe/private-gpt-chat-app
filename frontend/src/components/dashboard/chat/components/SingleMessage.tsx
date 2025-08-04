@@ -36,27 +36,27 @@ const SingleMessage: React.FC<SingleMessageProps> = ({
 
   return (
     <div
-      className={`flex w-full mb-3 animate-slideUp ${
+      className={`flex w-full mb-2 sm:mb-3 animate-slideUp ${
         isUser ? "justify-end" : "justify-start"
       }`}
     >
       <div
-        className={`flex items-start max-w-[85%] md:max-w-[75%] lg:max-w-[60%] ${
+        className={`flex items-start max-w-[90%] xs:max-w-[85%] sm:max-w-[80%] md:max-w-[75%] lg:max-w-[65%] xl:max-w-[60%] ${
           isUser ? "flex-row-reverse" : "flex-row"
-        } gap-2`}
+        } gap-1.5 sm:gap-2`}
       >
         {/* Assistant Avatar */}
         {!isUser && (
-          <div className="bg-gradient-to-br from-slate-100/10 to-slate-200/10 rounded-full p-2 border border-white/10 flex-shrink-0 shadow-lg">
-            <MessageCircle className="h-4 w-4 text-cyan-400" />
+          <div className="bg-gradient-to-br from-slate-100/10 to-slate-200/10 rounded-full p-1.5 sm:p-2 border border-white/10 flex-shrink-0 shadow-lg mobile-avatar">
+            <MessageCircle className="h-3 w-3 sm:h-4 sm:w-4 text-cyan-400" />
           </div>
         )}
 
         {/* User Avatar */}
         {isUser && (
-          <div className="bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-full p-2 border border-blue-400/30 flex-shrink-0 shadow-lg">
-            <div className="w-4 h-4 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-xs">
+          <div className="bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-full p-1.5 sm:p-2 border border-blue-400/30 flex-shrink-0 shadow-lg mobile-avatar">
+            <div className="w-3 h-3 sm:w-4 sm:h-4 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
+              <span className="text-white font-bold text-[8px] sm:text-xs">
                 {user?.name?.charAt(0).toUpperCase() || "U"}
               </span>
             </div>
@@ -64,9 +64,9 @@ const SingleMessage: React.FC<SingleMessageProps> = ({
         )}
 
         {/* Message Bubble */}
-        <div className="flex flex-col">
+        <div className="flex flex-col min-w-0 flex-1">
           <div
-            className={`relative backdrop-blur-sm border shadow-lg px-4 py-3 rounded-2xl transition-all duration-300 hover:shadow-xl group ${
+            className={`relative backdrop-blur-sm border shadow-lg px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl transition-all duration-300 hover:shadow-xl group mobile-chat-message ${
               isUser
                 ? "bg-gradient-to-r from-blue-600/90 to-cyan-600/90 border-blue-500/50 text-white rounded-br-md"
                 : "bg-gradient-to-r from-slate-800/80 to-slate-700/80 border-slate-600/30 text-gray-100 rounded-bl-md"
@@ -75,11 +75,11 @@ const SingleMessage: React.FC<SingleMessageProps> = ({
             {/* Message Content */}
             <div className="relative">
               {!isUser ? (
-                <div className="prose prose-sm max-w-none prose-invert">
+                <div className="prose prose-sm max-w-none prose-invert mobile-text-base">
                   <MarkdownMessage message={message.content} />
                 </div>
               ) : (
-                <p className="mb-0 text-sm leading-relaxed whitespace-pre-wrap">
+                <p className="mb-0 text-sm sm:text-base leading-relaxed whitespace-pre-wrap mobile-text-base">
                   {message.content}
                 </p>
               )}
@@ -93,13 +93,15 @@ const SingleMessage: React.FC<SingleMessageProps> = ({
             >
               {/* Timestamp */}
               <div className="flex items-center gap-1">
-                <Clock className="h-3 w-3 opacity-60" />
-                <span className="text-xs opacity-60">{timestamp}</span>
+                <Clock className="h-2.5 w-2.5 sm:h-3 sm:w-3 opacity-60" />
+                <span className="text-[10px] sm:text-xs opacity-60 mobile-text-sm">
+                  {timestamp}
+                </span>
               </div>
 
               {/* Message Actions (for assistant messages) */}
               {!isUser && (
-                <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                <div className="opacity-80 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200">
                   <MessageActions
                     content={message.content}
                     messageIndex={messageIndex}

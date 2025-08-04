@@ -55,18 +55,73 @@
   }
 
   /* Mobile optimizations */
-  @media (max-width: 768px) {
+  @media (max-width: 640px) {
     .mobile-chat-message {
       max-width: 85%;
     }
 
     .mobile-input-area {
-      padding: 1rem;
+      padding: 0.75rem;
     }
 
     .mobile-avatar {
       width: 32px;
       height: 32px;
+    }
+
+    /* Touch-friendly button sizes */
+    .mobile-touch-target {
+      min-height: 44px;
+      min-width: 44px;
+    }
+
+    /* Improved text readability on small screens */
+    .mobile-text-base {
+      font-size: 0.875rem;
+      line-height: 1.375;
+    }
+
+    .mobile-text-sm {
+      font-size: 0.75rem;
+      line-height: 1.25;
+    }
+  }
+
+  /* Tablet optimizations */
+  @media (min-width: 641px) and (max-width: 1024px) {
+    .tablet-layout {
+      padding: 1rem;
+    }
+
+    .tablet-sidebar {
+      width: 280px;
+    }
+
+    .tablet-content {
+      margin-left: 280px;
+    }
+  }
+
+  /* Desktop optimizations */
+  @media (min-width: 1025px) {
+    .desktop-layout {
+      padding: 1.5rem;
+    }
+
+    .desktop-sidebar {
+      width: 320px;
+    }
+
+    .desktop-content {
+      margin-left: 320px;
+    }
+  }
+
+  /* High DPI optimizations */
+  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .high-dpi-optimized {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
   }
 }

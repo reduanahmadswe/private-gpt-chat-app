@@ -75,17 +75,25 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
 
   return (
     <div
-      className={`fixed right-0 top-0 h-full w-80 lg:w-96 bg-gradient-to-b from-[#030637] to-[#2a1a3e] backdrop-blur-xl border-l border-white/10 z-30 shadow-2xl shadow-black/20 transform transition-transform duration-300 flex flex-col ${
+      className={`fixed inset-0 sm:right-0 sm:top-0 sm:h-full sm:inset-auto w-full sm:w-80 md:w-96 lg:w-[450px] bg-gradient-to-b from-[#030637] to-[#2a1a3e] backdrop-blur-xl border-l border-white/10 z-30 shadow-2xl shadow-black/20 transform transition-transform duration-300 flex flex-col ${
         showSettings ? "translate-x-0" : "translate-x-full"
       }`}
     >
+      {/* Mobile Overlay */}
+      {showSettings && (
+        <div
+          className="absolute inset-0 bg-black/50 backdrop-blur-sm sm:hidden"
+          onClick={() => setShowSettings(false)}
+        />
+      )}
+
       {/* Fixed Header */}
-      <div className="p-6 border-b border-white/10 flex-shrink-0">
+      <div className="relative p-4 sm:p-6 border-b border-white/10 flex-shrink-0 bg-gradient-to-r from-[#030637]/90 to-[#16213e]/90 backdrop-blur-xl">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-bold text-white">Settings</h2>
+          <h2 className="text-lg sm:text-xl font-bold text-white">Settings</h2>
           <button
             onClick={() => setShowSettings(false)}
-            className="text-[#D0D0D0] hover:text-white p-2 rounded-xl hover:bg-white/10 transition-all duration-300"
+            className="text-[#D0D0D0] hover:text-white p-2 rounded-xl hover:bg-white/10 transition-all duration-300 mobile-touch-target"
           >
             <svg
               className="h-5 w-5"
@@ -106,45 +114,48 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
 
       {/* Scrollable Content */}
       <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent hover:scrollbar-thumb-white/30">
-        <div className="p-6 space-y-6 pb-8">
+        <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 pb-8">
           {/* Settings Tabs */}
-          <div className="flex space-x-2 border-b border-white/20 pb-4">
+          <div className="flex space-x-1 sm:space-x-2 border-b border-white/20 pb-3 sm:pb-4">
             <button
               onClick={() => setSettingsTab("account")}
-              className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 ${
+              className={`flex items-center space-x-2 px-3 sm:px-4 py-2 rounded-xl transition-all duration-300 text-xs sm:text-sm mobile-touch-target ${
                 settingsTab === "account"
                   ? "bg-gradient-to-r from-[#00f5ff]/20 to-[#9d4edd]/20 border border-[#00f5ff]/30 text-white"
                   : "text-[#D0D0D0] hover:text-white hover:bg-white/10"
               }`}
             >
-              <User className="h-4 w-4" />
-              <span className="text-sm">Account</span>
+              <User className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span>Account</span>
             </button>
             <button
               onClick={() => setSettingsTab("password")}
-              className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 ${
+              className={`flex items-center space-x-2 px-3 sm:px-4 py-2 rounded-xl transition-all duration-300 text-xs sm:text-sm mobile-touch-target ${
                 settingsTab === "password"
                   ? "bg-gradient-to-r from-[#00f5ff]/20 to-[#9d4edd]/20 border border-[#00f5ff]/30 text-white"
                   : "text-[#D0D0D0] hover:text-white hover:bg-white/10"
               }`}
             >
-              <Lock className="h-4 w-4" />
-              <span className="text-sm">Password</span>
+              <Lock className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span>Password</span>
             </button>
           </div>
 
           {/* Account Tab */}
           {settingsTab === "account" && (
             <div className="space-y-4">
-              <div className="bg-gradient-to-r from-white/5 to-white/10 backdrop-blur-xl rounded-2xl p-4 border border-white/10">
-                <h3 className="text-white font-semibold mb-4 flex items-center space-x-2">
-                  <User className="h-4 w-4" />
+              <div className="bg-gradient-to-r from-white/5 to-white/10 backdrop-blur-xl rounded-xl sm:rounded-2xl p-3 sm:p-4 border border-white/10">
+                <h3 className="text-white font-semibold mb-3 sm:mb-4 flex items-center space-x-2 text-sm sm:text-base">
+                  <User className="h-3 w-3 sm:h-4 sm:w-4" />
                   <span>Profile Information</span>
                 </h3>
 
-                <form onSubmit={handleProfileUpdate} className="space-y-4">
+                <form
+                  onSubmit={handleProfileUpdate}
+                  className="space-y-3 sm:space-y-4"
+                >
                   <div>
-                    <label className="block text-[#D0D0D0] text-sm font-medium mb-2">
+                    <label className="block text-[#D0D0D0] text-xs sm:text-sm font-medium mb-2">
                       Full Name
                     </label>
                     <input
@@ -156,14 +167,14 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                           name: e.target.value,
                         })
                       }
-                      className="w-full px-3 py-2 bg-white/5 text-white placeholder-[#D0D0D0] rounded-xl border border-white/20 focus:outline-none focus:ring-2 focus:ring-[#00f5ff]/50 focus:border-[#00f5ff]/30 transition-all duration-300 text-sm"
+                      className="w-full px-3 py-2 sm:py-2.5 bg-white/5 text-white placeholder-[#D0D0D0] rounded-lg sm:rounded-xl border border-white/20 focus:outline-none focus:ring-2 focus:ring-[#00f5ff]/50 focus:border-[#00f5ff]/30 transition-all duration-300 text-xs sm:text-sm mobile-touch-target"
                       placeholder="Enter your full name"
                       required
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[#D0D0D0] text-sm font-medium mb-2">
+                    <label className="block text-[#D0D0D0] text-xs sm:text-sm font-medium mb-2">
                       Email Address
                     </label>
                     <input
@@ -175,7 +186,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                           email: e.target.value,
                         })
                       }
-                      className="w-full px-3 py-2 bg-white/5 text-white placeholder-[#D0D0D0] rounded-xl border border-white/20 focus:outline-none focus:ring-2 focus:ring-[#00f5ff]/50 focus:border-[#00f5ff]/30 transition-all duration-300 text-sm"
+                      className="w-full px-3 py-2 sm:py-2.5 bg-white/5 text-white placeholder-[#D0D0D0] rounded-lg sm:rounded-xl border border-white/20 focus:outline-none focus:ring-2 focus:ring-[#00f5ff]/50 focus:border-[#00f5ff]/30 transition-all duration-300 text-xs sm:text-sm mobile-touch-target"
                       placeholder="Enter your email address"
                       required
                     />
@@ -184,7 +195,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                   <button
                     type="submit"
                     disabled={settingsLoading}
-                    className={`w-full px-4 py-2 bg-gradient-to-r from-[#00f5ff] to-[#9d4edd] hover:from-[#9d4edd] hover:to-[#00f5ff] text-white rounded-xl font-medium transition-all duration-500 shadow-lg shadow-[#00f5ff]/20 hover:shadow-[#9d4edd]/30 transform hover:scale-105 text-sm ${
+                    className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 bg-gradient-to-r from-[#00f5ff] to-[#9d4edd] hover:from-[#9d4edd] hover:to-[#00f5ff] text-white rounded-lg sm:rounded-xl font-medium transition-all duration-500 shadow-lg shadow-[#00f5ff]/20 hover:shadow-[#9d4edd]/30 transform hover:scale-105 text-xs sm:text-sm mobile-touch-target ${
                       settingsLoading
                         ? "opacity-50 cursor-not-allowed transform-none"
                         : ""

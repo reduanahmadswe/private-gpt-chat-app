@@ -120,7 +120,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
         isVoiceMode
           ? "ml-0" // Full screen in voice mode
           : sidebarCollapsed
-          ? "ml-16"
+          ? "ml-0 sm:ml-16" // Full width on mobile, collapsed sidebar width on desktop
           : "ml-0 sm:ml-72 md:ml-80 lg:ml-80 xl:ml-96"
       }`}
     >
