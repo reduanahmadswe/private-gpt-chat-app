@@ -44,9 +44,9 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
   };
 
   return (
-    <div className="flex-1 overflow-y-auto scrollbar-thin pb-32">
+    <div className="flex-1 overflow-y-auto scrollbar-thin pb-24 xs:pb-28 sm:pb-32">
       <div className="min-h-full flex flex-col justify-end">
-        <div className="space-y-1 p-4 md:p-6 pb-4">
+        <div className="space-y-1 p-2 xs:p-3 sm:p-4 md:p-6 pb-4">
           {/* Welcome message if no messages */}
           {messages.length === 0 && !loading && (
             <div className="text-center py-12">

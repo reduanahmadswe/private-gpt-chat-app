@@ -1,0 +1,217 @@
+/* Enhanced responsive utilities and mobile optimizations */
+
+/* Custom breakpoint for extra small devices */
+@media (min-width: 475px) {
+  .xs\:block {
+    display: block;
+  }
+  .xs\:hidden {
+    display: none;
+  }
+  .xs\:flex {
+    display: flex;
+  }
+  .xs\:inline {
+    display: inline;
+  }
+  .xs\:text-sm {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+  .xs\:text-base {
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+  .xs\:p-2 {
+    padding: 0.5rem;
+  }
+  .xs\:p-3 {
+    padding: 0.75rem;
+  }
+  .xs\:p-4 {
+    padding: 1rem;
+  }
+  .xs\:px-3 {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+  .xs\:py-2\.5 {
+    padding-top: 0.625rem;
+    padding-bottom: 0.625rem;
+  }
+  .xs\:py-2 {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+  .xs\:py-1\.5 {
+    padding-top: 0.375rem;
+    padding-bottom: 0.375rem;
+  }
+  .xs\:py-1 {
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+  }
+  .xs\:px-2\.5 {
+    padding-left: 0.625rem;
+    padding-right: 0.625rem;
+  }
+  .xs\:pl-9 {
+    padding-left: 2.25rem;
+  }
+  .xs\:pr-9 {
+    padding-right: 2.25rem;
+  }
+  .xs\:pl-3 {
+    padding-left: 0.75rem;
+  }
+  .xs\:left-2\.5 {
+    left: 0.625rem;
+  }
+  .xs\:right-2\.5 {
+    right: 0.625rem;
+  }
+  .xs\:space-y-3 > * + * {
+    margin-top: 0.75rem;
+  }
+  .xs\:space-x-1 > * + * {
+    margin-left: 0.25rem;
+  }
+  .xs\:gap-1\.5 {
+    gap: 0.375rem;
+  }
+  .xs\:min-w-\[40px\] {
+    min-width: 40px;
+  }
+  .xs\:h-3\.5 {
+    height: 0.875rem;
+  }
+  .xs\:w-3\.5 {
+    width: 0.875rem;
+  }
+  .xs\:h-4 {
+    height: 1rem;
+  }
+  .xs\:w-4 {
+    width: 1rem;
+  }
+  .xs\:h-5 {
+    height: 1.25rem;
+  }
+  .xs\:w-5 {
+    width: 1.25rem;
+  }
+  .xs\:rounded-xl {
+    border-radius: 0.75rem;
+  }
+  .xs\:max-w-\[90\%\] {
+    max-width: 90%;
+  }
+  .xs\:pb-28 {
+    padding-bottom: 7rem;
+  }
+  .xs\:pt-18 {
+    padding-top: 4.5rem;
+  }
+  .xs\:min-h-\[44px\] {
+    min-height: 44px;
+  }
+}
+
+/* Mobile touch targets */
+.mobile-touch-target {
+  min-height: 44px; /* iOS recommended minimum */
+}
+
+@media (max-width: 640px) {
+  .mobile-touch-target {
+    min-height: 48px; /* Slightly larger on very small screens */
+  }
+}
+
+/* Improved mobile avatar sizing */
+.mobile-avatar {
+  min-width: 24px;
+  min-height: 24px;
+}
+
+@media (min-width: 475px) {
+  .mobile-avatar {
+    min-width: 28px;
+    min-height: 28px;
+  }
+}
+
+@media (min-width: 640px) {
+  .mobile-avatar {
+    min-width: 32px;
+    min-height: 32px;
+  }
+}
+
+/* Enhanced chat message styling for mobile */
+.mobile-chat-message {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+/* Improved scrollbar for mobile */
+@media (max-width: 768px) {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+  }
+}
+
+/* Fade-in animation for better UX */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Improved focus states for accessibility */
+.focus-visible:focus {
+  outline: 2px solid #00f5ff;
+  outline-offset: 2px;
+}
+
+/* Better mobile keyboard handling */
+@media (max-width: 768px) {
+  .keyboard-adjust {
+    padding-bottom: env(keyboard-inset-height, 0px);
+  }
+}
+
+/* Enhanced gradient backgrounds for mobile performance */
+@media (max-width: 640px) {
+  .bg-gradient-mobile-optimized {
+    background: linear-gradient(135deg, #030637 0%, #1a1a2e 50%, #16213e 100%);
+  }
+}
+
+/* Custom utility for pt-18 */
+.pt-18 {
+  padding-top: 4.5rem;
+}

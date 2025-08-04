@@ -171,7 +171,7 @@ const DashboardLayout: React.FC = () => {
   // Check if mobile screen and collapse sidebar on mobile by default
   useEffect(() => {
     const checkScreenSize = () => {
-      const isMobile = window.innerWidth < 640; // sm breakpoint
+      const isMobile = window.innerWidth < 768; // md breakpoint for better mobile experience
       setSidebarCollapsed(isMobile);
     };
 

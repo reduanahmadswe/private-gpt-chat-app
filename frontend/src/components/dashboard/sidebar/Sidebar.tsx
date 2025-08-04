@@ -189,6 +189,15 @@ const Sidebar: React.FC<SidebarProps> = ({
           {sidebarCollapsed ? (
             // Collapsed state - show compact chat indicators
             <div className="space-y-2">
+              {/* Add New Chat button in collapsed state */}
+              <button
+                onClick={startNewChat}
+                className="w-full p-1.5 sm:p-2 bg-gradient-to-r from-[#00f5ff]/20 to-[#9d4edd]/20 hover:from-[#9d4edd]/30 hover:to-[#00f5ff]/30 border border-[#00f5ff]/30 text-white rounded-lg sm:rounded-xl flex items-center justify-center transition-all duration-300 hover:shadow-lg"
+                title="New Chat"
+              >
+                <Plus className="h-4 w-4" />
+              </button>
+
               {chats.length === 0 ? (
                 <div className="text-center text-white/50 py-4 sm:py-6">
                   <MessageCircle className="h-6 w-6 sm:h-8 sm:w-8 mx-auto text-[#00f5ff]" />
@@ -211,14 +220,6 @@ const Sidebar: React.FC<SidebarProps> = ({
                   </div>
                 ))
               )}
-              {/* Add New Chat button in collapsed state */}
-              <button
-                onClick={startNewChat}
-                className="w-full p-1.5 sm:p-2 bg-gradient-to-r from-[#00f5ff]/20 to-[#9d4edd]/20 hover:from-[#9d4edd]/30 hover:to-[#00f5ff]/30 border border-[#00f5ff]/30 text-white rounded-lg sm:rounded-xl flex items-center justify-center transition-all duration-300 hover:shadow-lg"
-                title="New Chat"
-              >
-                <Plus className="h-4 w-4" />
-              </button>
             </div>
           ) : (
             // Expanded state - show full chat list

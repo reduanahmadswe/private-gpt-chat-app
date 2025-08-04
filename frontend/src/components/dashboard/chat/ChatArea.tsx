@@ -68,18 +68,21 @@ const ChatArea: React.FC<ChatAreaProps> = ({
       }
 
       // If we're at the very top, always show header
-      if (currentScrollY <= 5) {
+      if (currentScrollY <= 10) {
+        setIsHeaderVisible(true);
+      } else if (currentScrollY >= maxScrollY - 10) {
+        // If we're near the bottom, show header for better UX
         setIsHeaderVisible(true);
       } else {
         // Only check scroll direction if there's meaningful movement
         const scrollDifference = Math.abs(currentScrollY - lastScrollY);
-        if (scrollDifference > 3) {
+        if (scrollDifference > 5) {
           if (currentScrollY < lastScrollY) {
-            // Scrolling UP - hide header to give more reading space
-            setIsHeaderVisible(false);
-          } else {
-            // Scrolling DOWN - show header
+            // Scrolling UP - show header
             setIsHeaderVisible(true);
+          } else {
+            // Scrolling DOWN - hide header to give more reading space
+            setIsHeaderVisible(false);
           }
         }
       }
@@ -89,16 +92,26 @@ const ChatArea: React.FC<ChatAreaProps> = ({
 
     const container = scrollContainerRef.current;
     if (container) {
-      container.addEventListener("scroll", handleScroll, { passive: true });
+      // Use throttling for better performance
+      let ticking = false;
+      const throttledScroll = () => {
+        if (!ticking) {
+          requestAnimationFrame(() => {
+            handleScroll();
+            ticking = false;
+          });
+          ticking = true;
+        }
+      };
+
+      container.addEventListener("scroll", throttledScroll, { passive: true });
       // Check initial state
       handleScroll();
-    }
 
-    return () => {
-      if (container) {
-        container.removeEventListener("scroll", handleScroll);
-      }
-    };
+      return () => {
+        container.removeEventListener("scroll", throttledScroll);
+      };
+    }
   }, [lastScrollY, isInitialized]);
 
   // Reset header visibility when switching chats
@@ -120,8 +133,8 @@ const ChatArea: React.FC<ChatAreaProps> = ({
         isVoiceMode
           ? "ml-0" // Full screen in voice mode
           : sidebarCollapsed
-          ? "ml-0 sm:ml-16" // Full width on mobile, collapsed sidebar width on desktop
-          : "ml-0 sm:ml-72 md:ml-80 lg:ml-80 xl:ml-96"
+          ? "ml-0 md:ml-16" // Full width on mobile/tablet, collapsed sidebar width on desktop
+          : "ml-0 md:ml-72 lg:ml-80 xl:ml-96"
       }`}
     >
       {!isVoiceMode && (
@@ -138,8 +151,10 @@ const ChatArea: React.FC<ChatAreaProps> = ({
       <div className="flex-1 flex flex-col min-h-0">
         <div
           ref={scrollContainerRef}
-          className={`flex-1 transition-all duration-300 ${
-            isHeaderVisible && !isVoiceMode ? "pt-20 lg:pt-24" : "pt-0"
+          className={`flex-1 transition-all duration-500 ease-in-out ${
+            isHeaderVisible && !isVoiceMode
+              ? "pt-16 xs:pt-18 sm:pt-20 lg:pt-24"
+              : "pt-0"
           }`}
         >
           {!isVoiceMode && (

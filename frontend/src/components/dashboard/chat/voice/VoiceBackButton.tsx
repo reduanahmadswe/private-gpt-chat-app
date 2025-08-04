@@ -11,15 +11,15 @@ const VoiceBackButton: React.FC<VoiceBackButtonProps> = ({
   return (
     <button
       onClick={onExitVoiceMode}
-      className="group fixed top-4 left-4 sm:top-6 sm:left-6 z-50 p-3 sm:p-4 bg-white/10 backdrop-blur-sm rounded-full 
+      className="group fixed top-3 left-3 xs:top-4 xs:left-4 sm:top-6 sm:left-6 z-50 p-2 xs:p-3 sm:p-4 bg-white/10 backdrop-blur-sm rounded-full 
                  hover:bg-white/20 transition-all duration-300 transform hover:scale-110 
                  active:scale-95 border border-white/20 hover:border-white/40
                  shadow-lg hover:shadow-xl"
     >
-      <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6 text-white group-hover:text-purple-200 transition-colors duration-300" />
+      <ArrowLeft className="w-4 h-4 xs:w-5 xs:h-5 sm:w-6 sm:h-6 text-white group-hover:text-purple-200 transition-colors duration-300" />
       <div
         className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-500/20 to-pink-500/20 
-                     opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-pulse"
+                   opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-pulse"
       ></div>
     </button>
   );

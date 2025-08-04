@@ -20,7 +20,7 @@ const VoiceToTextButton: React.FC<VoiceToTextButtonProps> = ({
     <button
       onClick={onClick}
       disabled={loading}
-      className={`absolute left-3 lg:left-4 top-1/2 transform -translate-y-1/2 z-10 p-1.5 rounded-lg transition-all duration-300 group ${
+      className={`absolute left-2 xs:left-2.5 sm:left-3 lg:left-4 top-1/2 transform -translate-y-1/2 z-10 p-1 xs:p-1.5 sm:p-1.5 rounded-lg transition-all duration-300 group ${
         isListening
           ? "text-red-500 bg-red-500/20 animate-pulse shadow-lg shadow-red-500/30 scale-110"
           : "text-[#D0D0D0] hover:text-[#00f5ff] hover:bg-[#00f5ff]/15 hover:shadow-md hover:shadow-[#00f5ff]/20 hover:scale-110"
@@ -28,7 +28,7 @@ const VoiceToTextButton: React.FC<VoiceToTextButtonProps> = ({
       title={isListening ? "Stop voice input" : "Click to speak"}
     >
       <Mic
-        className={`h-4 w-4 lg:h-5 lg:w-5 transition-all duration-300 ${
+        className={`h-3 w-3 xs:h-3.5 xs:w-3.5 sm:h-4 sm:w-4 lg:h-5 lg:w-5 transition-all duration-300 ${
           isListening
             ? "drop-shadow-[0_0_4px_rgba(239,68,68,0.8)]"
             : "group-hover:drop-shadow-[0_0_4px_rgba(0,245,255,0.6)]"

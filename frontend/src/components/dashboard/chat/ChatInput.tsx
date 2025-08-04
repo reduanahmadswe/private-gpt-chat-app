@@ -83,11 +83,11 @@ const ChatInput: React.FC<ChatInputProps> = ({
         </div>
       ) : (
         // Normal sticky layout for TextInput
-        <div className="sticky bottom-0 left-0 right-0 bg-gradient-to-t from-slate-900 via-slate-900/95 to-transparent p-3 md:p-4 lg:p-6 backdrop-blur-xl border-t border-white/10">
-          <div className="w-full max-w-4xl mx-auto flex flex-col space-y-4">
+        <div className="sticky bottom-0 left-0 right-0 bg-gradient-to-t from-slate-900 via-slate-900/95 to-transparent p-2 xs:p-3 md:p-4 lg:p-6 backdrop-blur-xl border-t border-white/10">
+          <div className="w-full max-w-4xl mx-auto flex flex-col space-y-2 xs:space-y-3 sm:space-y-4">
             <div className="relative">
               {/* Input Container */}
-              <div className="bg-gradient-to-r from-slate-800/90 to-slate-700/90 backdrop-blur-xl rounded-xl md:rounded-2xl lg:rounded-3xl border border-slate-600/50 shadow-2xl shadow-black/20 overflow-hidden">
+              <div className="bg-gradient-to-r from-slate-800/90 to-slate-700/90 backdrop-blur-xl rounded-lg xs:rounded-xl md:rounded-2xl lg:rounded-3xl border border-slate-600/50 shadow-2xl shadow-black/20 overflow-hidden">
                 <div className="flex items-end">
                   {/* Text Input Area */}
                   <div className="flex-1 relative">
@@ -106,7 +106,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="flex items-center space-x-1 p-2">
+                  <div className="flex items-center space-x-0.5 xs:space-x-1 sm:space-x-1 p-1.5 xs:p-2">
                     {/* Voice Mode Toggle Button */}
                     <VoiceModeToggleButton
                       loading={loading}

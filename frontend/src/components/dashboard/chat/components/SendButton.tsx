@@ -18,7 +18,7 @@ const SendButton: React.FC<SendButtonProps> = ({
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`relative group px-3 sm:px-4 lg:px-6 py-2.5 sm:py-3 lg:py-4 rounded-lg sm:rounded-xl lg:rounded-2xl transition-all duration-500 flex items-center justify-center min-w-[44px] sm:min-w-[48px] lg:min-w-[60px] mobile-touch-target overflow-hidden ${
+      className={`relative group px-2 xs:px-3 sm:px-4 lg:px-6 py-2 xs:py-2.5 sm:py-3 lg:py-4 rounded-lg sm:rounded-xl lg:rounded-2xl transition-all duration-500 flex items-center justify-center min-w-[36px] xs:min-w-[40px] sm:min-w-[48px] lg:min-w-[60px] mobile-touch-target overflow-hidden ${
         disabled
           ? "bg-gradient-to-r from-gray-600 to-gray-700 cursor-not-allowed opacity-50"
           : "bg-gradient-to-r from-[#00f5ff] via-[#7c3aed] to-[#9d4edd] hover:from-[#9d4edd] hover:via-[#00f5ff] hover:to-[#00f5ff] shadow-lg shadow-[#00f5ff]/30 hover:shadow-[#9d4edd]/50 transform hover:scale-110 active:scale-95"
@@ -57,7 +57,7 @@ const SendButton: React.FC<SendButtonProps> = ({
           </div>
         ) : (
           <Send
-            className={`h-3.5 w-3.5 sm:h-4 sm:w-4 lg:h-5 lg:w-5 transition-all duration-300 ${
+            className={`h-3 w-3 xs:h-3.5 xs:w-3.5 sm:h-4 sm:w-4 lg:h-5 lg:w-5 transition-all duration-300 ${
               hasMessage
                 ? "text-white group-hover:text-white drop-shadow-lg group-hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]"
                 : "text-gray-300"

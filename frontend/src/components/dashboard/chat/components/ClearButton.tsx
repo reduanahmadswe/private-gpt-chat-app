@@ -11,12 +11,12 @@ const ClearButton: React.FC<ClearButtonProps> = ({ show, onClick }) => {
   return (
     <button
       onClick={onClick}
-      className="absolute right-3 lg:right-4 top-1/2 transform -translate-y-1/2 text-[#D0D0D0] hover:text-red-400 transition-all duration-300 p-1.5 rounded-xl hover:bg-red-500/10 hover:shadow-md hover:shadow-red-500/20 hover:scale-110 active:scale-95 group"
+      className="absolute right-2 xs:right-2.5 sm:right-3 lg:right-4 top-1/2 transform -translate-y-1/2 text-[#D0D0D0] hover:text-red-400 transition-all duration-300 p-1 xs:p-1.5 sm:p-1.5 rounded-xl hover:bg-red-500/10 hover:shadow-md hover:shadow-red-500/20 hover:scale-110 active:scale-95 group"
       title="Clear message"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        className="h-3 w-3 lg:h-4 lg:w-4 transition-all duration-300 group-hover:drop-shadow-[0_0_4px_rgba(248,113,113,0.6)]"
+        className="h-3 w-3 xs:h-3.5 xs:w-3.5 sm:h-4 sm:w-4 lg:h-4 lg:w-4 transition-all duration-300 group-hover:drop-shadow-[0_0_4px_rgba(248,113,113,0.6)]"
         viewBox="0 0 20 20"
         fill="currentColor"
       >
