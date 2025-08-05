@@ -343,11 +343,9 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
           <div className="bg-gradient-to-r from-white/5 to-white/10 backdrop-blur-xl rounded-2xl p-4 border border-white/10">
             <h3 className="text-white font-semibold mb-3">AI Model</h3>
             <div className="bg-gradient-to-r from-[#00f5ff]/10 to-[#9d4edd]/10 rounded-xl p-3 border border-[#00f5ff]/20">
-              <p className="text-[#00f5ff] font-medium text-sm">
-                Claude 3.5 Sonnet
-              </p>
+              <p className="text-[#00f5ff] font-medium text-sm">AI Bondhu</p>
               <p className="text-[#D0D0D0] text-xs">
-                Advanced reasoning and analysis
+                Your intelligent Bengali companion
               </p>
             </div>
           </div>

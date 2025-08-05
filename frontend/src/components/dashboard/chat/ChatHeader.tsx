@@ -19,7 +19,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
 }) => {
   return (
     <div
-      className={`absolute top-0 left-0 right-0 z-10 p-3 xs:p-4 lg:p-6 border-b border-white/10 bg-gradient-to-r from-white/5 to-white/10 backdrop-blur-xl shadow-lg transition-all duration-500 ease-in-out ${
+      className={`absolute top-0 left-0 right-0 z-10 p-3 xs:p-4 lg:p-6 border-b border-white/10 bg-gradient-to-r from-white/5 to-white/10 backdrop-blur-xl shadow-lg transition-all duration-200 ease-out ${
         isHeaderVisible
           ? "transform translate-y-0 opacity-100"
           : "transform -translate-y-full opacity-0 pointer-events-none"
@@ -54,7 +54,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
         <div className="flex items-center space-x-2 flex-shrink-0">
           <div className="hidden xs:flex px-2 xs:px-3 lg:px-4 py-1 xs:py-1.5 lg:py-2 bg-gradient-to-r from-[#00f5ff]/10 to-[#9d4edd]/10 rounded-md xs:rounded-lg lg:rounded-xl border border-[#00f5ff]/20">
             <span className="text-[#00f5ff] text-xs sm:text-xs lg:text-sm font-medium whitespace-nowrap">
-              Claude 3.5 Sonnet
+              AI Bondhu
             </span>
           </div>
         </div>

@@ -67,24 +67,12 @@ const ChatArea: React.FC<ChatAreaProps> = ({
         return;
       }
 
-      // If we're at the very top, always show header
-      if (currentScrollY <= 10) {
-        setIsHeaderVisible(true);
-      } else if (currentScrollY >= maxScrollY - 10) {
-        // If we're near the bottom, show header for better UX
+      // If we're at the very top (first few pixels), show header
+      if (currentScrollY <= 5) {
         setIsHeaderVisible(true);
       } else {
-        // Only check scroll direction if there's meaningful movement
-        const scrollDifference = Math.abs(currentScrollY - lastScrollY);
-        if (scrollDifference > 5) {
-          if (currentScrollY < lastScrollY) {
-            // Scrolling UP - show header
-            setIsHeaderVisible(true);
-          } else {
-            // Scrolling DOWN - hide header to give more reading space
-            setIsHeaderVisible(false);
-          }
-        }
+        // Hide header when scrolling anywhere else for maximum chat space
+        setIsHeaderVisible(false);
       }
 
       setLastScrollY(currentScrollY);
@@ -92,24 +80,12 @@ const ChatArea: React.FC<ChatAreaProps> = ({
 
     const container = scrollContainerRef.current;
     if (container) {
-      // Use throttling for better performance
-      let ticking = false;
-      const throttledScroll = () => {
-        if (!ticking) {
-          requestAnimationFrame(() => {
-            handleScroll();
-            ticking = false;
-          });
-          ticking = true;
-        }
-      };
-
-      container.addEventListener("scroll", throttledScroll, { passive: true });
+      container.addEventListener("scroll", handleScroll, { passive: true });
       // Check initial state
       handleScroll();
 
       return () => {
-        container.removeEventListener("scroll", throttledScroll);
+        container.removeEventListener("scroll", handleScroll);
       };
     }
   }, [lastScrollY, isInitialized]);
@@ -151,7 +127,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
       <div className="flex-1 flex flex-col min-h-0">
         <div
           ref={scrollContainerRef}
-          className={`flex-1 transition-all duration-500 ease-in-out ${
+          className={`flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent hover:scrollbar-thumb-white/30 transition-all duration-200 ease-out ${
             isHeaderVisible && !isVoiceMode
               ? "pt-16 xs:pt-18 sm:pt-20 lg:pt-24"
               : "pt-0"

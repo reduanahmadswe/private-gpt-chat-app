@@ -24,10 +24,45 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
 }) => {
   const { user } = useAuth();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const isAutoScrolling = useRef(false);
+  const scrollTimeoutRef = useRef<number | null>(null);
 
-  // Auto-scroll to bottom when new messages arrive
+  // Auto-scroll to bottom when new messages arrive (optimized to prevent shaking)
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (messagesEndRef.current && !isAutoScrolling.current) {
+      // Clear any existing timeout
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+
+      // Set a small delay to batch scroll operations
+      scrollTimeoutRef.current = setTimeout(() => {
+        if (messagesEndRef.current) {
+          isAutoScrolling.current = true;
+
+          // Use instant scroll during loading to prevent jittery behavior
+          messagesEndRef.current.scrollIntoView({
+            behavior: loading ? "instant" : "smooth",
+            block: "nearest",
+            inline: "nearest",
+          });
+
+          // Reset the flag after scroll completes
+          setTimeout(
+            () => {
+              isAutoScrolling.current = false;
+            },
+            loading ? 0 : 300
+          );
+        }
+      }, 50);
+    }
+
+    return () => {
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
   }, [messages, loading]);
 
   // Copy message content to clipboard
@@ -44,8 +79,8 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
   };
 
   return (
-    <div className="flex-1 overflow-y-auto scrollbar-thin pb-24 xs:pb-28 sm:pb-32">
-      <div className="min-h-full flex flex-col justify-end">
+    <div className="flex-1 pb-24 xs:pb-28 sm:pb-32">
+      <div className="min-h-full" style={{ minHeight: "calc(100vh - 200px)" }}>
         <div className="space-y-1 p-2 xs:p-3 sm:p-4 md:p-6 pb-4">
           {/* Welcome message if no messages */}
           {messages.length === 0 && !loading && (
@@ -96,8 +131,12 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
           {/* Typing Indicator */}
           {loading && <TypingIndicator />}
 
-          {/* Auto-scroll anchor */}
-          <div ref={messagesEndRef} />
+          {/* Auto-scroll anchor - positioned to prevent layout jumps */}
+          <div
+            ref={messagesEndRef}
+            className="h-1"
+            style={{ scrollMarginBottom: "10px" }}
+          />
         </div>
       </div>
     </div>

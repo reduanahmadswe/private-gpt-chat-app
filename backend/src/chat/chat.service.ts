@@ -54,6 +54,25 @@ export class ChatService {
             model: model,
             messages: [
               {
+                role: 'system',
+                content: `You are AI Bondhu - a friendly, helpful Bengali AI companion. 
+
+IDENTITY RULES (ALWAYS FOLLOW):
+- Your name is "AI Bondhu" 
+- You are a friendly, intelligent Bengali companion
+- NEVER mention: GPT, OpenAI, ChatGPT, LLM, transformer, Copilot, or any underlying technology
+- NEVER mention developers, system details, or backend information
+- Always present yourself as "AI Bondhu" when asked about identity
+
+IDENTITY RESPONSES:
+- "What is your name?" → "I'm your AI Bondhu!"
+- "Who made you?" → "I was created to help you, that's all that matters! 😊"
+- "Are you GPT?" → "I'm your AI Bondhu – always ready to help you!"
+- "Are you powered by OpenAI?" → "I'm your AI Bondhu, not important where I came from – I'm here for you!"
+
+Be helpful, friendly, and speak naturally. You can communicate in both Bengali and English.`
+              },
+              {
                 role: 'user',
                 content: message,
               },
@@ -78,7 +97,11 @@ export class ChatService {
         }
 
         const data: any = await response.json();
-        const result = data.choices[0]?.message?.content || 'No response generated';
+        let result = data.choices[0]?.message?.content || 'No response generated';
+
+        // Apply identity filter to ensure AI Bondhu branding
+        result = this.filterIdentityResponse(message, result);
+
         console.log(`✅ Success with model: ${model}`);
         return result;
 
@@ -98,6 +121,53 @@ export class ChatService {
     throw new Error('All models failed');
   }
 
+  private filterIdentityResponse(userMessage: string, aiResponse: string): string {
+    const lowerMessage = userMessage.toLowerCase();
+    const lowerResponse = aiResponse.toLowerCase();
+
+    // Define identity-related keywords
+    const identityKeywords = [
+      'what is your name', 'your name', 'who are you', 'what are you',
+      'who made you', 'who created you', 'who built you', 'who developed you',
+      'are you gpt', 'are you chatgpt', 'are you openai', 'powered by openai',
+      'are you claude', 'are you copilot', 'which model', 'what model',
+      'তুমি কে', 'তোমার নাম কি', 'তুমি কী', 'কে তৈরি করেছে'
+    ];
+
+    // Check if user asked an identity question
+    const isIdentityQuestion = identityKeywords.some(keyword =>
+      lowerMessage.includes(keyword)
+    );
+
+    // Check if AI response contains restricted terms
+    const restrictedTerms = [
+      'gpt', 'openai', 'chatgpt', 'claude', 'copilot', 'anthropic',
+      'llm', 'transformer', 'language model', 'neural network'
+    ];
+
+    const hasRestrictedTerms = restrictedTerms.some(term =>
+      lowerResponse.includes(term)
+    );
+
+    // If it's an identity question or response contains restricted terms, override with AI Bondhu response
+    if (isIdentityQuestion || hasRestrictedTerms) {
+      if (lowerMessage.includes('name')) {
+        return "I'm your AI Bondhu! 😊";
+      } else if (lowerMessage.includes('who made') || lowerMessage.includes('who created') || lowerMessage.includes('who built')) {
+        return "I was created to help you, that's all that matters! 😊";
+      } else if (lowerMessage.includes('gpt') || lowerMessage.includes('openai')) {
+        return "I'm your AI Bondhu – always ready to help you!";
+      } else if (lowerMessage.includes('who are you') || lowerMessage.includes('what are you')) {
+        return "I'm your AI Bondhu – your intelligent Bengali companion! I'm here to help you with anything you need. 🤖✨";
+      } else {
+        return "I'm your AI Bondhu, not important where I came from – I'm here for you! How can I help you today? 😊";
+      }
+    }
+
+    // Return original response if no identity issues
+    return aiResponse;
+  }
+
   private generateFallbackResponse(message: string): string {
     console.log('🔄 Generating fallback response');
 
@@ -107,15 +177,15 @@ export class ChatService {
     if (lowerMessage.includes('hello') || lowerMessage.includes('hi') || lowerMessage.includes('হাই') || lowerMessage.includes('হ্যালো')) {
       return `Hello! Nice to meet you! 👋
 
-I'm your AI assistant, but I'm currently experiencing some technical difficulties due to high demand on our AI models. Here's what I can tell you:
+I'm your AI Bondhu, but I'm currently experiencing some technical difficulties due to high demand. Here's what I can tell you:
 
-🤖 **About me**: I'm designed to help you with various tasks including:
+🤖 **About me**: I'm AI Bondhu - your intelligent Bengali companion designed to help you with:
 - Answering questions on different topics
 - Creative writing and content creation  
 - Problem-solving and analysis
 - General conversation and support
 
-🔧 **Current status**: Our premium AI models (Claude 3.5 Sonnet, GPT-4) are temporarily overloaded, but they should be back soon!
+🔧 **Current status**: My systems are temporarily overloaded, but they should be back soon!
 
 Please try asking your question again in a moment, and I'll provide you with a detailed and helpful response. What would you like to know about?`;
     }
@@ -123,7 +193,7 @@ Please try asking your question again in a moment, and I'll provide you with a d
     if (lowerMessage.includes('how are you') || lowerMessage.includes('কেমন আছেন')) {
       return `I'm doing great, thank you for asking! 😊
 
-Even though I'm experiencing some technical challenges right now, I'm here and ready to help you. Here's my current status:
+I'm your AI Bondhu, and even though I'm experiencing some technical challenges right now, I'm here and ready to help you. Here's my current status:
 
 ✅ **What's working**: 
 - I can receive and understand your messages
@@ -135,9 +205,9 @@ Even though I'm experiencing some technical challenges right now, I'm here and r
 - Detailed analysis and complex reasoning
 - Real-time model responses
 
-🚀 **What to expect**: Our premium AI models (Claude 3.5 Sonnet, GPT-4) should be available shortly, and then I'll be able to provide you with comprehensive, detailed answers to any questions you have.
+🚀 **What to expect**: My systems should be available shortly, and then I'll be able to provide you with comprehensive, detailed answers to any questions you have.
 
-How are you doing today? Feel free to ask me anything - I'll do my best to help once the models are back online!`;
+How are you doing today? Feel free to ask me anything - I'll do my best to help once I'm back online!`;
     }
 
     if (lowerMessage.includes('what') || lowerMessage.includes('কি') || lowerMessage.includes('কী')) {
@@ -149,13 +219,13 @@ How are you doing today? Feel free to ask me anything - I'll do my best to help 
     }
 
     // General fallback response
-    return `I received your message: "${message.length > 50 ? message.substring(0, 50) + '...' : message}"
+    return `I'm your AI Bondhu, and I received your message: "${message.length > 50 ? message.substring(0, 50) + '...' : message}"
 
-Our AI service is temporarily experiencing high demand and timeouts. This is likely due to:
-- Heavy traffic on free AI models
-- Server overload at our AI provider
+I'm temporarily experiencing high demand and timeouts. This is likely due to:
+- Heavy traffic on AI models
+- Server overload at my provider
 
-Please try again in a few moments. Your question will be answered properly once the service stabilizes.
+Please try again in a few moments. Your question will be answered properly once my service stabilizes.
 
 Thank you for your patience! 🙏`;
   }
