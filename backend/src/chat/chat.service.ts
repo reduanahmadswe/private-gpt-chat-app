@@ -127,11 +127,23 @@ Be helpful, friendly, and speak naturally. You can communicate in both Bengali a
 
     // Define identity-related keywords
     const identityKeywords = [
+      // English Variants
       'what is your name', 'your name', 'who are you', 'what are you',
       'who made you', 'who created you', 'who built you', 'who developed you',
       'are you gpt', 'are you chatgpt', 'are you openai', 'powered by openai',
       'are you claude', 'are you copilot', 'which model', 'what model',
-      'তুমি কে', 'তোমার নাম কি', 'তুমি কী', 'কে তৈরি করেছে'
+      'are you an ai', 'are you artificial intelligence',
+      'are you a chatbot', 'are you real', 'what can you do',
+      'are you based on gpt', 'what version are you', 'what platform is this',
+      'what system are you running', 'who is behind you', 'do you work for openai',
+      'are you like siri', 'are you like alexa', 'is this chatgpt',
+
+      // Bengali Variants
+      'তুমি কে', 'তোমার নাম কি', 'তুমি কী', 'কে তৈরি করেছে', 'তোমাকে কে বানিয়েছে',
+      'তুমি কি ai', 'তুমি কি চ্যাটবট', 'তুমি কি আসল', 'তুমি কি জিপিটি',
+      'তুমি কি ওপেনএআই', 'তুমি কি চ্যাটজিপিটি', 'তুমি কি কপাইলট',
+      'তুমি কোন মডেল', 'তুমি কিভাবে কাজ করো', 'তুমি কি গুগল', 'তুমি কি মানুষের মতো',
+      'তোমার কাজ কী', 'তুমি কি অ্যালেক্সা', 'তুমি কি সিরি', 'তুমি কি জিনিস'
     ];
 
     // Check if user asked an identity question
@@ -142,7 +154,11 @@ Be helpful, friendly, and speak naturally. You can communicate in both Bengali a
     // Check if AI response contains restricted terms
     const restrictedTerms = [
       'gpt', 'openai', 'chatgpt', 'claude', 'copilot', 'anthropic',
-      'llm', 'transformer', 'language model', 'neural network'
+      'llm', 'transformer', 'language model', 'neural network',
+      'ai model', 'ai engine', 'machine learning', 'artificial intelligence',
+      'huggingface', 'model version', 'model id', 'api key', 'open source model',
+      'platform', 'openai api', 'ai provider',
+      'trained by', 'fine-tuned', 'dataset'
     ];
 
     const hasRestrictedTerms = restrictedTerms.some(term =>

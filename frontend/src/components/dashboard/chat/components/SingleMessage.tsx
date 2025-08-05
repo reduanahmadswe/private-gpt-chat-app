@@ -101,7 +101,7 @@ const SingleMessage: React.FC<SingleMessageProps> = ({
 
               {/* Message Actions (for assistant messages) */}
               {!isUser && (
-                <div className="opacity-80 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200">
+                <div className="opacity-100 transition-opacity duration-200">
                   <MessageActions
                     content={message.content}
                     messageIndex={messageIndex}
