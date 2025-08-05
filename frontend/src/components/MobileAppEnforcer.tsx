@@ -65,6 +65,29 @@ export const MobileAppEnforcer = () => {
           return null;
         };
 
+        // Listen for OAuth completion and cleanup
+        const checkOAuthCompletion = () => {
+          const urlParams = new URLSearchParams(window.location.search);
+          if (urlParams.get("auth") === "success") {
+            console.log(
+              "🎉 OAuth completed successfully - cleaning up overlays"
+            );
+            // Clean up any loading overlays
+            const overlays = document.querySelectorAll(
+              '[id*="loading"], [id*="oauth"]'
+            );
+            overlays.forEach((overlay) => {
+              if (overlay.parentNode) {
+                overlay.parentNode.removeChild(overlay);
+              }
+            });
+          }
+        };
+
+        // Check on load and periodically
+        checkOAuthCompletion();
+        setInterval(checkOAuthCompletion, 1000);
+
         // Add CSS to ensure full coverage
         const style = document.createElement("style");
         style.textContent = `

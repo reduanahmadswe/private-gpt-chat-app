@@ -1,4 +1,3 @@
-import { Browser } from "@capacitor/browser";
 import { Capacitor } from "@capacitor/core";
 import React, {
   createContext,
@@ -243,7 +242,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
                 checkAuth();
                 toast.success(`Successfully logged in with ${provider}!`);
-                Browser.close();
+                console.log("✅ OAuth completed successfully - staying in app");
               }
             }
           });

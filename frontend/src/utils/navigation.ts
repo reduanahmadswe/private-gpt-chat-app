@@ -87,13 +87,16 @@ const removeLoadingOverlay = () => {
 export const navigateExternal = async (url: string, title: string = "Loading...", color?: string) => {
     try {
         if (Capacitor.isNativePlatform()) {
-            console.log(`🔗 Navigating to ${url} (NO BROWSER POPUP)...`);
+            console.log(`🔗 Navigating to ${url} (NO BROWSER POPUP - SAME WINDOW)...`);
 
             // Show loading overlay instead of browser popup
             createLoadingOverlay(title, color);
 
-            // Direct navigation without browser popup
-            window.location.href = url;
+            // CRITICAL: Force same-window navigation in mobile app
+            // This prevents any browser popup by staying in the same webview
+            setTimeout(() => {
+                window.location.replace(url);
+            }, 500);
         } else {
             // For web browser - regular navigation
             window.location.href = url;
