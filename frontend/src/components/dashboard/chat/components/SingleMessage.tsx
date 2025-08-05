@@ -47,16 +47,16 @@ const SingleMessage: React.FC<SingleMessageProps> = ({
       >
         {/* Assistant Avatar */}
         {!isUser && (
-          <div className="bg-gradient-to-br from-slate-100/10 to-slate-200/10 rounded-full p-1 xs:p-1.5 sm:p-2 border border-white/10 flex-shrink-0 shadow-lg mobile-avatar">
-            <MessageCircle className="h-3 w-3 xs:h-3.5 xs:w-3.5 sm:h-4 sm:w-4 text-cyan-400" />
+          <div className="bg-gradient-to-br from-slate-100/10 to-slate-200/10 rounded-full p-1.5 xs:p-2 sm:p-2.5 border border-white/10 flex-shrink-0 shadow-lg mobile-avatar">
+            <MessageCircle className="h-4 w-4 xs:h-5 xs:w-5 sm:h-6 sm:w-6 text-cyan-400" />
           </div>
         )}
 
         {/* User Avatar */}
         {isUser && (
           <div className="bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-full p-1 xs:p-1.5 sm:p-2 border border-blue-400/30 flex-shrink-0 shadow-lg mobile-avatar">
-            <div className="w-3 h-3 xs:w-3.5 xs:h-3.5 sm:w-4 sm:h-4 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-[6px] xs:text-[8px] sm:text-xs">
+            <div className="w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center">
+              <span className="text-white font-bold text-xs xs:text-sm sm:text-base">
                 {user?.name?.charAt(0).toUpperCase() || "U"}
               </span>
             </div>

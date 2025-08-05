@@ -160,10 +160,10 @@ const Sidebar: React.FC<SidebarProps> = ({
           {/* User Info */}
           {!sidebarCollapsed && (
             <div className="mt-3 lg:mt-4 p-2 sm:p-3 lg:p-4 rounded-lg sm:rounded-xl lg:rounded-2xl bg-gradient-to-r from-white/5 to-white/10 backdrop-blur-xl border border-white/10">
-              <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center justify-between gap-1 xs:gap-2">
                 <div className="flex items-center space-x-2 lg:space-x-3 min-w-0 flex-1">
-                  <div className="w-7 h-7 sm:w-8 sm:h-8 lg:w-10 lg:h-10 bg-gradient-to-br from-[#00f5ff] to-[#9d4edd] rounded-full flex items-center justify-center shadow-lg flex-shrink-0">
-                    <span className="text-white font-bold text-xs lg:text-sm">
+                  <div className="w-8 h-8 sm:w-8 sm:h-8 lg:w-10 lg:h-10 bg-gradient-to-br from-[#00f5ff] to-[#9d4edd] rounded-full flex items-center justify-center shadow-lg flex-shrink-0">
+                    <span className="text-white font-bold text-xs sm:text-xs lg:text-sm">
                       {user?.name?.charAt(0).toUpperCase() || "U"}
                     </span>
                   </div>
@@ -172,7 +172,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                       {user?.name || "User"}
                     </p>
                     <p
-                      className="text-[#D0D0D0] text-xs truncate w-full max-w-[80px] sm:max-w-[120px] lg:max-w-[180px] hidden sm:block"
+                      className="text-[#D0D0D0] text-xs truncate max-w-[120px] sm:max-w-[150px] lg:max-w-[180px] block sm:block"
                       title={user?.email}
                     >
                       {user?.email}
