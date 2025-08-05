@@ -6,6 +6,10 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
   html,
   body {
     @apply bg-gradient-to-br from-primary-900 via-secondary-500 to-secondary-600;
@@ -14,9 +18,64 @@
     overflow: hidden;
   }
 
+  /* Landing page specific styles */
+  .landing-page {
+    height: 100vh !important;
+    overflow-y: auto !important;
+    scroll-behavior: smooth;
+    scroll-snap-type: y proximity;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .landing-page section {
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+
+  /* Mobile responsive adjustments */
+  @media (max-width: 640px) {
+    .landing-page {
+      height: 100vh;
+      height: 100dvh; /* Dynamic viewport height for mobile */
+    }
+
+    .landing-page section {
+      min-height: 100vh;
+      min-height: 100dvh;
+      padding: 1rem;
+    }
+  }
+
+  /* Tablet responsive adjustments */
+  @media (min-width: 641px) and (max-width: 1024px) {
+    .landing-page section {
+      padding: 2rem;
+    }
+  }
+
+  /* Desktop responsive adjustments */
+  @media (min-width: 1025px) {
+    .landing-page section {
+      padding: 2rem 4rem;
+    }
+  }
+
+  /* Smooth scrolling enhancement */
+  @media (prefers-reduced-motion: no-preference) {
+    .landing-page {
+      scroll-behavior: smooth;
+    }
+  }
+
   #root {
     height: 100vh;
     overflow: hidden;
+  }
+
+  /* Landing page root override */
+  #root:has(.landing-page) {
+    height: auto !important;
+    overflow-y: auto !important;
   }
 
   /* Mobile specific fixes */

@@ -8,12 +8,32 @@ import Hero from "../components/landing/Hero";
 
 const LandingPage: React.FC = () => {
   return (
-    <div className="min-h-screen bg-[#030637] text-white font-sans">
+    <div className="landing-page min-h-screen bg-[#030637] text-white font-sans">
       <Header />
-      <Hero />
-      <Features />
-      <CallToAction />
-      <Contact />
+      <section
+        id="home"
+        className="min-h-screen flex items-center px-4 sm:px-6 lg:px-8"
+      >
+        <Hero />
+      </section>
+      <section
+        id="features"
+        className="min-h-screen flex items-center px-4 sm:px-6 lg:px-8"
+      >
+        <Features />
+      </section>
+      <section
+        id="about"
+        className="min-h-screen flex items-center px-4 sm:px-6 lg:px-8"
+      >
+        <CallToAction />
+      </section>
+      <section
+        id="contact"
+        className="min-h-screen flex items-center px-4 sm:px-6 lg:px-8"
+      >
+        <Contact />
+      </section>
       <Footer />
     </div>
   );

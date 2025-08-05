@@ -5,9 +5,9 @@ const Features: React.FC = () => {
   return (
     <div
       id="features"
-      className="bg-[#030637] py-12 sm:py-16 md:py-20 lg:py-24"
+      className="w-full flex-1 flex items-center justify-center px-4 sm:px-6"
     >
-      <div className="container mx-auto px-4 sm:px-6">
+      <div className="w-full max-w-7xl mx-auto">
         <div className="text-center mb-12 sm:mb-16 md:mb-20">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4 sm:mb-6 tracking-tight">
             <span className="bg-gradient-to-r from-[#00f5ff] to-[#9d4edd] bg-clip-text text-transparent">

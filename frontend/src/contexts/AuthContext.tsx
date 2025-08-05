@@ -84,23 +84,58 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       // Check if there's a token in localStorage
       const token = localStorage.getItem("token");
-      if (!token) {
-        // No token means user is not logged in
-        console.log("🔍 No token found, user not authenticated");
+      const refreshToken = localStorage.getItem("refreshToken");
+
+      if (!token && !refreshToken) {
+        // No tokens means user is not logged in
+        console.log("🔍 No tokens found, user not authenticated");
         setUser(null);
         setIsLoading(false);
         return;
       }
 
-      console.log("🔍 Token found, checking authentication...");
-      const response = await api.get("/api/auth/me");
-      console.log("✅ User authenticated:", response.data.user.email);
-      setUser(response.data.user);
+      try {
+        console.log("🔍 Token found, checking authentication...");
+        const response = await api.get("/api/auth/me");
+        console.log("✅ User authenticated:", response.data.user.email);
+        setUser(response.data.user);
+      } catch (error: any) {
+        // If main token fails but we have refresh token, try to refresh
+        if (error.response?.status === 401 && refreshToken) {
+          console.log("🔄 Access token expired, attempting refresh...");
+          try {
+            const refreshResponse = await api.post("/api/auth/refresh", {
+              refreshToken,
+            });
+
+            // Store new token
+            localStorage.setItem("token", refreshResponse.data.token);
+            console.log("✅ Token refreshed successfully");
+
+            // Retry the auth check with new token
+            const retryResponse = await api.get("/api/auth/me");
+            console.log(
+              "✅ User authenticated after refresh:",
+              retryResponse.data.user.email
+            );
+            setUser(retryResponse.data.user);
+          } catch (refreshError) {
+            console.error("❌ Token refresh failed:", refreshError);
+            // Clear all tokens and redirect to login
+            localStorage.removeItem("token");
+            localStorage.removeItem("refreshToken");
+            setUser(null);
+          }
+        } else {
+          throw error; // Re-throw if not a 401 or no refresh token
+        }
+      }
     } catch (error) {
       console.error("❌ Authentication check failed:", error);
       setUser(null);
-      // Clear invalid token from localStorage
+      // Clear invalid tokens from localStorage
       localStorage.removeItem("token");
+      localStorage.removeItem("refreshToken");
     } finally {
       setIsLoading(false);
     }
@@ -110,11 +145,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       setIsLoading(true);
       const response = await api.post("/api/auth/signin", { email, password });
-      const { user, token } = response.data;
+      const { user, token, refreshToken } = response.data;
 
-      // Store token in localStorage
+      // Store tokens in localStorage
       if (token) {
         localStorage.setItem("token", token);
+      }
+      if (refreshToken) {
+        localStorage.setItem("refreshToken", refreshToken);
       }
 
       setUser(user);
@@ -141,11 +179,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         email,
         password,
       });
-      const { user, token } = response.data;
+      const { user, token, refreshToken } = response.data;
 
-      // Store token in localStorage
+      // Store tokens in localStorage
       if (token) {
         localStorage.setItem("token", token);
+      }
+      if (refreshToken) {
+        localStorage.setItem("refreshToken", refreshToken);
       }
 
       setUser(user);
@@ -171,6 +212,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } finally {
       setUser(null);
       localStorage.removeItem("token");
+      localStorage.removeItem("refreshToken");
       setIsLoggingOut(false);
       toast.success("Logged out successfully");
     }
@@ -182,6 +224,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setIsLoggingOut(true);
     setUser(null);
     localStorage.removeItem("token");
+    localStorage.removeItem("refreshToken");
 
     // Show session expired toast only if we haven't already shown it
     if (!window.location.pathname.includes("/auth/")) {

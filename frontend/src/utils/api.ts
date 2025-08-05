@@ -55,10 +55,12 @@ api.interceptors.request.use(
     }
 )
 
-// Response interceptor to handle token expiration
+// Response interceptor to handle token expiration and auto-refresh
 api.interceptors.response.use(
     (response) => response,
-    (error) => {
+    async (error) => {
+        const originalRequest = error.config
+
         // Improved error logging
         const errorMessage = error.response?.data?.message ||
             error.response?.statusText ||
@@ -69,17 +71,52 @@ api.interceptors.response.use(
 
         console.error(`❌ API Error [${errorStatus}]:`, errorMessage)
 
-        if (error.response?.status === 401) {
+        if (error.response?.status === 401 && !originalRequest._retry) {
             // Only handle as session expiry if there was actually a token (meaning user was logged in)
             const hadToken = localStorage.getItem('token') || error.config.headers?.Authorization
+            const refreshToken = localStorage.getItem('refreshToken')
 
-            // Check if we're already handling session expiry
-            if (isHandlingSessionExpiry) {
-                console.log('🔄 Session expiry already being handled, skipping...')
+            // If this is a token refresh request that failed, don't retry
+            if (originalRequest.url?.includes('/auth/refresh')) {
+                localStorage.removeItem('token')
+                localStorage.removeItem('refreshToken')
+                authEventEmitter.emit('sessionExpired')
                 return Promise.reject(error)
             }
 
-            // Only treat as session expiry if user was previously authenticated
+            // Try to refresh token if we have one
+            if (hadToken && refreshToken && !isHandlingSessionExpiry) {
+                originalRequest._retry = true
+                isHandlingSessionExpiry = true
+
+                try {
+                    console.log('🔄 Access token expired, attempting refresh...')
+                    const refreshResponse = await api.post('/api/auth/refresh', {
+                        refreshToken
+                    })
+
+                    const newToken = refreshResponse.data.token
+                    localStorage.setItem('token', newToken)
+
+                    // Update the original request with new token
+                    originalRequest.headers.Authorization = `Bearer ${newToken}`
+
+                    console.log('✅ Token refreshed successfully, retrying original request')
+                    isHandlingSessionExpiry = false
+
+                    // Retry the original request
+                    return api(originalRequest)
+                } catch (refreshError) {
+                    console.error('❌ Token refresh failed:', refreshError)
+                    localStorage.removeItem('token')
+                    localStorage.removeItem('refreshToken')
+                    authEventEmitter.emit('sessionExpired')
+                    isHandlingSessionExpiry = false
+                    return Promise.reject(refreshError)
+                }
+            }
+
+            // If no refresh token or hadToken is false, handle as normal session expiry
             if (hadToken) {
                 // Set flag to prevent multiple executions
                 isHandlingSessionExpiry = true
@@ -87,6 +124,7 @@ api.interceptors.response.use(
 
                 // Clear local storage immediately
                 localStorage.removeItem('token')
+                localStorage.removeItem('refreshToken')
                 sessionStorage.clear()
 
                 // Emit session expired event to notify AuthContext

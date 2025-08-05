@@ -5,22 +5,22 @@ import { Link } from "react-router-dom";
 const Footer: React.FC = () => {
   return (
     <footer className="bg-[#030637] backdrop-blur-xl border-t border-white/10 shadow-2xl shadow-black/30">
-      <div className="container mx-auto px-6 py-16">
-        <div className="grid md:grid-cols-4 gap-12">
+      <div className="container mx-auto px-4 sm:px-6 py-12 sm:py-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 sm:gap-10 md:gap-12">
           {/* Brand */}
-          <div className="md:col-span-2">
-            <div className="flex items-center space-x-3 mb-6">
-              <div className="bg-gradient-to-br from-[#00f5ff] to-[#9d4edd] rounded-2xl p-3 shadow-lg shadow-[#00f5ff]/20">
-                <Brain className="h-7 w-7 text-white" />
+          <div className="sm:col-span-2 md:col-span-2">
+            <div className="flex items-center space-x-2 sm:space-x-3 mb-4 sm:mb-6">
+              <div className="bg-gradient-to-br from-[#00f5ff] to-[#9d4edd] rounded-xl sm:rounded-2xl p-2 sm:p-3 shadow-lg shadow-[#00f5ff]/20">
+                <Brain className="h-6 w-6 sm:h-7 sm:w-7 text-white" />
               </div>
-              <span className="text-2xl font-bold tracking-tight">
+              <span className="text-xl sm:text-2xl font-bold tracking-tight">
                 <span className="bg-gradient-to-r from-[#00f5ff] to-[#9d4edd] bg-clip-text text-transparent">
                   AI
                 </span>
                 <span className="text-white ml-1">Bondhu</span>
               </span>
             </div>
-            <p className="text-[#E0E0E0] mb-6 max-w-md leading-relaxed font-light">
+            <p className="text-[#E0E0E0] mb-4 sm:mb-6 max-w-md leading-relaxed font-light text-sm sm:text-base">
               Your trusted companion for private AI conversations. Secure,
               intelligent, and always available.
             </p>

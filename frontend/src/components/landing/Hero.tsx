@@ -4,7 +4,10 @@ import { Link } from "react-router-dom";
 
 const Hero: React.FC = () => {
   return (
-    <div className="container mx-auto px-4 sm:px-6 py-12 sm:py-16 md:py-20 lg:py-24">
+    <div
+      id="home"
+      className="w-full flex-1 flex items-center justify-center px-4 sm:px-6"
+    >
       <div className="text-center max-w-5xl mx-auto">
         <div className="flex justify-center mb-8 sm:mb-10 md:mb-12">
           <div className="bg-gradient-to-br from-[#3C0753]/40 via-[#16213e]/30 to-[#030637]/40 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 border border-white/10 shadow-2xl shadow-black/30">

@@ -12,8 +12,8 @@ export class AuthService {
 
     const payload: IJWTPayload = { userId, email };
 
-    const token = jwt.sign(payload, jwtSecret, { expiresIn: '1d' });
-    const refreshToken = jwt.sign(payload, jwtRefreshSecret, { expiresIn: '7d' });
+    const token = jwt.sign(payload, jwtSecret, { expiresIn: '7d' });
+    const refreshToken = jwt.sign(payload, jwtRefreshSecret, { expiresIn: '30d' });
 
     return { token, refreshToken };
   }
@@ -96,7 +96,7 @@ export class AuthService {
       const token = jwt.sign(
         { userId: decoded.userId, email: decoded.email },
         jwtSecret,
-        { expiresIn: '1d' }
+        { expiresIn: '7d' }
       );
 
       return { token };

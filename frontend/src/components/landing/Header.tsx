@@ -13,6 +13,37 @@ const Header: React.FC = () => {
     setIsMobileMenuOpen(false);
   };
 
+  const handleSmoothScroll = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    targetId: string
+  ) => {
+    e.preventDefault();
+    const target = document.getElementById(targetId);
+    if (target) {
+      // Get the landing page container for proper scrolling
+      const landingPage = document.querySelector(".landing-page");
+      if (landingPage) {
+        // Calculate position relative to the scrollable container
+        const targetRect = target.getBoundingClientRect();
+        const containerRect = landingPage.getBoundingClientRect();
+        const scrollTop = landingPage.scrollTop;
+        const targetPosition = targetRect.top - containerRect.top + scrollTop;
+
+        landingPage.scrollTo({
+          top: targetPosition,
+          behavior: "smooth",
+        });
+      } else {
+        // Fallback to window scroll
+        target.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }
+    }
+    closeMobileMenu();
+  };
+
   return (
     <header className="bg-[#030637]/95 backdrop-blur-xl border-b border-white/10 sticky top-0 z-50 shadow-2xl shadow-black/20">
       <div className="container mx-auto px-4 sm:px-6">
@@ -34,19 +65,22 @@ const Header: React.FC = () => {
           <nav className="hidden md:flex items-center space-x-1 lg:space-x-2">
             <a
               href="#features"
-              className="text-[#E0E0E0] hover:text-white hover:bg-white/10 px-3 lg:px-4 py-2 rounded-xl transition-all duration-300 font-medium text-sm lg:text-base"
+              onClick={(e) => handleSmoothScroll(e, "features")}
+              className="text-[#E0E0E0] hover:text-white hover:bg-white/10 px-3 lg:px-4 py-2 rounded-xl transition-all duration-300 font-medium text-sm lg:text-base cursor-pointer"
             >
               Features
             </a>
             <a
               href="#about"
-              className="text-[#E0E0E0] hover:text-white hover:bg-white/10 px-3 lg:px-4 py-2 rounded-xl transition-all duration-300 font-medium text-sm lg:text-base"
+              onClick={(e) => handleSmoothScroll(e, "about")}
+              className="text-[#E0E0E0] hover:text-white hover:bg-white/10 px-3 lg:px-4 py-2 rounded-xl transition-all duration-300 font-medium text-sm lg:text-base cursor-pointer"
             >
               About
             </a>
             <a
               href="#contact"
-              className="text-[#E0E0E0] hover:text-white hover:bg-white/10 px-3 lg:px-4 py-2 rounded-xl transition-all duration-300 font-medium text-sm lg:text-base"
+              onClick={(e) => handleSmoothScroll(e, "contact")}
+              className="text-[#E0E0E0] hover:text-white hover:bg-white/10 px-3 lg:px-4 py-2 rounded-xl transition-all duration-300 font-medium text-sm lg:text-base cursor-pointer"
             >
               Contact
             </a>
@@ -88,22 +122,22 @@ const Header: React.FC = () => {
             <nav className="flex flex-col space-y-2">
               <a
                 href="#features"
-                onClick={closeMobileMenu}
-                className="text-[#E0E0E0] hover:text-white hover:bg-white/10 px-4 py-3 rounded-xl transition-all duration-300 font-medium mobile-touch-target"
+                onClick={(e) => handleSmoothScroll(e, "features")}
+                className="text-[#E0E0E0] hover:text-white hover:bg-white/10 px-4 py-3 rounded-xl transition-all duration-300 font-medium mobile-touch-target cursor-pointer"
               >
                 Features
               </a>
               <a
                 href="#about"
-                onClick={closeMobileMenu}
-                className="text-[#E0E0E0] hover:text-white hover:bg-white/10 px-4 py-3 rounded-xl transition-all duration-300 font-medium mobile-touch-target"
+                onClick={(e) => handleSmoothScroll(e, "about")}
+                className="text-[#E0E0E0] hover:text-white hover:bg-white/10 px-4 py-3 rounded-xl transition-all duration-300 font-medium mobile-touch-target cursor-pointer"
               >
                 About
               </a>
               <a
                 href="#contact"
-                onClick={closeMobileMenu}
-                className="text-[#E0E0E0] hover:text-white hover:bg-white/10 px-4 py-3 rounded-xl transition-all duration-300 font-medium mobile-touch-target"
+                onClick={(e) => handleSmoothScroll(e, "contact")}
+                className="text-[#E0E0E0] hover:text-white hover:bg-white/10 px-4 py-3 rounded-xl transition-all duration-300 font-medium mobile-touch-target cursor-pointer"
               >
                 Contact
               </a>

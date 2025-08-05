@@ -3,15 +3,18 @@ import React from "react";
 
 const Contact: React.FC = () => {
   return (
-    <section id="contact" className="bg-[#030637] py-24">
-      <div className="container mx-auto px-6">
-        <div className="text-center mb-20">
-          <h2 className="text-5xl font-bold mb-6 tracking-tight">
+    <section
+      id="contact"
+      className="w-full flex-1 flex items-center justify-center px-4 sm:px-6"
+    >
+      <div className="w-full max-w-6xl mx-auto">
+        <div className="text-center mb-12 sm:mb-16 md:mb-20">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6 tracking-tight">
             <span className="bg-gradient-to-r from-[#00f5ff] to-[#9d4edd] bg-clip-text text-transparent">
               Contact with Owner
             </span>
           </h2>
-          <p className="text-[#E0E0E0] text-xl max-w-3xl mx-auto leading-relaxed font-light">
+          <p className="text-[#E0E0E0] text-base sm:text-lg md:text-xl max-w-3xl mx-auto leading-relaxed font-light px-4">
             Connect with the creator of AI Bondhu. Let's discuss opportunities,
             collaborations, or just say hello!
           </p>
