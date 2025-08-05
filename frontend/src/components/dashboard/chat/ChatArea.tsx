@@ -118,7 +118,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
 
   return (
     <div
-      className={`flex-1 flex flex-col h-screen bg-gradient-to-br from-[#030637] via-[#1a1a2e] to-[#16213e] backdrop-blur-xl transition-all duration-300 relative ${
+      className={`flex-1 flex flex-col h-screen max-h-screen bg-gradient-to-br from-[#030637] via-[#1a1a2e] to-[#16213e] backdrop-blur-xl transition-all duration-300 relative overflow-hidden ${
         isVoiceMode
           ? "ml-0" // Full screen in voice mode
           : showSettings
@@ -143,7 +143,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
       )}
 
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col min-h-0">
+      <div className="flex-1 flex flex-col min-h-0 h-full">
         <div
           ref={scrollContainerRef}
           className={`flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent hover:scrollbar-thumb-white/30 transition-all duration-200 ease-out scroll-smooth webkit-scrolling-touch ${
@@ -154,6 +154,8 @@ const ChatArea: React.FC<ChatAreaProps> = ({
           style={{
             WebkitOverflowScrolling: "touch", // Enable momentum scrolling on iOS
             overscrollBehavior: "contain", // Prevent overscroll effects
+            height: "calc(100vh - 120px)", // Ensure proper height calculation
+            maxHeight: "calc(100vh - 120px)",
           }}
         >
           {!isVoiceMode && (

@@ -79,8 +79,8 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
   };
 
   return (
-    <div className="flex-1 pb-24 xs:pb-28 sm:pb-32">
-      <div className="min-h-full" style={{ minHeight: "calc(100vh - 200px)" }}>
+    <div className="flex-1 pb-4 xs:pb-6 sm:pb-8">
+      <div className="min-h-full">
         <div className="space-y-1 p-2 xs:p-3 sm:p-4 md:p-6 pb-4">
           {/* Welcome message if no messages */}
           {messages.length === 0 && !loading && (

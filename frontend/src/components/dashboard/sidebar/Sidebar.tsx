@@ -141,7 +141,14 @@ const Sidebar: React.FC<SidebarProps> = ({
           {/* New Chat Button */}
           {!sidebarCollapsed && (
             <button
-              onClick={startNewChat}
+              onClick={() => {
+                startNewChat();
+                // Close sidebar on mobile after starting new chat
+                if (window.innerWidth < 640) {
+                  // sm breakpoint
+                  setSidebarCollapsed(true);
+                }
+              }}
               className="w-full bg-gradient-to-r from-[#00f5ff] to-[#9d4edd] hover:from-[#9d4edd] hover:to-[#00f5ff] text-white py-2 sm:py-2.5 lg:py-3 px-3 lg:px-4 rounded-lg sm:rounded-xl lg:rounded-2xl flex items-center justify-center space-x-2 transition-all duration-500 shadow-lg shadow-[#00f5ff]/20 hover:shadow-[#9d4edd]/30 transform hover:scale-105 font-semibold text-sm lg:text-base"
             >
               <Plus className="h-4 w-4 sm:h-4 sm:w-4 lg:h-5 lg:w-5" />
@@ -191,7 +198,14 @@ const Sidebar: React.FC<SidebarProps> = ({
             <div className="space-y-2">
               {/* Add New Chat button in collapsed state */}
               <button
-                onClick={startNewChat}
+                onClick={() => {
+                  startNewChat();
+                  // Close sidebar on mobile after starting new chat
+                  if (window.innerWidth < 640) {
+                    // sm breakpoint
+                    setSidebarCollapsed(true);
+                  }
+                }}
                 className="w-full p-1.5 sm:p-2 bg-gradient-to-r from-[#00f5ff]/20 to-[#9d4edd]/20 hover:from-[#9d4edd]/30 hover:to-[#00f5ff]/30 border border-[#00f5ff]/30 text-white rounded-lg sm:rounded-xl flex items-center justify-center transition-all duration-300 hover:shadow-lg"
                 title="New Chat"
               >
@@ -211,7 +225,14 @@ const Sidebar: React.FC<SidebarProps> = ({
                         ? "bg-gradient-to-r from-[#00f5ff]/20 to-[#9d4edd]/20 border-[#00f5ff]/30 shadow-lg shadow-[#00f5ff]/10"
                         : "bg-gradient-to-r from-white/5 to-white/10 border-white/10 hover:from-white/10 hover:to-white/15 hover:border-[#40e0d0]/20"
                     }`}
-                    onClick={() => selectChat(chat)}
+                    onClick={() => {
+                      selectChat(chat);
+                      // Close sidebar on mobile after selecting a chat
+                      if (window.innerWidth < 640) {
+                        // sm breakpoint
+                        setSidebarCollapsed(true);
+                      }
+                    }}
                     title={chat.title || "New Chat"}
                   >
                     <div className="flex items-center justify-center">
@@ -245,7 +266,14 @@ const Sidebar: React.FC<SidebarProps> = ({
                         ? "bg-gradient-to-r from-[#00f5ff]/20 to-[#9d4edd]/20 border-[#00f5ff]/30 shadow-lg shadow-[#00f5ff]/10"
                         : "bg-gradient-to-r from-white/5 to-white/10 border-white/10 hover:from-white/10 hover:to-white/15 hover:border-[#40e0d0]/20 hover:shadow-lg hover:shadow-[#40e0d0]/5"
                     }`}
-                    onClick={() => selectChat(chat)}
+                    onClick={() => {
+                      selectChat(chat);
+                      // Close sidebar on mobile after selecting a chat
+                      if (window.innerWidth < 640) {
+                        // sm breakpoint
+                        setSidebarCollapsed(true);
+                      }
+                    }}
                   >
                     <div className="flex items-center justify-between gap-2">
                       {editingTitle === chat._id ? (
