@@ -68,7 +68,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
       }
 
       // If we're at the very top (first few pixels), show header
-      if (currentScrollY <= 5) {
+      if (currentScrollY <= 3) {
         setIsHeaderVisible(true);
       } else {
         // Hide header when scrolling anywhere else for maximum chat space
@@ -80,12 +80,31 @@ const ChatArea: React.FC<ChatAreaProps> = ({
 
     const container = scrollContainerRef.current;
     if (container) {
-      container.addEventListener("scroll", handleScroll, { passive: true });
+      // Use requestAnimationFrame for smoother scrolling on all devices
+      let ticking = false;
+      const smoothHandleScroll = () => {
+        if (!ticking) {
+          requestAnimationFrame(() => {
+            handleScroll();
+            ticking = false;
+          });
+          ticking = true;
+        }
+      };
+
+      container.addEventListener("scroll", smoothHandleScroll, {
+        passive: true,
+      });
+      container.addEventListener("touchmove", smoothHandleScroll, {
+        passive: true,
+      });
+
       // Check initial state
       handleScroll();
 
       return () => {
-        container.removeEventListener("scroll", handleScroll);
+        container.removeEventListener("scroll", smoothHandleScroll);
+        container.removeEventListener("touchmove", smoothHandleScroll);
       };
     }
   }, [lastScrollY, isInitialized]);
@@ -127,11 +146,15 @@ const ChatArea: React.FC<ChatAreaProps> = ({
       <div className="flex-1 flex flex-col min-h-0">
         <div
           ref={scrollContainerRef}
-          className={`flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent hover:scrollbar-thumb-white/30 transition-all duration-200 ease-out ${
+          className={`flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent hover:scrollbar-thumb-white/30 transition-all duration-200 ease-out scroll-smooth webkit-scrolling-touch ${
             isHeaderVisible && !isVoiceMode
               ? "pt-16 xs:pt-18 sm:pt-20 lg:pt-24"
               : "pt-0"
           }`}
+          style={{
+            WebkitOverflowScrolling: "touch", // Enable momentum scrolling on iOS
+            overscrollBehavior: "contain", // Prevent overscroll effects
+          }}
         >
           {!isVoiceMode && (
             <ChatMessages

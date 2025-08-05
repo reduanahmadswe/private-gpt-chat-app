@@ -52,7 +52,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
           </div>
         </div>
         <div className="flex items-center space-x-2 flex-shrink-0">
-          <div className="hidden xs:flex px-2 xs:px-3 lg:px-4 py-1 xs:py-1.5 lg:py-2 bg-gradient-to-r from-[#00f5ff]/10 to-[#9d4edd]/10 rounded-md xs:rounded-lg lg:rounded-xl border border-[#00f5ff]/20">
+          <div className="flex px-2 xs:px-3 lg:px-4 py-1 xs:py-1.5 lg:py-2 bg-gradient-to-r from-[#00f5ff]/10 to-[#9d4edd]/10 rounded-md xs:rounded-lg lg:rounded-xl border border-[#00f5ff]/20">
             <span className="text-[#00f5ff] text-xs sm:text-xs lg:text-sm font-medium whitespace-nowrap">
               AI Bondhu
             </span>

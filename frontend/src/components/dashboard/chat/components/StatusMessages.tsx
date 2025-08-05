@@ -13,7 +13,7 @@ const StatusMessages: React.FC<StatusMessagesProps> = ({
 }) => {
   return (
     <div className="text-xs text-[#D0D0D0]/70 mt-2 xs:mt-3 lg:mt-4 text-center leading-relaxed transition-all duration-300">
-      <p className="mb-1 xs:mb-2 px-2">
+      <p className="mb-1 xs:mb-2 px-2 hidden sm:block">
         AI responses are generated and may contain inaccuracies. Please verify
         important information.
       </p>

@@ -37,6 +37,24 @@ const TextInputField: React.FC<TextInputFieldProps> = ({
     }
   };
 
+  // Dynamic placeholder based on screen size
+  const [placeholder, setPlaceholder] = React.useState("Type your message...");
+
+  React.useEffect(() => {
+    const updatePlaceholder = () => {
+      if (window.innerWidth >= 640) {
+        // sm breakpoint
+        setPlaceholder("Type your message... (Shift + Enter for new line)");
+      } else {
+        setPlaceholder("Type your message...");
+      }
+    };
+
+    updatePlaceholder();
+    window.addEventListener("resize", updatePlaceholder);
+    return () => window.removeEventListener("resize", updatePlaceholder);
+  }, []);
+
   return (
     <div className="flex-1 relative">
       <div className="relative flex items-center min-h-[40px] xs:min-h-[44px] sm:min-h-[48px] md:min-h-[52px]">
@@ -53,7 +71,7 @@ const TextInputField: React.FC<TextInputFieldProps> = ({
           value={value + (interimTranscript ? ` ${interimTranscript}` : "")}
           onChange={handleChange}
           onKeyPress={onKeyPress}
-          placeholder="Type your message... (Shift + Enter for new line)"
+          placeholder={placeholder}
           className={`w-full py-2 xs:py-2.5 sm:py-3 md:py-4 ${
             isVoiceToTextSupported
               ? "pl-8 xs:pl-9 sm:pl-11 md:pl-12 lg:pl-14"
