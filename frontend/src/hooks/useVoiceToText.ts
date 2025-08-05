@@ -55,7 +55,7 @@ export const useVoiceToText = () => {
     const [interimTranscript, setInterimTranscript] = useState("");
 
     const recognitionRef = useRef<VoiceToTextSpeechRecognition | null>(null);
-    const timeoutRef = useRef<number | null>(null);
+    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     // Initialize speech recognition
     useEffect(() => {

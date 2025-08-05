@@ -46,14 +46,14 @@ const SignUp: React.FC = () => {
     <div className="min-h-screen bg-[#030637] flex flex-col font-sans">
       {/* Header with Navigation */}
       <header className="bg-[#030637]/95 backdrop-blur-xl border-b border-white/10 shadow-2xl shadow-black/20">
-        <div className="container mx-auto px-6">
-          <div className="flex items-center justify-between h-20">
+        <div className="container mx-auto px-4 sm:px-6">
+          <div className="flex items-center justify-between h-16 sm:h-20">
             {/* Logo */}
-            <Link to="/" className="flex items-center space-x-3">
-              <div className="bg-gradient-to-br from-[#00f5ff] to-[#9d4edd] rounded-2xl p-3 shadow-lg shadow-[#00f5ff]/20">
-                <Brain className="h-7 w-7 text-white" />
+            <Link to="/" className="flex items-center space-x-2 sm:space-x-3">
+              <div className="bg-gradient-to-br from-[#00f5ff] to-[#9d4edd] rounded-xl sm:rounded-2xl p-2 sm:p-3 shadow-lg shadow-[#00f5ff]/20">
+                <Brain className="h-5 w-5 sm:h-7 sm:w-7 text-white" />
               </div>
-              <span className="text-2xl font-bold tracking-tight text-white">
+              <span className="text-lg sm:text-2xl font-bold tracking-tight text-white">
                 <span className="bg-gradient-to-r from-[#00f5ff] to-[#9d4edd] bg-clip-text text-transparent">
                   AI
                 </span>
@@ -64,75 +64,78 @@ const SignUp: React.FC = () => {
             {/* Back to Home */}
             <Link
               to="/"
-              className="flex items-center space-x-2 text-[#E0E0E0] hover:text-white hover:bg-white/10 px-4 py-2 rounded-xl transition-all duration-300 font-medium"
+              className="flex items-center space-x-1 sm:space-x-2 text-[#E0E0E0] hover:text-white hover:bg-white/10 px-2 sm:px-4 py-2 rounded-xl transition-all duration-300 font-medium text-sm sm:text-base"
             >
               <ArrowLeft className="h-4 w-4" />
-              <span>Back to Home</span>
+              <span className="hidden sm:inline">Back to Home</span>
+              <span className="sm:hidden">Back</span>
             </Link>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <div className="flex-1 flex items-center justify-center px-6 py-16">
-        <div className="bg-gradient-to-br from-[#3C0753]/50 via-[#16213e]/30 to-[#030637]/50 backdrop-blur-xl border border-white/10 rounded-3xl p-12 max-w-lg w-full shadow-2xl shadow-black/40">
-          <div className="text-center mb-10">
-            <h1 className="text-4xl font-bold text-white mb-3 tracking-tight">
+      <div className="flex-1 flex items-center justify-center px-4 sm:px-6 py-8 sm:py-16">
+        <div className="bg-gradient-to-br from-[#3C0753]/50 via-[#16213e]/30 to-[#030637]/50 backdrop-blur-xl border border-white/10 rounded-2xl sm:rounded-3xl p-6 sm:p-12 max-w-lg w-full shadow-2xl shadow-black/40">
+          <div className="text-center mb-8 sm:mb-10">
+            <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2 sm:mb-3 tracking-tight">
               Create Account
             </h1>
-            <p className="text-[#E0E0E0] font-light">Join AI Bondhu today</p>
+            <p className="text-[#E0E0E0] font-light text-sm sm:text-base">
+              Join AI Bondhu today
+            </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
             <div className="relative">
-              <User className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#E0E0E0]/60 transition-colors duration-300" />
+              <User className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-[#E0E0E0]/60 transition-colors duration-300" />
               <input
                 type="text"
                 name="name"
                 placeholder="Full Name"
                 value={formData.name}
                 onChange={handleChange}
-                className="w-full px-6 py-4 pl-12 bg-white/5 hover:bg-white/10 text-white placeholder-[#E0E0E0]/60 rounded-2xl border border-white/20 hover:border-[#00f5ff]/50 focus:outline-none focus:ring-2 focus:ring-[#00f5ff]/50 focus:border-[#00f5ff]/50 focus:bg-white/10 backdrop-blur-sm transition-all duration-300 font-light shadow-lg hover:shadow-[#00f5ff]/10 focus:shadow-[#00f5ff]/20"
+                className="w-full px-4 sm:px-6 py-3 sm:py-4 pl-10 sm:pl-12 bg-white/5 hover:bg-white/10 text-white placeholder-[#E0E0E0]/60 rounded-xl sm:rounded-2xl border border-white/20 hover:border-[#00f5ff]/50 focus:outline-none focus:ring-2 focus:ring-[#00f5ff]/50 focus:border-[#00f5ff]/50 focus:bg-white/10 backdrop-blur-sm transition-all duration-300 font-light shadow-lg hover:shadow-[#00f5ff]/10 focus:shadow-[#00f5ff]/20 text-sm sm:text-base"
                 required
               />
             </div>
 
             <div className="relative">
-              <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#E0E0E0]/60 transition-colors duration-300" />
+              <Mail className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-[#E0E0E0]/60 transition-colors duration-300" />
               <input
                 type="email"
                 name="email"
                 placeholder="Email Address"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full px-6 py-4 pl-12 bg-white/5 hover:bg-white/10 text-white placeholder-[#E0E0E0]/60 rounded-2xl border border-white/20 hover:border-[#00f5ff]/50 focus:outline-none focus:ring-2 focus:ring-[#00f5ff]/50 focus:border-[#00f5ff]/50 focus:bg-white/10 backdrop-blur-sm transition-all duration-300 font-light shadow-lg hover:shadow-[#00f5ff]/10 focus:shadow-[#00f5ff]/20"
+                className="w-full px-4 sm:px-6 py-3 sm:py-4 pl-10 sm:pl-12 bg-white/5 hover:bg-white/10 text-white placeholder-[#E0E0E0]/60 rounded-xl sm:rounded-2xl border border-white/20 hover:border-[#00f5ff]/50 focus:outline-none focus:ring-2 focus:ring-[#00f5ff]/50 focus:border-[#00f5ff]/50 focus:bg-white/10 backdrop-blur-sm transition-all duration-300 font-light shadow-lg hover:shadow-[#00f5ff]/10 focus:shadow-[#00f5ff]/20 text-sm sm:text-base"
                 required
               />
             </div>
 
             <div className="relative">
-              <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#E0E0E0]/60 transition-colors duration-300" />
+              <Lock className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-[#E0E0E0]/60 transition-colors duration-300" />
               <input
                 type="password"
                 name="password"
                 placeholder="Password"
                 value={formData.password}
                 onChange={handleChange}
-                className="w-full px-6 py-4 pl-12 bg-white/5 hover:bg-white/10 text-white placeholder-[#E0E0E0]/60 rounded-2xl border border-white/20 hover:border-[#00f5ff]/50 focus:outline-none focus:ring-2 focus:ring-[#00f5ff]/50 focus:border-[#00f5ff]/50 focus:bg-white/10 backdrop-blur-sm transition-all duration-300 font-light shadow-lg hover:shadow-[#00f5ff]/10 focus:shadow-[#00f5ff]/20"
+                className="w-full px-4 sm:px-6 py-3 sm:py-4 pl-10 sm:pl-12 bg-white/5 hover:bg-white/10 text-white placeholder-[#E0E0E0]/60 rounded-xl sm:rounded-2xl border border-white/20 hover:border-[#00f5ff]/50 focus:outline-none focus:ring-2 focus:ring-[#00f5ff]/50 focus:border-[#00f5ff]/50 focus:bg-white/10 backdrop-blur-sm transition-all duration-300 font-light shadow-lg hover:shadow-[#00f5ff]/10 focus:shadow-[#00f5ff]/20 text-sm sm:text-base"
                 required
                 minLength={6}
               />
             </div>
 
             <div className="relative">
-              <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#E0E0E0]/60 transition-colors duration-300" />
+              <Lock className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-[#E0E0E0]/60 transition-colors duration-300" />
               <input
                 type="password"
                 name="confirmPassword"
                 placeholder="Confirm Password"
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                className="w-full px-6 py-4 pl-12 bg-white/5 hover:bg-white/10 text-white placeholder-[#E0E0E0]/60 rounded-2xl border border-white/20 hover:border-[#00f5ff]/50 focus:outline-none focus:ring-2 focus:ring-[#00f5ff]/50 focus:border-[#00f5ff]/50 focus:bg-white/10 backdrop-blur-sm transition-all duration-300 font-light shadow-lg hover:shadow-[#00f5ff]/10 focus:shadow-[#00f5ff]/20"
+                className="w-full px-4 sm:px-6 py-3 sm:py-4 pl-10 sm:pl-12 bg-white/5 hover:bg-white/10 text-white placeholder-[#E0E0E0]/60 rounded-xl sm:rounded-2xl border border-white/20 hover:border-[#00f5ff]/50 focus:outline-none focus:ring-2 focus:ring-[#00f5ff]/50 focus:border-[#00f5ff]/50 focus:bg-white/10 backdrop-blur-sm transition-all duration-300 font-light shadow-lg hover:shadow-[#00f5ff]/10 focus:shadow-[#00f5ff]/20 text-sm sm:text-base"
                 required
                 minLength={6}
               />
@@ -141,7 +144,7 @@ const SignUp: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className={`w-full px-6 py-4 bg-gradient-to-r from-[#00f5ff] to-[#9d4edd] hover:from-[#9d4edd] hover:to-[#00f5ff] text-white rounded-2xl transition-all duration-500 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] shadow-xl shadow-[#00f5ff]/30 hover:shadow-[#9d4edd]/40 transform hover:scale-105 font-semibold ${
+              className={`w-full px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-r from-[#00f5ff] to-[#9d4edd] hover:from-[#9d4edd] hover:to-[#00f5ff] text-white rounded-xl sm:rounded-2xl transition-all duration-500 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] shadow-xl shadow-[#00f5ff]/30 hover:shadow-[#9d4edd]/40 transform hover:scale-105 font-semibold text-sm sm:text-base ${
                 loading ? "opacity-50 cursor-not-allowed" : ""
               }`}
             >
@@ -150,13 +153,13 @@ const SignUp: React.FC = () => {
           </form>
 
           {/* Divider */}
-          <div className="mt-8 mb-6">
+          <div className="mt-6 sm:mt-8 mb-4 sm:mb-6">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-white/20"></div>
               </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-[#030637] text-[#E0E0E0]/60 font-light">
+              <div className="relative flex justify-center text-xs sm:text-sm">
+                <span className="px-3 sm:px-4 bg-[#030637] text-[#E0E0E0]/60 font-light">
                   Or continue with
                 </span>
               </div>
@@ -166,12 +169,12 @@ const SignUp: React.FC = () => {
           {/* OAuth Login Buttons */}
           <GoogleLoginButton />
 
-          <div className="mt-4">
+          <div className="mt-3 sm:mt-4">
             <FacebookLoginButton />
           </div>
 
-          <div className="mt-8 text-center">
-            <p className="text-[#E0E0E0] font-light">
+          <div className="mt-6 sm:mt-8 text-center">
+            <p className="text-[#E0E0E0] font-light text-sm sm:text-base">
               Already have an account?{" "}
               <Link
                 to="/auth/signin"

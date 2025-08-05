@@ -1,4 +1,5 @@
 import { Route, Routes } from "react-router-dom";
+import MobileAppEnforcer from "./components/MobileAppEnforcer";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute";
 import { AuthProvider } from "./contexts/AuthContext";
@@ -10,9 +11,12 @@ import LandingPage from "./pages/LandingPage";
 import Settings from "./pages/Settings";
 
 function App() {
+  console.log("🚀 App component rendered");
+
   return (
     <AuthProvider>
-      <div className="min-h-screen">
+      <MobileAppEnforcer />
+      <div className="min-h-[100dvh] w-full overflow-x-hidden bg-gradient-to-br from-primary-900 via-secondary-500 to-secondary-600">
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route

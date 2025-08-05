@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { navigateInternal } from './navigation'
 
 // Get API base URL from environment variables
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'
@@ -133,7 +134,7 @@ api.interceptors.response.use(
                 // Redirect to signin after a brief delay if not already on auth pages
                 setTimeout(() => {
                     if (!window.location.pathname.includes('/auth/')) {
-                        window.location.href = '/auth/signin'
+                        navigateInternal('/auth/signin')
                     }
                     // Reset the flag after redirect
                     setTimeout(() => {

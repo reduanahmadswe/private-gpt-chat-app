@@ -12,10 +12,10 @@ const GoogleLoginButton: React.FC = () => {
     <button
       onClick={handleGoogleLogin}
       type="button"
-      className="w-full flex items-center justify-center px-6 py-3 border border-white/20 rounded-xl text-white bg-white/5 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-[#00f5ff]/50 transition-all duration-300 shadow-lg hover:shadow-xl group"
+      className="w-full flex items-center justify-center px-4 sm:px-6 py-3 sm:py-3.5 border border-white/20 rounded-xl sm:rounded-xl text-white bg-white/5 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-[#00f5ff]/50 transition-all duration-300 shadow-lg hover:shadow-xl group text-sm sm:text-base touch-manipulation"
     >
       <svg
-        className="w-5 h-5 mr-3 group-hover:scale-110 transition-transform duration-300"
+        className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 group-hover:scale-110 transition-transform duration-300 flex-shrink-0"
         viewBox="0 0 24 24"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -37,7 +37,7 @@ const GoogleLoginButton: React.FC = () => {
           fill="#EA4335"
         />
       </svg>
-      <span className="font-medium">Continue with Google</span>
+      <span className="font-medium truncate">Continue with Google</span>
     </button>
   );
 };

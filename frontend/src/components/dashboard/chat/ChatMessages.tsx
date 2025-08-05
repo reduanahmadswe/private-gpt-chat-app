@@ -25,7 +25,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
   const { user } = useAuth();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const isAutoScrolling = useRef(false);
-  const scrollTimeoutRef = useRef<number | null>(null);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Auto-scroll to bottom when new messages arrive (optimized to prevent shaking)
   useEffect(() => {

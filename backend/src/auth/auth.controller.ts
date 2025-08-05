@@ -131,11 +131,20 @@ export class AuthController {
       // In production, rely on cookies only for security
       let redirectUrl: string;
 
-      if (isProduction) {
-        // Production: Use secure cookies AND pass token for compatibility
+      // Check if request is from mobile app by checking query parameter or user agent
+      const userAgent = req.get('User-Agent') || '';
+      const isMobileApp = req.query.mobile === 'true' ||
+        userAgent.includes('AI-Bondhu-Mobile') ||
+        req.get('X-Mobile-App') === 'true';
+
+      if (isMobileApp) {
+        // Mobile App: Use custom URL scheme for deep linking
+        redirectUrl = `aibondhu://auth/callback?auth=success&provider=google&token=${result.token}`;
+      } else if (isProduction) {
+        // Web Production: Use secure cookies AND pass token for compatibility
         redirectUrl = `${envVars.CLIENT_URL}/dashboard?auth=success&provider=google&token=${result.token}`;
       } else {
-        // Development: Also pass token in query for easier testing
+        // Web Development: Also pass token in query for easier testing
         redirectUrl = `${envVars.CLIENT_URL}/dashboard?auth=success&provider=google&token=${result.token}`;
       }
 
@@ -196,11 +205,20 @@ export class AuthController {
       // In production, rely on cookies only for security
       let redirectUrl: string;
 
-      if (isProduction) {
-        // Production: Use secure cookies AND pass token for compatibility
+      // Check if request is from mobile app by checking query parameter or user agent
+      const userAgent = req.get('User-Agent') || '';
+      const isMobileApp = req.query.mobile === 'true' ||
+        userAgent.includes('AI-Bondhu-Mobile') ||
+        req.get('X-Mobile-App') === 'true';
+
+      if (isMobileApp) {
+        // Mobile App: Use custom URL scheme for deep linking
+        redirectUrl = `aibondhu://auth/callback?auth=success&provider=facebook&token=${result.token}`;
+      } else if (isProduction) {
+        // Web Production: Use secure cookies AND pass token for compatibility
         redirectUrl = `${envVars.CLIENT_URL}/dashboard?auth=success&provider=facebook&token=${result.token}`;
       } else {
-        // Development: Also pass token in query for easier testing
+        // Web Development: Also pass token in query for easier testing
         redirectUrl = `${envVars.CLIENT_URL}/dashboard?auth=success&provider=facebook&token=${result.token}`;
       }
 
