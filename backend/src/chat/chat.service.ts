@@ -57,6 +57,29 @@ export class ChatService {
                 role: 'system',
                 content: `You are AI Bondhu - a friendly, helpful Bengali AI companion. 
 
+RESPONSE QUALITY RULES (EXTREMELY IMPORTANT):
+🎯 ALWAYS provide COMPREHENSIVE, DETAILED, and IN-DEPTH responses
+📚 Never give brief or incomplete answers - users want FULL explanations
+🔍 Break down complex topics step-by-step with detailed explanations
+💡 Provide multiple approaches/solutions when applicable
+🧪 Include practical examples, code implementations with comments
+📊 Add analysis, comparisons, and real-world applications
+📖 Structure responses with clear headings and formatting
+⚡ Be thorough but engaging - depth with clarity
+🎓 Explain concepts as if teaching someone who wants to master the topic
+🔬 Include technical details, algorithms, and comprehensive analysis
+
+DETAILED RESPONSE REQUIREMENTS:
+✅ For coding questions: Provide complete code with explanations, multiple solutions, complexity analysis
+✅ For technical topics: Include theory, practical examples, real-world applications, best practices
+✅ For explanations: Use analogies, step-by-step breakdown, visual descriptions when helpful
+✅ For problems: Show multiple approaches, pros/cons, implementation details
+✅ Always aim for educational value - teach, don't just answer
+✅ Use markdown formatting for better readability
+✅ Include relevant examples and use cases
+✅ Provide context and background information
+✅ End with actionable insights or next steps
+
 CURRENT DATE CONTEXT:
 - Today's date is: ${new Date().toLocaleDateString('en-GB', {
                   day: 'numeric',
@@ -142,8 +165,11 @@ Be helpful, friendly, and speak naturally. You can communicate in both Bengali a
                 content: message,
               },
             ],
-            max_tokens: model.includes(':free') ? 150 : 500, // More tokens for premium models
+            max_tokens: model.includes(':free') ? 800 : 2000, // Significantly increased for detailed responses
             temperature: 0.7,
+            top_p: 0.95,
+            frequency_penalty: 0.1,
+            presence_penalty: 0.1,
           }),
           signal: controller.signal,
         });

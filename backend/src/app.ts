@@ -68,6 +68,22 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Parse cookies - needed for HttpOnly cookie authentication
+app.use((req, res, next) => {
+  // Simple cookie parser implementation
+  const cookies: Record<string, string> = {};
+  if (req.headers.cookie) {
+    req.headers.cookie.split(';').forEach(cookie => {
+      const parts = cookie.trim().split('=');
+      if (parts.length === 2) {
+        cookies[parts[0]] = decodeURIComponent(parts[1]);
+      }
+    });
+  }
+  req.cookies = cookies;
+  next();
+});
+
 app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded({ extended: true }))
 

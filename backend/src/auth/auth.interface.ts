@@ -12,6 +12,8 @@ export interface IRegisterRequest {
 export interface IAuthResponse {
   token: string;
   refreshToken: string;
+  tokenExpiry?: Date;
+  refreshTokenExpiry?: Date;
   user: {
     id: string;
     name: string;

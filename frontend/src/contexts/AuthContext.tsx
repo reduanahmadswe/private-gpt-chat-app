@@ -7,23 +7,30 @@ import React, {
   useState,
 } from "react";
 import toast from "react-hot-toast";
+import { useSessionPersistence } from "../hooks/useSessionPersistence";
 import { User } from "../types/auth";
-import { api } from "../utils/api";
+import { api, authEventEmitter, sessionManager } from "../utils/api";
 import { cleanupNavigation, navigateOAuth } from "../utils/navigation";
 
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<boolean>;
+  login: (
+    email: string,
+    password: string,
+    rememberMe?: boolean
+  ) => Promise<boolean>;
   register: (
     username: string,
     email: string,
-    password: string
+    password: string,
+    rememberMe?: boolean
   ) => Promise<boolean>;
   logout: () => Promise<void>;
   forceLogout: () => void;
   checkAuth: () => Promise<void>;
   googleLogin: () => void;
+  isSessionPersistent: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -44,8 +51,56 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isSessionPersistent, setIsSessionPersistent] = useState(false);
 
   console.log("🚀 AuthProvider rendered, isLoading:", isLoading);
+
+  // Initialize session persistence
+  useSessionPersistence();
+
+  // Listen for session expiry events and cross-tab communication
+  useEffect(() => {
+    const handleSessionExpired = () => {
+      console.log("🔔 Session expired event received");
+      setUser(null);
+      setIsSessionPersistent(false);
+      toast.error("Your session has expired. Please log in again.");
+    };
+
+    const handleCrossTabLogin = async () => {
+      console.log("🔄 Cross-tab login event received");
+      try {
+        const sessionValid = await sessionManager.verifySession();
+        if (sessionValid) {
+          const user = await sessionManager.getCurrentUser();
+          setUser(user);
+          setIsSessionPersistent(true);
+          toast.success("Logged in from another tab!");
+        }
+      } catch (error) {
+        console.error("❌ Error handling cross-tab login:", error);
+      }
+    };
+
+    const handleCrossTabLogout = () => {
+      console.log("🚪 Cross-tab logout event received");
+      setUser(null);
+      setIsSessionPersistent(false);
+      toast.error("Logged out from another tab");
+    };
+
+    authEventEmitter.on("sessionExpired", handleSessionExpired);
+    authEventEmitter.on("logout", handleSessionExpired);
+    authEventEmitter.on("crossTabLogin", handleCrossTabLogin);
+    authEventEmitter.on("crossTabLogout", handleCrossTabLogout);
+
+    return () => {
+      authEventEmitter.off("sessionExpired", handleSessionExpired);
+      authEventEmitter.off("logout", handleSessionExpired);
+      authEventEmitter.off("crossTabLogin", handleCrossTabLogin);
+      authEventEmitter.off("crossTabLogout", handleCrossTabLogout);
+    };
+  }, []);
 
   // Force app to load after maximum 3 seconds - NO MORE BLANK SCREEN!
   useEffect(() => {
@@ -68,7 +123,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       if (authSuccess === "success" && urlToken) {
         console.log("🔑 Processing OAuth callback");
-        localStorage.setItem("token", urlToken);
+        // For OAuth, set fallback tokens in case cookies aren't set yet
+        sessionManager.setFallbackTokens(urlToken, urlToken, true);
 
         // Use navigation utility to cleanup all overlays
         cleanupNavigation();
@@ -78,32 +134,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           document.title,
           window.location.pathname
         );
+
         if (provider) {
           toast.success(`Logged in with ${provider}!`);
         }
+
+        setIsSessionPersistent(true);
       }
 
-      // Quick token check
-      const token = localStorage.getItem("token");
-      if (!token) {
-        console.log("🔍 No token found");
-        setUser(null);
-        setIsLoading(false);
-        return;
-      }
+      // Check if user is authenticated via HttpOnly cookies
+      const sessionValid = await sessionManager.verifySession();
 
-      // Quick API check (with timeout)
-      try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 2000); // 2 second API timeout
-
-        const response = await api.get("/api/auth/me", {
-          signal: controller.signal,
-        });
-
-        clearTimeout(timeoutId);
-        console.log("✅ User authenticated");
-        setUser(response.data.user);
+      if (sessionValid) {
+        console.log("✅ Valid session found in cookies");
+        const user = await sessionManager.getCurrentUser();
+        setUser(user);
+        setIsSessionPersistent(true);
+        console.log("✅ User authenticated via cookies:", user);
 
         // Remove any OAuth loading overlays when user is authenticated
         const oauthLoading = document.getElementById("oauth-loading");
@@ -121,29 +168,55 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             "🗑️ Removed Facebook loading overlay after authentication"
           );
         }
-      } catch (error) {
-        console.log("⚠️ API check failed, continuing...");
+      } else {
+        console.log("❌ No valid session found");
         setUser(null);
+        setIsSessionPersistent(false);
+        // Clear any leftover fallback tokens
+        sessionManager.clearFallbackTokens();
       }
     } catch (error) {
-      console.log("❌ Auth check error, continuing...");
+      console.error("❌ Auth check failed:", error);
       setUser(null);
+      setIsSessionPersistent(false);
+      sessionManager.clearFallbackTokens();
     } finally {
       console.log("✅ Auth check complete");
       setIsLoading(false);
     }
   };
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const login = async (
+    email: string,
+    password: string,
+    rememberMe = false
+  ): Promise<boolean> => {
     try {
       setIsLoading(true);
-      const response = await api.post("/api/auth/signin", { email, password });
-      const { user, token, refreshToken } = response.data;
+      const response = await api.post("/api/auth/signin", {
+        email,
+        password,
+        rememberMe,
+      });
+      const { user } = response.data;
 
-      if (token) localStorage.setItem("token", token);
-      if (refreshToken) localStorage.setItem("refreshToken", refreshToken);
+      // Backend sets HttpOnly cookies automatically
+      // Just set fallback tokens for environments where cookies might not work
+      if (response.data.token && response.data.refreshToken) {
+        sessionManager.setFallbackTokens(
+          response.data.token,
+          response.data.refreshToken,
+          rememberMe
+        );
+      }
 
       setUser(user);
+      setIsSessionPersistent(rememberMe);
+
+      // Trigger cross-tab login event
+      localStorage.setItem("auth_event", "login");
+      setTimeout(() => localStorage.removeItem("auth_event"), 100);
+
       toast.success("Successfully logged in!");
       return true;
     } catch (error: any) {
@@ -157,7 +230,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const register = async (
     username: string,
     email: string,
-    password: string
+    password: string,
+    rememberMe = false
   ): Promise<boolean> => {
     try {
       setIsLoading(true);
@@ -165,13 +239,27 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         name: username,
         email,
         password,
+        rememberMe,
       });
-      const { user, token, refreshToken } = response.data;
+      const { user } = response.data;
 
-      if (token) localStorage.setItem("token", token);
-      if (refreshToken) localStorage.setItem("refreshToken", refreshToken);
+      // Backend sets HttpOnly cookies automatically
+      // Just set fallback tokens for environments where cookies might not work
+      if (response.data.token && response.data.refreshToken) {
+        sessionManager.setFallbackTokens(
+          response.data.token,
+          response.data.refreshToken,
+          rememberMe
+        );
+      }
 
       setUser(user);
+      setIsSessionPersistent(rememberMe);
+
+      // Trigger cross-tab login event
+      localStorage.setItem("auth_event", "login");
+      setTimeout(() => localStorage.removeItem("auth_event"), 100);
+
       toast.success("Account created successfully!");
       return true;
     } catch (error: any) {
@@ -186,14 +274,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (isLoggingOut) return;
     try {
       setIsLoggingOut(true);
-      await api.post("/api/auth/logout");
+      // Use the sessionManager logout which handles both cookies and fallback tokens
+      await sessionManager.logout();
     } catch (error) {
       console.error("Logout error:", error);
     } finally {
       setUser(null);
-      localStorage.removeItem("token");
-      localStorage.removeItem("refreshToken");
+      setIsSessionPersistent(false);
       setIsLoggingOut(false);
+
+      // Trigger cross-tab logout event
+      localStorage.setItem("auth_event", "logout");
+      setTimeout(() => localStorage.removeItem("auth_event"), 100);
+
       toast.success("Logged out successfully");
     }
   };
@@ -202,8 +295,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (isLoggingOut) return;
     setIsLoggingOut(true);
     setUser(null);
-    localStorage.removeItem("token");
-    localStorage.removeItem("refreshToken");
+    sessionManager.clearFallbackTokens();
+    setIsSessionPersistent(false);
     setIsLoggingOut(false);
   };
 
@@ -274,6 +367,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     forceLogout,
     checkAuth,
     googleLogin,
+    isSessionPersistent,
   };
 
   // SIMPLE LOADING - GUARANTEED TO WORK!

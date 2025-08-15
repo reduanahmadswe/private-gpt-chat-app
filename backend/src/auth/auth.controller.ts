@@ -12,10 +12,17 @@ export class AuthController {
       const data: RegisterInput = req.body;
       const result = await authService.register(data);
 
+      // Set HttpOnly cookies for secure token storage
+      this.setAuthCookies(res, result.token, result.refreshToken, result.tokenExpiry, result.refreshTokenExpiry);
+
       res.status(201).json({
         success: true,
         message: 'User registered successfully',
-        ...result,
+        token: result.token,
+        refreshToken: result.refreshToken,
+        tokenExpiry: result.tokenExpiry,
+        refreshTokenExpiry: result.refreshTokenExpiry,
+        user: result.user,
       });
     } catch (error) {
       next(error);
@@ -27,19 +34,52 @@ export class AuthController {
       const data: LoginInput = req.body;
       const result = await authService.login(data);
 
+      // Set HttpOnly cookies for secure token storage
+      this.setAuthCookies(res, result.token, result.refreshToken, result.tokenExpiry, result.refreshTokenExpiry);
+
       res.status(200).json({
         success: true,
         message: 'Login successful',
-        ...result,
+        token: result.token,
+        refreshToken: result.refreshToken,
+        tokenExpiry: result.tokenExpiry,
+        refreshTokenExpiry: result.refreshTokenExpiry,
+        user: result.user,
       });
     } catch (error) {
       next(error);
     }
   }
 
+  // Helper method to set secure HttpOnly cookies
+  private setAuthCookies(res: Response, token: string, refreshToken: string, tokenExpiry?: Date, refreshTokenExpiry?: Date): void {
+    const isProduction = envVars.NODE_ENV === 'production';
+
+    // Set access token cookie
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: isProduction, // HTTPS only in production
+      sameSite: isProduction ? 'none' : 'lax', // Allow cross-site in production for Vercel
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      expires: tokenExpiry || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      path: '/',
+    });
+
+    // Set refresh token cookie  
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'lax',
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+      expires: refreshTokenExpiry || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      path: '/',
+    });
+  }
+
   refreshToken = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const { refreshToken } = req.body;
+      // Try to get refresh token from cookies first, then body
+      let refreshToken = req.cookies?.refreshToken || req.body.refreshToken;
 
       if (!refreshToken) {
         res.status(400).json({
@@ -51,10 +91,54 @@ export class AuthController {
 
       const result = await authService.refreshToken(refreshToken);
 
+      // Set new token in cookie
+      this.setAuthCookies(res, result.token, refreshToken);
+
       res.status(200).json({
         success: true,
         message: 'Token refreshed successfully',
-        ...result,
+        token: result.token,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // Verify session endpoint for client-side authentication checks
+  verifySession = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const user = req.user as IUser;
+
+      res.status(200).json({
+        success: true,
+        message: 'Session valid',
+        user: {
+          id: user._id || user.id,
+          name: user.name,
+          email: user.email,
+          avatar: user.avatar,
+          authProvider: user.authProvider,
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // Get current user info
+  me = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const user = req.user as IUser;
+
+      res.status(200).json({
+        success: true,
+        user: {
+          id: user._id || user.id,
+          name: user.name,
+          email: user.email,
+          avatar: user.avatar,
+          authProvider: user.authProvider,
+        },
       });
     } catch (error) {
       next(error);

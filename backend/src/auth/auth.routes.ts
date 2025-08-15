@@ -18,6 +18,12 @@ router.post('/signin', validate(loginSchema), authController.login);
 // POST /api/auth/refresh
 router.post('/refresh', authController.refreshToken);
 
+// GET /api/auth/verify - Verify current session
+router.get('/verify', authenticate, authController.verifySession);
+
+// GET /api/auth/me - Get current user info
+router.get('/me', authenticate, authController.me);
+
 // POST /api/auth/logout
 router.post('/logout', authenticate, authController.logout);
 

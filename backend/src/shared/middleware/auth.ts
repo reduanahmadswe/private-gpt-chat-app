@@ -11,9 +11,17 @@ export const authenticate = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const authHeader = req.headers.authorization;
+    // Try to get token from Authorization header or cookies
+    let token: string | undefined;
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.substring(7);
+    } else if (req.cookies && req.cookies.token) {
+      token = req.cookies.token;
+    }
+
+    if (!token) {
       res.status(401).json({
         success: false,
         message: 'Access token required',
@@ -21,9 +29,7 @@ export const authenticate = async (
       return;
     }
 
-    const token = authHeader.substring(7);
     const jwtSecret = envVars.JWT_SECRET;
-
     const decoded = jwt.verify(token, jwtSecret) as IJWTPayload;
     const user = await User.findById(decoded.userId);
 

@@ -1,8 +1,8 @@
 import axios from 'axios'
 import { navigateInternal } from './navigation'
 
-// Get API base URL from environment variables
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'
+// Get API base URL from environment variables and ensure no trailing slash
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001').replace(/\/$/, '')
 
 console.log('🔗 API Base URL:', API_BASE_URL)
 
@@ -30,25 +30,135 @@ class AuthEventEmitter {
 
 export const authEventEmitter = new AuthEventEmitter()
 
-// Guard to prevent multiple session expiry handlers
+// Session management utilities for HttpOnly cookie-based auth
+export const sessionManager = {
+    isRefreshing: false,
+    refreshPromise: null as Promise<boolean> | null,
+
+    // For HttpOnly cookies, we can't directly access tokens from JS
+    // We'll rely on the backend to include them in requests automatically
+    async verifySession(): Promise<boolean> {
+        try {
+            const response = await axios.get(`${API_BASE_URL}/api/auth/verify`, {
+                withCredentials: true // Essential for HttpOnly cookies
+            });
+            return response.data.success;
+        } catch (error) {
+            return false;
+        }
+    },
+
+    async getCurrentUser(): Promise<any> {
+        try {
+            const response = await axios.get(`${API_BASE_URL}/api/auth/me`, {
+                withCredentials: true
+            });
+            return response.data.user;
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    // For fallback localStorage support (when cookies aren't available)
+    getFallbackToken(): string | null {
+        return localStorage.getItem('token') || sessionStorage.getItem('token')
+    },
+
+    setFallbackTokens(token: string, refreshToken: string, rememberMe = false): void {
+        const storage = rememberMe ? localStorage : sessionStorage
+        storage.setItem('token', token)
+        storage.setItem('refreshToken', refreshToken)
+
+        // Set expiry times
+        const tokenExpiry = new Date()
+        tokenExpiry.setDate(tokenExpiry.getDate() + 7)
+        storage.setItem('tokenExpiry', tokenExpiry.toISOString())
+
+        const refreshExpiry = new Date()
+        refreshExpiry.setDate(refreshExpiry.getDate() + 30)
+        storage.setItem('refreshTokenExpiry', refreshExpiry.toISOString())
+    },
+
+    clearFallbackTokens(): void {
+        localStorage.removeItem('token')
+        localStorage.removeItem('refreshToken')
+        localStorage.removeItem('tokenExpiry')
+        localStorage.removeItem('refreshTokenExpiry')
+        sessionStorage.removeItem('token')
+        sessionStorage.removeItem('refreshToken')
+        sessionStorage.removeItem('tokenExpiry')
+        sessionStorage.removeItem('refreshTokenExpiry')
+    },
+
+    async refreshAccessToken(): Promise<boolean> {
+        if (this.isRefreshing && this.refreshPromise) {
+            return this.refreshPromise;
+        }
+
+        this.isRefreshing = true
+        this.refreshPromise = this._performRefresh()
+
+        try {
+            const success = await this.refreshPromise
+            this.isRefreshing = false
+            this.refreshPromise = null
+            return success
+        } catch (error) {
+            this.isRefreshing = false
+            this.refreshPromise = null
+            throw error
+        }
+    },
+
+    async _performRefresh(): Promise<boolean> {
+        try {
+            const response = await axios.post(`${API_BASE_URL}/api/auth/refresh`, {}, {
+                withCredentials: true // This will send HttpOnly cookies
+            })
+
+            return response.data.success
+        } catch (error) {
+            console.error('🔄 Token refresh failed:', error)
+            authEventEmitter.emit('logout')
+            throw error
+        }
+    },
+
+    async logout(): Promise<void> {
+        try {
+            await axios.post(`${API_BASE_URL}/api/auth/logout`, {}, {
+                withCredentials: true
+            })
+        } catch (error) {
+            console.error('Logout error:', error)
+        } finally {
+            // Clear any fallback tokens
+            this.clearFallbackTokens()
+            authEventEmitter.emit('logout')
+        }
+    }
+}// Guard to prevent multiple session expiry handlers
 let isHandlingSessionExpiry = false
 
 // Create axios instance with interceptors
 const api = axios.create({
     baseURL: API_BASE_URL,
-    withCredentials: true,
+    withCredentials: true, // Essential for HttpOnly cookies
     headers: {
         'Content-Type': 'application/json',
     }
 })
 
-// Request interceptor to add token to every request
+// Request interceptor for fallback token support only
 api.interceptors.request.use(
     (config) => {
-        const token = localStorage.getItem('token')
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`
+        // For fallback support when cookies aren't available
+        const fallbackToken = sessionManager.getFallbackToken()
+
+        if (fallbackToken && !config.headers.Authorization) {
+            config.headers.Authorization = `Bearer ${fallbackToken}`
         }
+
         return config
     },
     (error) => {
@@ -73,60 +183,47 @@ api.interceptors.response.use(
         console.error(`❌ API Error [${errorStatus}]:`, errorMessage)
 
         if (error.response?.status === 401 && !originalRequest._retry) {
-            // Only handle as session expiry if there was actually a token (meaning user was logged in)
-            const hadToken = localStorage.getItem('token') || error.config.headers?.Authorization
-            const refreshToken = localStorage.getItem('refreshToken')
-
             // If this is a token refresh request that failed, don't retry
             if (originalRequest.url?.includes('/auth/refresh')) {
-                localStorage.removeItem('token')
-                localStorage.removeItem('refreshToken')
+                sessionManager.clearFallbackTokens()
                 authEventEmitter.emit('sessionExpired')
                 return Promise.reject(error)
             }
 
-            // Try to refresh token if we have one
-            if (hadToken && refreshToken && !isHandlingSessionExpiry) {
+            // Try to refresh session using HttpOnly cookies
+            if (!isHandlingSessionExpiry) {
                 originalRequest._retry = true
                 isHandlingSessionExpiry = true
 
                 try {
                     console.log('🔄 Access token expired, attempting refresh...')
-                    const refreshResponse = await api.post('/api/auth/refresh', {
-                        refreshToken
-                    })
+                    const refreshSuccess = await sessionManager.refreshAccessToken()
 
-                    const newToken = refreshResponse.data.token
-                    localStorage.setItem('token', newToken)
+                    if (refreshSuccess) {
+                        console.log('✅ Session refreshed successfully, retrying original request')
+                        isHandlingSessionExpiry = false
 
-                    // Update the original request with new token
-                    originalRequest.headers.Authorization = `Bearer ${newToken}`
-
-                    console.log('✅ Token refreshed successfully, retrying original request')
-                    isHandlingSessionExpiry = false
-
-                    // Retry the original request
-                    return api(originalRequest)
+                        // Retry the original request
+                        return api(originalRequest)
+                    } else {
+                        throw new Error('Session refresh failed')
+                    }
                 } catch (refreshError) {
-                    console.error('❌ Token refresh failed:', refreshError)
-                    localStorage.removeItem('token')
-                    localStorage.removeItem('refreshToken')
+                    console.error('❌ Session refresh failed:', refreshError)
+                    sessionManager.clearFallbackTokens()
                     authEventEmitter.emit('sessionExpired')
                     isHandlingSessionExpiry = false
                     return Promise.reject(refreshError)
                 }
             }
 
-            // If no refresh token or hadToken is false, handle as normal session expiry
-            if (hadToken) {
-                // Set flag to prevent multiple executions
+            // Handle session expiry
+            if (!isHandlingSessionExpiry) {
                 isHandlingSessionExpiry = true
                 console.log('🚫 401 Unauthorized - handling session expiry')
 
-                // Clear local storage immediately
-                localStorage.removeItem('token')
-                localStorage.removeItem('refreshToken')
-                sessionStorage.clear()
+                // Clear any fallback tokens
+                sessionManager.clearFallbackTokens()
 
                 // Emit session expired event to notify AuthContext
                 authEventEmitter.emit('sessionExpired')
@@ -137,19 +234,11 @@ api.interceptors.response.use(
                         navigateInternal('/auth/signin')
                     }
                     // Reset the flag after redirect
-                    setTimeout(() => {
-                        isHandlingSessionExpiry = false
-                    }, 1000)
-                }, 1500)
-            } else {
-                // This is just a normal 401 (user not logged in), not a session expiry
-                console.log('🔓 401 Unauthorized - user not authenticated (normal)')
+                    isHandlingSessionExpiry = false
+                }, 1000)
             }
-
-        } else if (error.response?.data?.message) {
-            // Show backend error message
-            console.error('Backend error:', error.response.data.message)
         }
+
         return Promise.reject(error)
     }
 )

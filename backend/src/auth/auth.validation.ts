@@ -21,6 +21,7 @@ export const registerSchema = z.object({
       })
       .min(6, 'Password must be at least 6 characters')
       .max(100, 'Password cannot exceed 100 characters'),
+    rememberMe: z.boolean().optional().default(false),
   }),
 });
 
@@ -37,6 +38,7 @@ export const loginSchema = z.object({
         required_error: 'Password is required',
       })
       .min(1, 'Password cannot be empty'),
+    rememberMe: z.boolean().optional().default(false),
   }),
 });
 

@@ -10,6 +10,7 @@ const SignIn: React.FC = () => {
     email: "",
     password: "",
   });
+  const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -25,7 +26,7 @@ const SignIn: React.FC = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      await login(formData.email, formData.password);
+      await login(formData.email, formData.password, rememberMe);
       navigate("/dashboard");
     } catch (error) {
       // Error is handled in AuthContext
@@ -104,6 +105,51 @@ const SignIn: React.FC = () => {
                 required
                 minLength={6}
               />
+            </div>
+
+            {/* Remember Me */}
+            <div className="flex items-center justify-between">
+              <label className="flex items-center cursor-pointer group">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="sr-only"
+                />
+                <div
+                  className={`w-4 h-4 sm:w-5 sm:h-5 rounded border-2 flex items-center justify-center transition-all duration-300 ${
+                    rememberMe
+                      ? "bg-gradient-to-r from-[#00f5ff] to-[#9d4edd] border-[#00f5ff]"
+                      : "border-white/20 bg-white/5 group-hover:border-[#00f5ff]/50"
+                  }`}
+                >
+                  {rememberMe && (
+                    <svg
+                      className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-white"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  )}
+                </div>
+                <span className="ml-2 sm:ml-3 text-sm sm:text-base text-[#E0E0E0] group-hover:text-white transition-colors">
+                  Remember me
+                </span>
+              </label>
+
+              <div className="text-right">
+                <a
+                  href="#"
+                  className="text-sm sm:text-base text-[#00f5ff] hover:text-[#9d4edd] transition-colors font-medium"
+                >
+                  Forgot password?
+                </a>
+              </div>
             </div>
 
             <button

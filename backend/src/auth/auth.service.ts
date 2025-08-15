@@ -6,16 +6,49 @@ import { User } from '../user/user.model';
 import { IAuthRequest, IAuthResponse, IFacebookOAuthResponse, IGoogleOAuthResponse, IJWTPayload, IRegisterRequest } from './auth.interface';
 
 export class AuthService {
-  private generateTokens(userId: string, email: string): { token: string; refreshToken: string } {
+  private generateTokens(userId: string, email: string): { token: string; refreshToken: string; tokenExpiry: Date; refreshTokenExpiry: Date } {
     const jwtSecret = envVars.JWT_SECRET;
     const jwtRefreshSecret = envVars.JWT_REFRESH_SECRET;
 
     const payload: IJWTPayload = { userId, email };
 
+    // Token expires in 7 days
+    const tokenExpiry = new Date();
+    tokenExpiry.setDate(tokenExpiry.getDate() + 7);
+
+    // Refresh token expires in 30 days
+    const refreshTokenExpiry = new Date();
+    refreshTokenExpiry.setDate(refreshTokenExpiry.getDate() + 30);
+
     const token = jwt.sign(payload, jwtSecret, { expiresIn: '7d' });
     const refreshToken = jwt.sign(payload, jwtRefreshSecret, { expiresIn: '30d' });
 
-    return { token, refreshToken };
+    return { token, refreshToken, tokenExpiry, refreshTokenExpiry };
+  }
+
+  // Verify and decode token without throwing errors
+  verifyToken(token: string): IJWTPayload | null {
+    try {
+      const jwtSecret = envVars.JWT_SECRET;
+      return jwt.verify(token, jwtSecret) as IJWTPayload;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  // Check if token is expired or will expire soon (within 1 hour)
+  isTokenExpiringSoon(token: string): boolean {
+    try {
+      const decoded = jwt.decode(token) as any;
+      if (!decoded || !decoded.exp) return true;
+
+      const now = Math.floor(Date.now() / 1000);
+      const oneHour = 60 * 60; // 1 hour in seconds
+
+      return decoded.exp - now < oneHour;
+    } catch (error) {
+      return true;
+    }
   }
 
   async register(data: IRegisterRequest): Promise<IAuthResponse> {
@@ -31,11 +64,14 @@ export class AuthService {
     const user = new User({ name, email, password });
     await user.save();
 
-    // Generate tokens
+    // Generate tokens with expiry dates
     const tokens = this.generateTokens(user._id.toString(), user.email);
 
     return {
-      ...tokens,
+      token: tokens.token,
+      refreshToken: tokens.refreshToken,
+      tokenExpiry: tokens.tokenExpiry,
+      refreshTokenExpiry: tokens.refreshTokenExpiry,
       user: {
         id: user._id.toString(),
         name: user.name,
@@ -64,11 +100,14 @@ export class AuthService {
     }
 
     console.log(`✅ Login successful for email: ${email}`);
-    // Generate tokens
+    // Generate tokens with expiry dates
     const tokens = this.generateTokens(user._id.toString(), user.email);
 
     return {
-      ...tokens,
+      token: tokens.token,
+      refreshToken: tokens.refreshToken,
+      tokenExpiry: tokens.tokenExpiry,
+      refreshTokenExpiry: tokens.refreshTokenExpiry,
       user: {
         id: user._id.toString(),
         name: user.name,
@@ -79,7 +118,7 @@ export class AuthService {
     };
   }
 
-  async refreshToken(refreshToken: string): Promise<{ token: string }> {
+  async refreshToken(refreshToken: string): Promise<{ token: string; tokenExpiry?: Date }> {
     const jwtRefreshSecret = envVars.JWT_REFRESH_SECRET;
 
     try {
@@ -90,16 +129,13 @@ export class AuthService {
         throw createError('Invalid refresh token', 401);
       }
 
-      // Generate new access token
-      const jwtSecret = envVars.JWT_SECRET;
+      // Generate new access token with expiry info
+      const tokens = this.generateTokens(user._id.toString(), user.email);
 
-      const token = jwt.sign(
-        { userId: decoded.userId, email: decoded.email },
-        jwtSecret,
-        { expiresIn: '7d' }
-      );
-
-      return { token };
+      return {
+        token: tokens.token,
+        tokenExpiry: tokens.tokenExpiry
+      };
     } catch (error) {
       throw createError('Invalid refresh token', 401);
     }
