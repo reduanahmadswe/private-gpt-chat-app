@@ -2,6 +2,7 @@ import { Clock, MessageCircle } from "lucide-react";
 import React from "react";
 import { Message } from "../../../../hooks/useChat";
 import MarkdownMessage from "../../../MarkdownMessage";
+import MessageTimestamp from "../../../MessageTimestamp";
 import MessageActions from "./MessageActions";
 
 interface SingleMessageProps {
@@ -28,17 +29,12 @@ const SingleMessage: React.FC<SingleMessageProps> = ({
 }) => {
   const isUser = message.role === "user";
 
-  // Format timestamp
-  const timestamp = new Date().toLocaleTimeString([], {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-
   return (
     <div
       className={`flex w-full mb-2 sm:mb-3 animate-slideUp ${
         isUser ? "justify-end" : "justify-start"
       }`}
+      style={{ willChange: "transform" }} // Optimize for animations
     >
       <div
         className={`flex items-start max-w-[95%] xs:max-w-[90%] sm:max-w-[85%] md:max-w-[80%] lg:max-w-[75%] xl:max-w-[70%] ${
@@ -94,9 +90,12 @@ const SingleMessage: React.FC<SingleMessageProps> = ({
               {/* Timestamp */}
               <div className="flex items-center gap-1">
                 <Clock className="h-2.5 w-2.5 sm:h-3 sm:w-3 opacity-60" />
-                <span className="text-[10px] sm:text-xs opacity-60 mobile-text-sm">
-                  {timestamp}
-                </span>
+                <MessageTimestamp
+                  messageId={`${
+                    message.role
+                  }-${messageIndex}-${message.content.substring(0, 20)}`}
+                  className="text-[10px] sm:text-xs opacity-60 mobile-text-sm"
+                />
               </div>
 
               {/* Message Actions (for assistant messages) */}

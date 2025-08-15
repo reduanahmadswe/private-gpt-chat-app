@@ -1,0 +1,47 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle with Gradient -->
+  <defs>
+    <linearGradient id="bg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#030637;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0d47a1;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="glow-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f5ff;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#4fc3f7;stop-opacity:0.6" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <circle cx="256" cy="256" r="250" fill="url(#bg-gradient)" stroke="url(#glow-gradient)" stroke-width="12"/>
+  
+  <!-- Chat Bubble Icon -->
+  <g transform="translate(128, 150)">
+    <!-- Main Chat Bubble -->
+    <path d="M48 0h160c26.51 0 48 21.49 48 48v96c0 26.51-21.49 48-48 48h-96l-48 48v-48c-26.51 0-48-21.49-48-48V48c0-26.51 21.49-48 48-48z" 
+          fill="url(#glow-gradient)" opacity="0.9"/>
+    
+    <!-- AI Brain Symbol -->
+    <circle cx="128" cy="72" r="35" fill="none" stroke="#ffffff" stroke-width="3" opacity="0.8"/>
+    <circle cx="118" cy="62" r="4" fill="#ffffff"/>
+    <circle cx="138" cy="62" r="4" fill="#ffffff"/>
+    <circle cx="128" cy="82" r="6" fill="#ffffff" opacity="0.7"/>
+    
+    <!-- Connection Lines (Neural Network) -->
+    <line x1="93" y1="72" x2="107" y2="72" stroke="#ffffff" stroke-width="2" opacity="0.6"/>
+    <line x1="149" y1="72" x2="163" y2="72" stroke="#ffffff" stroke-width="2" opacity="0.6"/>
+    <line x1="128" y1="37" x2="128" y2="51" stroke="#ffffff" stroke-width="2" opacity="0.6"/>
+    <line x1="128" y1="93" x2="128" y2="107" stroke="#ffffff" stroke-width="2" opacity="0.6"/>
+  </g>
+  
+  <!-- Chat Text Lines -->
+  <g opacity="0.7">
+    <rect x="180" y="280" width="80" height="8" rx="4" fill="#00f5ff"/>
+    <rect x="180" y="300" width="120" height="8" rx="4" fill="#4fc3f7"/>
+    <rect x="180" y="320" width="60" height="8" rx="4" fill="#81d4fa"/>
+  </g>
+  
+  <!-- Floating Elements -->
+  <circle cx="400" cy="120" r="8" fill="#00f5ff" opacity="0.6"/>
+  <circle cx="100" cy="400" r="6" fill="#4fc3f7" opacity="0.7"/>
+  <circle cx="420" cy="380" r="10" fill="#81d4fa" opacity="0.5"/>
+</svg>

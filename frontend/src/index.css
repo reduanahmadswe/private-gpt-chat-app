@@ -98,6 +98,8 @@
   .scrollbar-thin {
     scrollbar-width: thin;
     scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
   }
 
   .scrollbar-thin::-webkit-scrollbar {
@@ -111,10 +113,39 @@
   .scrollbar-thin::-webkit-scrollbar-thumb {
     background-color: rgba(255, 255, 255, 0.2);
     border-radius: 3px;
+    transition: background-color 0.2s ease;
   }
 
   .scrollbar-thin::-webkit-scrollbar-thumb:hover {
     background-color: rgba(255, 255, 255, 0.3);
+  }
+
+  /* Enhanced smooth scrolling for better performance */
+  .webkit-scrolling-touch {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    will-change: scroll-position;
+    transform: translateZ(0); /* Force hardware acceleration */
+  }
+
+  /* Ultra smooth scrolling class */
+  .ultra-smooth-scroll {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    will-change: scroll-position;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000;
+    -webkit-transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    -webkit-perspective: 1000;
+  }
+
+  /* Optimize scroll performance */
+  .scroll-optimized {
+    contain: layout style paint;
+    content-visibility: auto;
+    contain-intrinsic-size: auto 500px;
   }
 
   /* Chat animations */

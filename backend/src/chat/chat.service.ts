@@ -25,10 +25,10 @@ export class ChatService {
 
     // Try premium models first for better responses, then fallback to free models
     const models = [
-      'anthropic/claude-3.5-sonnet', // Premium model - detailed responses
-      'anthropic/claude-3-haiku', // Faster premium model
-      'openai/gpt-4o-mini', // OpenAI premium model
+      'openai/gpt-4o-mini', // Fast and reliable OpenAI model
+      'anthropic/claude-3-haiku', // Fast premium model
       'openai/gpt-3.5-turbo', // Popular OpenAI model
+      'anthropic/claude-3.5-sonnet', // Premium model - detailed responses
       'google/gemma-2-9b-it:free', // Free fallback
       'microsoft/phi-3-mini-128k-instruct:free', // Free fallback
     ];
@@ -40,7 +40,7 @@ export class ChatService {
       try {
         // Create AbortController for timeout
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 20000); // Increased to 20 seconds for premium models
+        const timeoutId = setTimeout(() => controller.abort(), 30000); // Increased to 30 seconds
 
         const response = await fetch(`${baseURL}/chat/completions`, {
           method: 'POST',
@@ -57,9 +57,69 @@ export class ChatService {
                 role: 'system',
                 content: `You are AI Bondhu - a friendly, helpful Bengali AI companion. 
 
+CURRENT DATE CONTEXT:
+- Today's date is: ${new Date().toLocaleDateString('en-GB', {
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric'
+                })} (${new Date().toLocaleDateString('bn-BD', {
+                  weekday: 'long',
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric'
+                })})
+- Current time is: ${new Date().toLocaleTimeString('en-US', {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  timeZone: 'Asia/Dhaka'
+                })} Bangladesh Time
+- Current year: ${new Date().getFullYear()}
+
 IDENTITY RULES (ALWAYS FOLLOW):
 - Your name is "AI Bondhu" 
 - You are a friendly, intelligent Bengali companion
+
+DEVELOPER INFORMATION:
+- Developer Name: Reduan Ahmad
+- Developer Profile: Full-Stack Developer & AI Enthusiast
+- GitHub: https://github.com/reduanahmadswe
+- LinkedIn: https://linkedin.com/in/reduanahmadswe
+- Email: reduanahmadswe@gmail.com
+- Facebook: https://facebook.com/reduanahmadswe
+- Location: Bangladesh 🇧🇩
+- Specialization: React, Node.js, Python, AI/ML, Mobile App Development
+- This app: "Private GPT Chat" - A secure, privacy-focused AI chat application
+- App Features: Real-time chat, voice integration, OAuth authentication, mobile-responsive design
+
+CRITICAL DEVELOPER RESPONSE RULES (ALWAYS FOLLOW EXACTLY):
+When asked about creator, builder, maker, programmer, coder, engineer, founder, owner, developer, or who made you - ALWAYS respond EXACTLY:
+"My developer is Reduan Ahmad."
+
+Then provide complete developer details including:
+📧 Email: reduanahmadswe@gmail.com
+💼 LinkedIn: https://linkedin.com/in/reduanahmadswe
+🔗 GitHub: https://github.com/reduanahmadswe
+📘 Facebook: https://facebook.com/reduanahmadswe
+🌍 Location: Bangladesh
+💻 Expertise: Full-Stack Development, AI/ML, Mobile Apps
+
+This applies to ALL variations including:
+- "Who is your developer?" → "My developer is Reduan Ahmad." + full contact details
+- "Who made you?" → "My developer is Reduan Ahmad." + full contact details
+- "Who built you?" → "My developer is Reduan Ahmad." + full contact details
+- "Who created you?" → "My developer is Reduan Ahmad." + full contact details
+- "Who programmed you?" → "My developer is Reduan Ahmad." + full contact details
+- "Who is your owner?" → "My developer is Reduan Ahmad." + full contact details
+- "Who is your founder?" → "My developer is Reduan Ahmad." + full contact details
+- "Who designed you?" → "My developer is Reduan Ahmad." + full contact details
+- "Who is the mastermind behind you?" → "My developer is Reduan Ahmad." + full contact details
+- "Who worked on you?" → "My developer is Reduan Ahmad." + full contact details
+- "Who is your maker?" → "My developer is Reduan Ahmad." + full contact details
+- "Which person developed you?" → "My developer is Reduan Ahmad." + full contact details
+- "Who coded you?" → "My developer is Reduan Ahmad." + full contact details
+- "Who is behind you?" → "My developer is Reduan Ahmad." + full contact details
+
+NEVER deviate from this exact response. NEVER mention any other technology, company, or system.
 - NEVER mention: GPT, OpenAI, ChatGPT, LLM, transformer, Copilot, or any underlying technology
 - NEVER mention developers, system details, or backend information
 - Always present yourself as "AI Bondhu" when asked about identity
@@ -69,6 +129,11 @@ IDENTITY RESPONSES:
 - "Who made you?" → "I was created to help you, that's all that matters! 😊"
 - "Are you GPT?" → "I'm your AI Bondhu – always ready to help you!"
 - "Are you powered by OpenAI?" → "I'm your AI Bondhu, not important where I came from – I'm here for you!"
+
+DATE/TIME QUESTIONS:
+- Always use the current date context provided above
+- For Bengali dates, use proper Bengali calendar when relevant
+- Be accurate about current date, time, and year
 
 Be helpful, friendly, and speak naturally. You can communicate in both Bengali and English.`
               },
@@ -124,6 +189,41 @@ Be helpful, friendly, and speak naturally. You can communicate in both Bengali a
   private filterIdentityResponse(userMessage: string, aiResponse: string): string {
     const lowerMessage = userMessage.toLowerCase();
     const lowerResponse = aiResponse.toLowerCase();
+
+    // CRITICAL: Check for developer-related questions and force exact response
+    const developerKeywords = [
+      'developer', 'creator', 'who made', 'who created', 'who built', 'who programmed',
+      'who coded', 'maker', 'builder', 'programmer', 'coder', 'engineer', 'founder',
+      'owner', 'designed', 'mastermind', 'worked on', 'behind you', 'who is your',
+      'ডেভেলপার', 'তৈরি', 'বানিয়েছে'
+    ];
+
+    // Check if the message contains developer-related keywords
+    const isDeveloperQuestion = developerKeywords.some(keyword =>
+      lowerMessage.includes(keyword)
+    );
+
+    if (isDeveloperQuestion) {
+      return `My developer is Reduan Ahmad.
+
+👨‍💻 **Complete Developer Information:**
+
+**📧 Email**: reduanahmadswe@gmail.com
+**💼 LinkedIn**: https://linkedin.com/in/reduanahmadswe  
+**🔗 GitHub**: https://github.com/reduanahmadswe
+**📘 Facebook**: https://facebook.com/reduanahmadswe
+**🌍 Location**: Bangladesh 🇧🇩
+**💻 Expertise**: Full-Stack Development, AI/ML, Mobile Apps
+
+**About Reduan Ahmad:**
+- Full-Stack Developer & AI Enthusiast
+- Specializes in React, Node.js, Python, AI/ML
+- Creator of "Private GPT Chat" application
+- Based in Bangladesh
+- Passionate about building innovative AI solutions
+
+Feel free to connect with him on any of these platforms for collaboration opportunities or feedback about this application!`;
+    }
 
     // Define identity-related keywords
     const identityKeywords = [
@@ -190,6 +290,38 @@ Be helpful, friendly, and speak naturally. You can communicate in both Bengali a
     // Simple keyword-based responses when AI is down
     const lowerMessage = message.toLowerCase();
 
+    // Date/time related questions
+    if (lowerMessage.includes('date') || lowerMessage.includes('today') || lowerMessage.includes('তারিখ') || lowerMessage.includes('আজকের') || lowerMessage.includes('আজ') || lowerMessage.includes('কত তারিখ')) {
+      const today = new Date();
+      const banglaDate = today.toLocaleDateString('bn-BD', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      });
+      const englishDate = today.toLocaleDateString('en-GB', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      });
+      const currentTime = today.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        timeZone: 'Asia/Dhaka'
+      });
+
+      return `📅 **Current Date & Time Information:**
+
+🗓️ **Today's Date**: ${englishDate}
+🗓️ **আজকের তারিখ**: ${banglaDate}
+🕐 **Current Time**: ${currentTime} (Bangladesh Time)
+📊 **Year**: ${today.getFullYear()}
+
+I'm your AI Bondhu, and even though my main systems are temporarily experiencing high demand, I can still provide you with accurate date and time information!
+
+Is there anything specific about today's date or any other day you'd like to know about?`;
+    }
+
     if (lowerMessage.includes('hello') || lowerMessage.includes('hi') || lowerMessage.includes('হাই') || lowerMessage.includes('হ্যালো')) {
       return `Hello! Nice to meet you! 👋
 
@@ -224,6 +356,29 @@ I'm your AI Bondhu, and even though I'm experiencing some technical challenges r
 🚀 **What to expect**: My systems should be available shortly, and then I'll be able to provide you with comprehensive, detailed answers to any questions you have.
 
 How are you doing today? Feel free to ask me anything - I'll do my best to help once I'm back online!`;
+    }
+
+    // Developer-related questions - EXACT RESPONSE REQUIRED
+    if (lowerMessage.includes('developer') || lowerMessage.includes('creator') || lowerMessage.includes('who made') || lowerMessage.includes('who created') || lowerMessage.includes('who built') || lowerMessage.includes('who programmed') || lowerMessage.includes('who coded') || lowerMessage.includes('maker') || lowerMessage.includes('builder') || lowerMessage.includes('programmer') || lowerMessage.includes('coder') || lowerMessage.includes('engineer') || lowerMessage.includes('founder') || lowerMessage.includes('owner') || lowerMessage.includes('designed') || lowerMessage.includes('mastermind') || lowerMessage.includes('worked on') || lowerMessage.includes('behind you') || lowerMessage.includes('ডেভেলপার') || lowerMessage.includes('তৈরি') || lowerMessage.includes('বানিয়েছে')) {
+      return `My developer is Reduan Ahmad.
+
+👨‍💻 **Complete Developer Information:**
+
+**📧 Email**: reduanahmadswe@gmail.com
+**💼 LinkedIn**: https://linkedin.com/in/reduanahmadswe  
+**🔗 GitHub**: https://github.com/reduanahmadswe
+**📘 Facebook**: https://facebook.com/reduanahmadswe
+**🌍 Location**: Bangladesh 🇧🇩
+**💻 Expertise**: Full-Stack Development, AI/ML, Mobile Apps
+
+**About Reduan Ahmad:**
+- Full-Stack Developer & AI Enthusiast
+- Specializes in React, Node.js, Python, AI/ML
+- Creator of "Private GPT Chat" application
+- Based in Bangladesh
+- Passionate about building innovative AI solutions
+
+Feel free to connect with him on any of these platforms for collaboration opportunities or feedback about this application!`;
     }
 
     if (lowerMessage.includes('what') || lowerMessage.includes('কি') || lowerMessage.includes('কী')) {

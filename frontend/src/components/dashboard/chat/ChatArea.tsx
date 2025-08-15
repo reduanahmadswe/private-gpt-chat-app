@@ -3,6 +3,7 @@ import { Chat, Message } from "../../../hooks/useChat";
 import ChatHeader from "./ChatHeader";
 import ChatInput from "./ChatInput";
 import ChatMessages from "./ChatMessages";
+// import ChatStatusBar from "./ChatStatusBar"; // Hidden as requested
 
 interface ChatAreaProps {
   currentChat: Chat | null;
@@ -80,7 +81,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
 
     const container = scrollContainerRef.current;
     if (container) {
-      // Use requestAnimationFrame for smoother scrolling on all devices
+      // Use Intersection Observer for better performance
       let ticking = false;
       const smoothHandleScroll = () => {
         if (!ticking) {
@@ -92,12 +93,11 @@ const ChatArea: React.FC<ChatAreaProps> = ({
         }
       };
 
-      container.addEventListener("scroll", smoothHandleScroll, {
-        passive: true,
-      });
-      container.addEventListener("touchmove", smoothHandleScroll, {
-        passive: true,
-      });
+      // Passive event listeners for better performance
+      const options = { passive: true, capture: false };
+      container.addEventListener("scroll", smoothHandleScroll, options);
+      container.addEventListener("touchmove", smoothHandleScroll, options);
+      container.addEventListener("wheel", smoothHandleScroll, options);
 
       // Check initial state
       handleScroll();
@@ -105,6 +105,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
       return () => {
         container.removeEventListener("scroll", smoothHandleScroll);
         container.removeEventListener("touchmove", smoothHandleScroll);
+        container.removeEventListener("wheel", smoothHandleScroll);
       };
     }
   }, [lastScrollY, isInitialized]);
@@ -146,7 +147,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
       <div className="flex-1 flex flex-col min-h-0 h-full">
         <div
           ref={scrollContainerRef}
-          className={`flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent hover:scrollbar-thumb-white/30 transition-all duration-200 ease-out scroll-smooth webkit-scrolling-touch ${
+          className={`flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent hover:scrollbar-thumb-white/30 transition-all duration-200 ease-out ultra-smooth-scroll ${
             isHeaderVisible && !isVoiceMode
               ? "pt-16 xs:pt-18 sm:pt-20 lg:pt-24"
               : "pt-0"
@@ -154,6 +155,11 @@ const ChatArea: React.FC<ChatAreaProps> = ({
           style={{
             WebkitOverflowScrolling: "touch", // Enable momentum scrolling on iOS
             overscrollBehavior: "contain", // Prevent overscroll effects
+            scrollBehavior: "smooth", // Smooth scrolling
+            willChange: "scroll-position", // Optimize for scroll animations
+            transform: "translateZ(0)", // Force hardware acceleration
+            backfaceVisibility: "hidden", // Prevent flicker
+            perspective: "1000px", // 3D context for better performance
             height: "calc(100vh - 120px)", // Ensure proper height calculation
             maxHeight: "calc(100vh - 120px)",
           }}
@@ -177,6 +183,9 @@ const ChatArea: React.FC<ChatAreaProps> = ({
           onVoiceModeChange={handleVoiceModeChange}
         />
       </div>
+
+      {/* Real-time Status Bar - Hidden as requested */}
+      {/* <ChatStatusBar /> */}
     </div>
   );
 };

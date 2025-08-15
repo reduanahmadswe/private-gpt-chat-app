@@ -60,11 +60,22 @@ export const useChat = () => {
         setMessages(newMessages);
         setLoading(true);
 
+        // Set a timeout for the request
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => {
+            controller.abort();
+            toast.error("Response timeout! AI Bondhu is taking too long. Please try again.");
+        }, 35000); // 35 seconds timeout
+
         try {
             const response = await api.post("/api/chat", {
                 message: inputMessage,
                 chatId: currentChat?._id,
+            }, {
+                signal: controller.signal
             });
+
+            clearTimeout(timeoutId);
 
             // Add assistant message with streaming effect
             const assistantMessage: Message = {
@@ -107,7 +118,21 @@ export const useChat = () => {
                 fetchChats();
             }
         } catch (error: any) {
-            toast.error(error.response?.data?.message || "Failed to send message");
+            clearTimeout(timeoutId);
+
+            // Handle different types of errors
+            if (error.name === 'AbortError') {
+                toast.error("AI Bondhu response timed out. Please try again with a shorter message.");
+            } else if (error.response?.status === 429) {
+                toast.error("Too many requests. Please wait a moment and try again.");
+            } else if (error.response?.status >= 500) {
+                toast.error("AI Bondhu servers are busy. Please try again in a moment.");
+            } else {
+                toast.error(error.response?.data?.message || "Failed to send message. Please try again.");
+            }
+
+            // Remove the empty assistant message if request failed
+            setMessages(newMessages);
             setStreamingMessageIndex(null);
         } finally {
             setLoading(false);

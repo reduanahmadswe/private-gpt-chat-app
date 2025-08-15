@@ -35,15 +35,15 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
         clearTimeout(scrollTimeoutRef.current);
       }
 
-      // Set a small delay to batch scroll operations
-      scrollTimeoutRef.current = setTimeout(() => {
+      // Use requestAnimationFrame for smoother scrolling
+      const smoothScroll = () => {
         if (messagesEndRef.current) {
           isAutoScrolling.current = true;
 
-          // Use instant scroll during loading to prevent jittery behavior
+          // Use smooth scrolling with better performance
           messagesEndRef.current.scrollIntoView({
-            behavior: loading ? "instant" : "smooth",
-            block: "nearest",
+            behavior: "smooth",
+            block: "end",
             inline: "nearest",
           });
 
@@ -52,10 +52,13 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
             () => {
               isAutoScrolling.current = false;
             },
-            loading ? 0 : 300
+            150 // Reduced timeout for better responsiveness
           );
         }
-      }, 50);
+      };
+
+      // Use requestAnimationFrame for better performance
+      requestAnimationFrame(smoothScroll);
     }
 
     return () => {
@@ -81,7 +84,10 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
   return (
     <div className="flex-1 pb-4 xs:pb-6 sm:pb-8">
       <div className="min-h-full">
-        <div className="space-y-1 p-2 xs:p-3 sm:p-4 md:p-6 pb-4">
+        <div
+          className="space-y-1 p-2 xs:p-3 sm:p-4 md:p-6 pb-4 scroll-optimized"
+          style={{ willChange: "transform" }}
+        >
           {/* Welcome message if no messages */}
           {messages.length === 0 && !loading && (
             <div className="text-center py-12">
@@ -135,7 +141,10 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
           <div
             ref={messagesEndRef}
             className="h-1"
-            style={{ scrollMarginBottom: "10px" }}
+            style={{
+              scrollMarginBottom: "10px",
+              transform: "translateZ(0)", // Force hardware acceleration
+            }}
           />
         </div>
       </div>
