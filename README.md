@@ -12,7 +12,7 @@ A comprehensive, full-stack AI chat application built with React, Node.js, and T
 
 ## 🌟 **Live Demo**
 
-- **🌐 Web App**: [https://aibondhu.vercel.app](https://aibondhu.vercel.app)
+- **🌐 Web App**: [https://ai-bondhu-tau.vercel.app/](https://ai-bondhu-tau.vercel.app/)
 - **📱 Android APK**: Available on request
 - **🍎 iOS App**: Available on request
 
@@ -1065,6 +1065,6 @@ We'd love to hear your ideas! Please:
 
 [🐛 Report Bug](https://github.com/reduanahmadswe/private-gpt-chat-app/issues) • [✨ Request Feature](https://github.com/reduanahmadswe/private-gpt-chat-app/issues) • [📖 Documentation](https://github.com/reduanahmadswe/private-gpt-chat-app/wiki) • [📱 Download APK](https://github.com/reduanahmadswe/private-gpt-chat-app/releases)
 
-**🌐 Live Demo**: [https://aibondhu.vercel.app](https://aibondhu.vercel.app)
+**🌐 Live Demo**: [https://ai-bondhu-tau.vercel.app/](https://aibondhu.vercel.app)
 
 </div>
