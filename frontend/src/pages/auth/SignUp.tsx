@@ -81,9 +81,9 @@ const SignUp: React.FC = () => {
       </header>
 
       {/* Main Content */}
-      <div className="flex-1 flex items-center justify-center px-4 sm:px-6 py-8 sm:py-16">
+      <div className="flex-1 flex items-center justify-center px-4 sm:px-6 py-8 sm:py-12 pb-20 sm:pb-32">
         <div className="bg-gradient-to-br from-[#3C0753]/50 via-[#16213e]/30 to-[#030637]/50 backdrop-blur-xl border border-white/10 rounded-2xl sm:rounded-3xl p-6 sm:p-12 max-w-lg w-full shadow-2xl shadow-black/40">
-          <div className="text-center mb-8 sm:mb-10">
+          <div className="text-center mb-6 sm:mb-8">
             <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2 sm:mb-3 tracking-tight">
               Create Account
             </h1>
@@ -92,7 +92,7 @@ const SignUp: React.FC = () => {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
             <div className="relative">
               <User className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-[#E0E0E0]/60 transition-colors duration-300" />
               <input
@@ -195,7 +195,7 @@ const SignUp: React.FC = () => {
           </form>
 
           {/* Divider */}
-          <div className="mt-6 sm:mt-8 mb-4 sm:mb-6">
+          <div className="mt-5 sm:mt-6 mb-4 sm:mb-5">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-white/20"></div>

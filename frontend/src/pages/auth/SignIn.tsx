@@ -68,7 +68,7 @@ const SignIn: React.FC = () => {
       </header>
 
       {/* Main Content */}
-      <div className="flex-1 flex items-center justify-center px-4 sm:px-6 py-8 sm:py-12 md:py-16">
+      <div className="flex-1 flex items-center justify-center px-4 sm:px-6 py-8 sm:py-12 pb-20 sm:pb-32">
         <div className="bg-gradient-to-br from-[#3C0753]/50 via-[#16213e]/30 to-[#030637]/50 backdrop-blur-xl border border-white/10 rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-10 lg:p-12 max-w-md sm:max-w-lg w-full shadow-2xl shadow-black/40">
           <div className="text-center mb-6 sm:mb-8 md:mb-10">
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2 sm:mb-3 tracking-tight">
@@ -183,7 +183,7 @@ const SignIn: React.FC = () => {
             <FacebookLoginButton />
           </div>
 
-          <div className="mt-6 sm:mt-8 text-center">
+          <div className="mt-8 sm:mt-10 text-center pb-4">
             <p className="text-sm sm:text-base text-[#E0E0E0] font-light">
               Don't have an account?{" "}
               <Link

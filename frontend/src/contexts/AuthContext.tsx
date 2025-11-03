@@ -64,7 +64,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.log("🔔 Session expired event received");
       setUser(null);
       setIsSessionPersistent(false);
-      toast.error("Your session has expired. Please log in again.");
+      // Session expired message removed as per user request
     };
 
     const handleCrossTabLogin = async () => {
@@ -82,6 +82,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
     };
 
+    const handleLogout = () => {
+      console.log("🚪 Logout event received");
+      setUser(null);
+      setIsSessionPersistent(false);
+      // Don't show toast here as logout() already shows success message
+    };
+
     const handleCrossTabLogout = () => {
       console.log("🚪 Cross-tab logout event received");
       setUser(null);
@@ -90,13 +97,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
 
     authEventEmitter.on("sessionExpired", handleSessionExpired);
-    authEventEmitter.on("logout", handleSessionExpired);
+    authEventEmitter.on("logout", handleLogout);
     authEventEmitter.on("crossTabLogin", handleCrossTabLogin);
     authEventEmitter.on("crossTabLogout", handleCrossTabLogout);
 
     return () => {
       authEventEmitter.off("sessionExpired", handleSessionExpired);
-      authEventEmitter.off("logout", handleSessionExpired);
+      authEventEmitter.off("logout", handleLogout);
       authEventEmitter.off("crossTabLogin", handleCrossTabLogin);
       authEventEmitter.off("crossTabLogout", handleCrossTabLogout);
     };

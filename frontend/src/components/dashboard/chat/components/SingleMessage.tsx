@@ -31,16 +31,12 @@ const SingleMessage: React.FC<SingleMessageProps> = ({
 
   return (
     <div
-      className={`flex w-full mb-2 sm:mb-3 animate-slideUp ${
+      className={`flex w-full mb-3 sm:mb-4 animate-slideUp ${
         isUser ? "justify-end" : "justify-start"
       }`}
       style={{ willChange: "transform" }} // Optimize for animations
     >
-      <div
-        className={`flex items-start max-w-[95%] xs:max-w-[90%] sm:max-w-[85%] md:max-w-[80%] lg:max-w-[75%] xl:max-w-[70%] ${
-          isUser ? "flex-row-reverse" : "flex-row"
-        } gap-1 xs:gap-1.5 sm:gap-2`}
-      >
+      <div className={`flex items-start w-full ${isUser ? "flex-row-reverse" : "flex-row"} gap-2`}>
         {/* Assistant Avatar */}
         {!isUser && (
           <div className="bg-gradient-to-br from-slate-100/10 to-slate-200/10 rounded-full p-1.5 xs:p-2 sm:p-2.5 border border-white/10 flex-shrink-0 shadow-lg mobile-avatar">
@@ -60,13 +56,14 @@ const SingleMessage: React.FC<SingleMessageProps> = ({
         )}
 
         {/* Message Bubble */}
-        <div className="flex flex-col min-w-0 flex-1">
+        <div className="flex flex-col min-w-0 w-full max-w-[820px]">
           <div
-            className={`relative backdrop-blur-sm border shadow-lg px-2 xs:px-3 sm:px-4 py-2 xs:py-2.5 sm:py-3 rounded-lg xs:rounded-xl sm:rounded-2xl transition-all duration-300 hover:shadow-xl group mobile-chat-message ${
+            className={`relative backdrop-blur-sm border shadow-sm px-4 sm:px-6 py-3 sm:py-4 rounded-2xl transition-all duration-300 group mobile-chat-message w-full ${
               isUser
-                ? "bg-gradient-to-r from-blue-600/90 to-cyan-600/90 border-blue-500/50 text-white rounded-br-md"
-                : "bg-gradient-to-r from-slate-800/80 to-slate-700/80 border-slate-600/30 text-gray-100 rounded-bl-md"
+                ? "bg-gradient-to-r from-blue-600/95 to-cyan-500/90 border-blue-500/40 text-white rounded-br-2xl rounded-tl-2xl"
+                : "bg-gradient-to-r from-slate-900/90 to-slate-800/80 border-slate-700/30 text-gray-100 rounded-bl-2xl rounded-tr-2xl"
             }`}
+            style={{ wordBreak: 'break-word' }}
           >
             {/* Message Content */}
             <div className="relative">

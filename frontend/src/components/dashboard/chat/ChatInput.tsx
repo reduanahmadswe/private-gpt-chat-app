@@ -84,7 +84,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
       ) : (
         // Normal sticky layout for TextInput
         <div className="sticky bottom-0 left-0 right-0 px-1 xs:px-2 sm:px-4 md:px-6 lg:px-8 pt-2 xs:pt-3 sm:pt-4 pb-1 xs:pb-2 sm:pb-3 md:pb-4 safe-area-inset-bottom">
-          <div className="w-full max-w-4xl mx-auto flex flex-col space-y-1 xs:space-y-2 sm:space-y-3 md:space-y-4">
+          <div className="w-full max-w-3xl mx-auto flex flex-col space-y-1 xs:space-y-2 sm:space-y-3 md:space-y-4">
             <div className="relative">
               {/* Input Container */}
               <div className="bg-gradient-to-r from-slate-800/95 to-slate-700/95 backdrop-blur-xl rounded-lg xs:rounded-xl sm:rounded-2xl md:rounded-2xl lg:rounded-3xl border border-slate-600/50 shadow-2xl shadow-black/20 overflow-hidden">

@@ -84,10 +84,11 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
   return (
     <div className="flex-1 pb-4 xs:pb-6 sm:pb-8">
       <div className="min-h-full">
-        <div
-          className="space-y-1 p-2 xs:p-3 sm:p-4 md:p-6 pb-4 scroll-optimized"
-          style={{ willChange: "transform" }}
-        >
+        <div className="w-full flex justify-center">
+          <div
+            className="w-full max-w-3xl space-y-3 p-4 xs:p-5 sm:p-6 md:p-8 pb-6 scroll-optimized"
+            style={{ willChange: "transform" }}
+          >
           {/* Welcome message if no messages */}
           {messages.length === 0 && !loading && (
             <div className="text-center py-12">
@@ -135,17 +136,24 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
           ))}
 
           {/* Typing Indicator */}
-          {loading && <TypingIndicator />}
+          {loading && (
+            <div className="flex justify-center">
+              <div className="w-full max-w-3xl">
+                <TypingIndicator />
+              </div>
+            </div>
+          )}
 
           {/* Auto-scroll anchor - positioned to prevent layout jumps */}
           <div
             ref={messagesEndRef}
-            className="h-1"
+            className="h-2"
             style={{
-              scrollMarginBottom: "10px",
+              scrollMarginBottom: "20px",
               transform: "translateZ(0)", // Force hardware acceleration
             }}
           />
+          </div>
         </div>
       </div>
     </div>
