@@ -63,6 +63,9 @@ export const sessionManager = {
     getFallbackToken(): string | null {
         return localStorage.getItem('token') || sessionStorage.getItem('token')
     },
+    getFallbackRefreshToken(): string | null {
+        return localStorage.getItem('refreshToken') || sessionStorage.getItem('refreshToken')
+    },
 
     setFallbackTokens(token: string, refreshToken: string, rememberMe = false): void {
         const storage = rememberMe ? localStorage : sessionStorage
@@ -112,9 +115,21 @@ export const sessionManager = {
 
     async _performRefresh(): Promise<boolean> {
         try {
-            const response = await axios.post(`${API_BASE_URL}/api/auth/refresh`, {}, {
-                withCredentials: true // This will send HttpOnly cookies
+            // If cookies are not available (e.g. certain mobile/web environments),
+            // fall back to sending the stored refresh token in the request body.
+            const fallbackRefresh = this.getFallbackRefreshToken()
+            const body = fallbackRefresh ? { refreshToken: fallbackRefresh } : {}
+
+            const response = await axios.post(`${API_BASE_URL}/api/auth/refresh`, body, {
+                withCredentials: true // This will send HttpOnly cookies when available
             })
+
+            // If server returned a new access token and we're using fallback tokens,
+            // update the fallback access token so subsequent requests can use it.
+            if (response.data?.token && fallbackRefresh) {
+                // Keep the same refresh token in storage but update access token
+                this.setFallbackTokens(response.data.token, fallbackRefresh, true)
+            }
 
             return response.data.success
         } catch (error) {
